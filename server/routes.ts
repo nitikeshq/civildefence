@@ -1,10 +1,11 @@
-// Based on Replit Auth blueprint
+// Local password authentication
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertVolunteerSchema, insertIncidentSchema, insertInventorySchema } from "@shared/schema";
-import { requireRole } from "./middleware";
+import { setupAuth, hashPassword } from "./auth";
+import passport from "passport";
+import { insertVolunteerSchema, insertIncidentSchema, insertInventorySchema, insertUserSchema } from "@shared/schema";
+import { requireRole, isAuthenticated } from "./middleware";
 import { z } from "zod";
 
 // Validation schemas for mutations
@@ -35,11 +36,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await setupAuth(app);
 
   // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  app.post('/api/auth/signup', async (req, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
+      const { password, ...userData } = insertUserSchema.parse(req.body);
+      
+      // Check if username already exists
+      const existingUser = await storage.getUserByUsername(userData.username);
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+      
+      // Check if email already exists (if provided)
+      if (userData.email) {
+        const existingEmail = await storage.getUserByEmail(userData.email);
+        if (existingEmail) {
+          return res.status(400).json({ message: "Email already exists" });
+        }
+      }
+      
+      // Hash password and create user
+      const password_hash = await hashPassword(password);
+      const user = await storage.createUser({ ...userData, password_hash });
+      
+      // Don't return password_hash
+      const { password_hash: _, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (error: any) {
+      console.error("Error creating user:", error);
+      res.status(400).json({ message: error.message || "Failed to create user" });
+    }
+  });
+
+  app.post('/api/auth/login', passport.authenticate('local'), (req, res) => {
+    // If we get here, authentication was successful
+    const { password_hash, ...userWithoutPassword } = req.user as any;
+    res.json(userWithoutPassword);
+  });
+
+  app.post('/api/auth/logout', (req, res) => {
+    req.logout((err) => {
+      if (err) {
+        return res.status(500).json({ message: "Logout failed" });
+      }
+      res.json({ message: "Logged out successfully" });
+    });
+  });
+
+  app.get('/api/auth/me', isAuthenticated, async (req, res) => {
+    try {
+      const user = req.user as any;
+      const { password_hash, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
@@ -49,7 +96,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Volunteer routes
   app.post('/api/volunteers', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = (req.user as any).id;
       const volunteerData = insertVolunteerSchema.parse({ ...req.body, userId });
       const volunteer = await storage.createVolunteer(volunteerData);
       res.json(volunteer);
@@ -105,7 +152,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch('/api/volunteers/:id/status', isAuthenticated, requireRole("district_admin", "department_admin", "state_admin"), async (req: any, res) => {
     try {
       const validatedData = updateVolunteerStatusSchema.parse(req.body);
-      const approvedBy = req.user.claims.sub;
+      const approvedBy = (req.user as any).id;
       
       const volunteer = await storage.updateVolunteerStatus(
         req.params.id,
@@ -126,7 +173,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Incident routes
   app.post('/api/incidents', isAuthenticated, async (req: any, res) => {
     try {
-      const reportedBy = req.user.claims.sub;
+      const reportedBy = (req.user as any).id;
       const incidentData = insertIncidentSchema.parse({ ...req.body, reportedBy });
       const incident = await storage.createIncident(incidentData);
       res.json(incident);
@@ -139,8 +186,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/incidents', isAuthenticated, async (req: any, res) => {
     try {
       const { status, district, search } = req.query;
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
+      const user = req.user as any;
       
       let incidents;
       if (search) {
@@ -156,9 +202,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Regular users can only see incidents they reported
       // District admins see incidents from their district
       // Department and state admins see all
-      if (user?.role === "volunteer") {
-        incidents = incidents.filter((i: any) => i.reportedBy === userId);
-      } else if (user?.role === "district_admin" && user.district) {
+      if (user.role === "volunteer") {
+        incidents = incidents.filter((i: any) => i.reportedBy === user.id);
+      } else if (user.role === "district_admin" && user.district) {
         incidents = incidents.filter((i: any) => i.district === user.district);
       }
       
@@ -177,14 +223,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Check access: users can view incidents they reported, admins can view all in their scope
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
+      const user = req.user as any;
       
-      if (user?.role === "volunteer" && incident.reportedBy !== userId) {
+      if (user.role === "volunteer" && incident.reportedBy !== user.id) {
         return res.status(403).json({ message: "Forbidden - you can only view incidents you reported" });
       }
       
-      if (user?.role === "district_admin" && user.district && incident.district !== user.district) {
+      if (user.role === "district_admin" && user.district && incident.district !== user.district) {
         return res.status(403).json({ message: "Forbidden - you can only view incidents from your district" });
       }
       

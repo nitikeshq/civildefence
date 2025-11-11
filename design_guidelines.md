@@ -18,15 +18,18 @@
 - Secondary: 'Inter' for data tables and forms
 - Monospace: 'Roboto Mono' for codes and reference numbers
 
-**Type Scale**:
-- Mega headlines (Hero): text-5xl md:text-6xl lg:text-7xl, font-bold
-- Page titles: text-4xl md:text-5xl, font-bold
-- Section headers: text-3xl md:text-4xl, font-semibold
-- Card titles: text-xl md:text-2xl, font-semibold
-- Body large: text-lg, font-normal
-- Body regular: text-base, font-normal
-- Small text/captions: text-sm, font-normal
-- Metadata/labels: text-xs, font-medium, uppercase tracking-wide
+**Type Scale** (Increased for Government Accessibility):
+NOTE: All font sizes increased by 2-4px for better readability for senior government officials
+- Mega headlines (Hero): text-5xl md:text-6xl lg:text-7xl, font-bold (48-64px)
+- Page titles: text-4xl md:text-5xl, font-bold (40-48px)
+- Section headers: text-3xl md:text-4xl, font-semibold (32-40px)
+- Card titles: text-xl md:text-2xl, font-semibold (24-28px)
+- Body large: text-lg, font-normal (20px)
+- Body regular: text-base, font-normal (18px - INCREASED for accessibility)
+- Small text/captions: text-sm, font-normal (16px - INCREASED)
+- Metadata/labels: text-xs, font-medium, uppercase tracking-wide (14px - INCREASED)
+
+**Accessibility Note**: Base font size increased from 16px to 18px to accommodate senior government officials and meet enhanced WCAG AAA readability standards.
 
 **Hierarchy Rules**: Government names and official titles use heavier weights (font-bold). Department names use font-semibold with slight letter-spacing.
 

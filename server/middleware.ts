@@ -1,18 +1,21 @@
 import type { RequestHandler } from "express";
 import { storage } from "./storage";
 
+// Middleware to check if user is authenticated
+export const isAuthenticated: RequestHandler = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.status(401).json({ message: "Unauthorized - please login" });
+};
+
 // Middleware to check user roles
 export function requireRole(...allowedRoles: string[]): RequestHandler {
   return async (req: any, res, next) => {
     try {
-      const userId = req.user?.claims?.sub;
-      if (!userId) {
+      const user = req.user;
+      if (!user || !user.id) {
         return res.status(401).json({ message: "Unauthorized" });
-      }
-
-      const user = await storage.getUser(userId);
-      if (!user) {
-        return res.status(401).json({ message: "User not found" });
       }
 
       const userRole = user.role || "volunteer";

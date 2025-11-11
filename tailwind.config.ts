@@ -5,6 +5,19 @@ export default {
   content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
+      fontSize: {
+        xs: ['0.875rem', { lineHeight: '1.5' }],      // 14px (increased from 12px)
+        sm: ['1rem', { lineHeight: '1.5' }],          // 16px (increased from 14px)
+        base: ['1.125rem', { lineHeight: '1.6' }],    // 18px (increased from 16px)
+        lg: ['1.25rem', { lineHeight: '1.6' }],       // 20px (increased from 18px)
+        xl: ['1.5rem', { lineHeight: '1.6' }],        // 24px (increased from 20px)
+        '2xl': ['1.75rem', { lineHeight: '1.5' }],    // 28px (increased from 24px)
+        '3xl': ['2rem', { lineHeight: '1.4' }],       // 32px (increased from 30px)
+        '4xl': ['2.5rem', { lineHeight: '1.3' }],     // 40px (increased from 36px)
+        '5xl': ['3rem', { lineHeight: '1.2' }],       // 48px (increased from 48px)
+        '6xl': ['3.5rem', { lineHeight: '1.2' }],     // 56px (increased from 60px)
+        '7xl': ['4rem', { lineHeight: '1.1' }],       // 64px (increased from 72px)
+      },
       borderRadius: {
         lg: ".5625rem", /* 9px */
         md: ".375rem", /* 6px */

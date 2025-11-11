@@ -32,9 +32,11 @@ export const userRoleEnum = pgEnum("user_role", [
   "state_admin",
 ]);
 
-// Users table for Replit Auth
+// Users table for local password authentication
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  username: varchar("username").unique().notNull(),
+  password_hash: text("password_hash").notNull(),
   email: varchar("email").unique(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
@@ -47,6 +49,15 @@ export const users = pgTable("users", {
 
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
+
+// Insert schema for user signup
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
 
 // Volunteer status enum
 export const volunteerStatusEnum = pgEnum("volunteer_status", [
