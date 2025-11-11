@@ -263,14 +263,18 @@ export default function DistrictAdminDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 gap-2">
-                  <Button className="w-full" variant="default" data-testid="button-district-report">
-                    <FileText className="mr-2 h-4 w-4" />
-                    Generate District Report
-                  </Button>
-                  <Button className="w-full" variant="outline" data-testid="button-export-data">
-                    <FileText className="mr-2 h-4 w-4" />
-                    Export Data (Excel/PDF)
-                  </Button>
+                  <Link href="/mis-reports" asChild>
+                    <Button className="w-full" variant="default" data-testid="button-district-report">
+                      <FileText className="mr-2 h-4 w-4" />
+                      Generate District Report
+                    </Button>
+                  </Link>
+                  <Link href="/mis-reports" asChild>
+                    <Button className="w-full" variant="outline" data-testid="button-export-data">
+                      <FileText className="mr-2 h-4 w-4" />
+                      Export Data (Excel/PDF)
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>

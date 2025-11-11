@@ -289,38 +289,54 @@ export default function StateAdminDashboard() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                <Button className="w-full" variant="default" data-testid="button-volunteer-report">
-                  <FileText className="mr-2 h-4 w-4" />
-                  Volunteer Report
-                </Button>
-                <Button className="w-full" variant="outline" data-testid="button-incident-report">
-                  <FileText className="mr-2 h-4 w-4" />
-                  Incident Report
-                </Button>
-                <Button className="w-full" variant="outline" data-testid="button-inventory-report">
-                  <FileText className="mr-2 h-4 w-4" />
-                  Inventory Report
-                </Button>
-                <Button className="w-full" variant="outline" data-testid="button-district-report">
-                  <MapPin className="mr-2 h-4 w-4" />
-                  District Report
-                </Button>
-                <Button className="w-full" variant="outline" data-testid="button-export-excel">
-                  <Download className="mr-2 h-4 w-4" />
-                  Export to Excel
-                </Button>
-                <Button className="w-full" variant="outline" data-testid="button-export-pdf">
-                  <Download className="mr-2 h-4 w-4" />
-                  Export to PDF
-                </Button>
-                <Button className="w-full" variant="outline" data-testid="button-export-csv">
-                  <Download className="mr-2 h-4 w-4" />
-                  Export to CSV
-                </Button>
-                <Button className="w-full" variant="outline" data-testid="button-custom-report">
-                  <Settings className="mr-2 h-4 w-4" />
-                  Custom Report
-                </Button>
+                <Link href="/mis-reports" asChild>
+                  <Button className="w-full" variant="default" data-testid="button-volunteer-report">
+                    <FileText className="mr-2 h-4 w-4" />
+                    Volunteer Report
+                  </Button>
+                </Link>
+                <Link href="/mis-reports" asChild>
+                  <Button className="w-full" variant="outline" data-testid="button-incident-report">
+                    <FileText className="mr-2 h-4 w-4" />
+                    Incident Report
+                  </Button>
+                </Link>
+                <Link href="/mis-reports" asChild>
+                  <Button className="w-full" variant="outline" data-testid="button-inventory-report">
+                    <FileText className="mr-2 h-4 w-4" />
+                    Inventory Report
+                  </Button>
+                </Link>
+                <Link href="/mis-reports" asChild>
+                  <Button className="w-full" variant="outline" data-testid="button-district-report">
+                    <MapPin className="mr-2 h-4 w-4" />
+                    District Report
+                  </Button>
+                </Link>
+                <Link href="/mis-reports" asChild>
+                  <Button className="w-full" variant="outline" data-testid="button-export-excel">
+                    <Download className="mr-2 h-4 w-4" />
+                    Export to Excel
+                  </Button>
+                </Link>
+                <Link href="/mis-reports" asChild>
+                  <Button className="w-full" variant="outline" data-testid="button-export-pdf">
+                    <Download className="mr-2 h-4 w-4" />
+                    Export to PDF
+                  </Button>
+                </Link>
+                <Link href="/mis-reports" asChild>
+                  <Button className="w-full" variant="outline" data-testid="button-export-csv">
+                    <Download className="mr-2 h-4 w-4" />
+                    Export to CSV
+                  </Button>
+                </Link>
+                <Link href="/mis-reports" asChild>
+                  <Button className="w-full" variant="outline" data-testid="button-custom-report">
+                    <Settings className="mr-2 h-4 w-4" />
+                    Custom Report
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
