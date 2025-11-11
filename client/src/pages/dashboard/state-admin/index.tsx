@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import LogoutCard from "@/components/LogoutCard";
 import type { Volunteer, Incident, InventoryItem } from "@shared/schema";
 import { redirectToSignIn } from "@/lib/authRedirect";
 import { useToast } from "@/hooks/use-toast";
@@ -290,7 +291,7 @@ export default function StateAdminDashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="mb-8">
             <CardHeader>
               <CardTitle>MIS Reports & Data Export</CardTitle>
               <CardDescription>Comprehensive state-level reporting and analytics</CardDescription>
@@ -332,6 +333,8 @@ export default function StateAdminDashboard() {
               </div>
             </CardContent>
           </Card>
+
+          <LogoutCard />
         </div>
       </main>
 

@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import LogoutCard from "@/components/LogoutCard";
 import type { Volunteer, Incident, InventoryItem } from "@shared/schema";
 import { redirectToSignIn } from "@/lib/authRedirect";
 import { useToast } from "@/hooks/use-toast";
@@ -191,7 +192,7 @@ export default function DepartmentAdminDashboard() {
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 gap-6 mb-8">
             <Card>
               <CardHeader>
                 <CardTitle>Cumulative Statistics</CardTitle>
@@ -247,6 +248,8 @@ export default function DepartmentAdminDashboard() {
               </CardContent>
             </Card>
           </div>
+
+          <LogoutCard />
         </div>
       </main>
 
