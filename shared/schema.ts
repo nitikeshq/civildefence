@@ -50,14 +50,17 @@ export const users = pgTable("users", {
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 
-// Insert schema for user signup
+// Insert schema for user signup (client sends password, server creates password_hash)
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
+  password_hash: true,
   createdAt: true,
   updatedAt: true,
 }).extend({
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
+
+export type InsertUser = z.infer<typeof insertUserSchema>;
 
 // Volunteer status enum
 export const volunteerStatusEnum = pgEnum("volunteer_status", [

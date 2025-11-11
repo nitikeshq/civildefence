@@ -58,18 +58,14 @@ export default function Navigation() {
 
           <div className="hidden md:flex items-center gap-3">
             <Link href="/signin">
-              <a>
-                <Button variant="ghost" data-testid="button-signin">
-                  Sign In
-                </Button>
-              </a>
+              <Button variant="ghost" asChild data-testid="button-signin">
+                <a>Sign In</a>
+              </Button>
             </Link>
             <Link href="/signup">
-              <a>
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90" data-testid="button-signup">
-                  Sign Up
-                </Button>
-              </a>
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90" asChild data-testid="button-signup">
+                <a>Sign Up</a>
+              </Button>
             </Link>
           </div>
 
@@ -102,18 +98,14 @@ export default function Navigation() {
               Contact Us
             </Button>
             <Link href="/signin">
-              <a className="w-full">
-                <Button variant="ghost" className="w-full justify-start" data-testid="button-mobile-signin">
-                  Sign In
-                </Button>
-              </a>
+              <Button variant="ghost" className="w-full justify-start" asChild data-testid="button-mobile-signin">
+                <a>Sign In</a>
+              </Button>
             </Link>
             <Link href="/signup">
-              <a className="w-full">
-                <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90" data-testid="button-mobile-signup">
-                  Sign Up
-                </Button>
-              </a>
+              <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90" asChild data-testid="button-mobile-signup">
+                <a>Sign Up</a>
+              </Button>
             </Link>
           </div>
         )}
