@@ -77,7 +77,7 @@ export default function StateAdminDashboard() {
     <div className="min-h-screen flex flex-col">
       <Header />
       
-      <main className="flex-1 bg-muted/30">
+      <main id="main-content" className="flex-1 bg-muted/30">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground mb-2">

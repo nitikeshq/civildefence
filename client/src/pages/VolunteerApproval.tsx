@@ -204,7 +204,7 @@ export default function VolunteerApproval() {
     <div className="min-h-screen flex flex-col">
       <Header />
       
-      <main className="flex-1 bg-muted/30">
+      <main id="main-content" className="flex-1 bg-muted/30">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           <Link href="/">
             <Button variant="ghost" className="mb-6" data-testid="button-back">

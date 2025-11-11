@@ -285,4 +285,54 @@
   .border.hover-elevate:not(.no-hover-interaction-elevate)::after {
     inset: -1px;
   }
+
+  /* Accessibility: Font Size Controls */
+  html.font-normal {
+    font-size: 16px;
+  }
+
+  html.font-large {
+    font-size: 18px;
+  }
+
+  html.font-larger {
+    font-size: 20px;
+  }
+
+  /* Accessibility: High Contrast Mode */
+  html.high-contrast {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --border: 0 0% 20%;
+    --card: 0 0% 98%;
+    --card-foreground: 0 0% 0%;
+    --muted: 0 0% 85%;
+    --muted-foreground: 0 0% 10%;
+    --primary: 27 100% 40%;
+    --primary-foreground: 0 0% 100%;
+    --accent: 210 10% 85%;
+    --accent-foreground: 0 0% 0%;
+    --input: 0 0% 60%;
+  }
+
+  html.high-contrast.dark {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --border: 0 0% 80%;
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 100%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 95%;
+    --primary: 27 100% 60%;
+    --primary-foreground: 0 0% 0%;
+    --accent: 210 10% 20%;
+    --accent-foreground: 0 0% 100%;
+    --input: 0 0% 40%;
+  }
+
+  /* Screen Reader Mode Enhancements */
+  html[data-screen-reader="true"] *:focus {
+    outline: 3px solid hsl(var(--primary)) !important;
+    outline-offset: 2px !important;
+  }
 }
