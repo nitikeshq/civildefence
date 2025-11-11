@@ -200,7 +200,7 @@ export default function VolunteerRegistration() {
                         <FormItem>
                           <FormLabel>Date of Birth</FormLabel>
                           <FormControl>
-                            <Input {...field} type="date" data-testid="input-dob" />
+                            <Input {...field} value={field.value ?? ""} type="date" data-testid="input-dob" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -214,7 +214,7 @@ export default function VolunteerRegistration() {
                         <FormItem>
                           <FormLabel>Emergency Contact</FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="Emergency contact name" data-testid="input-emergency-contact" />
+                            <Input {...field} value={field.value ?? ""} placeholder="Emergency contact name" data-testid="input-emergency-contact" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -228,7 +228,7 @@ export default function VolunteerRegistration() {
                         <FormItem>
                           <FormLabel>Emergency Phone</FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="Emergency phone number" data-testid="input-emergency-phone" />
+                            <Input {...field} value={field.value ?? ""} placeholder="Emergency phone number" data-testid="input-emergency-phone" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -271,7 +271,7 @@ export default function VolunteerRegistration() {
                       <FormItem>
                         <FormLabel>Qualifications</FormLabel>
                         <FormControl>
-                          <Textarea {...field} placeholder="Enter educational and professional qualifications" data-testid="input-qualifications" />
+                          <Textarea {...field} value={field.value ?? ""} placeholder="Enter educational and professional qualifications" data-testid="input-qualifications" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -285,7 +285,7 @@ export default function VolunteerRegistration() {
                       <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                         <FormControl>
                           <Checkbox
-                            checked={field.value}
+                            checked={field.value ?? false}
                             onCheckedChange={field.onChange}
                             data-testid="checkbox-ex-serviceman"
                           />
@@ -307,7 +307,7 @@ export default function VolunteerRegistration() {
                         <FormItem>
                           <FormLabel>Service History</FormLabel>
                           <FormControl>
-                            <Textarea {...field} placeholder="Enter service history details" data-testid="input-service-history" />
+                            <Textarea {...field} value={field.value ?? ""} placeholder="Enter service history details" data-testid="input-service-history" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -322,7 +322,7 @@ export default function VolunteerRegistration() {
                       <FormItem>
                         <FormLabel>Medical History</FormLabel>
                         <FormControl>
-                          <Textarea {...field} placeholder="Enter any relevant medical history" data-testid="input-medical-history" />
+                          <Textarea {...field} value={field.value ?? ""} placeholder="Enter any relevant medical history" data-testid="input-medical-history" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import type { Volunteer } from "@shared/schema";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,7 +35,7 @@ export default function VolunteerApproval() {
   const { toast } = useToast();
   const { user, isAuthenticated, isLoading } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedVolunteer, setSelectedVolunteer] = useState<any>(null);
+  const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [showRejectDialog, setShowRejectDialog] = useState(false);
 
@@ -52,7 +53,7 @@ export default function VolunteerApproval() {
     }
   }, [isAuthenticated, isLoading, toast]);
 
-  const { data: volunteers } = useQuery({
+  const { data: volunteers = [] } = useQuery<Volunteer[]>({
     queryKey: ["/api/volunteers", searchQuery],
     queryFn: async () => {
       const url = searchQuery 
@@ -139,7 +140,7 @@ export default function VolunteerApproval() {
     approveMutation.mutate(volunteerId);
   };
 
-  const handleReject = (volunteer: any) => {
+  const handleReject = (volunteer: Volunteer) => {
     setSelectedVolunteer(volunteer);
     setShowRejectDialog(true);
   };
@@ -153,6 +154,7 @@ export default function VolunteerApproval() {
       });
       return;
     }
+    if (!selectedVolunteer) return;
     rejectMutation.mutate({ id: selectedVolunteer.id, reason: rejectionReason });
   };
 
@@ -244,16 +246,16 @@ export default function VolunteerApproval() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {volunteers && volunteers.length > 0 ? (
-                      volunteers.map((volunteer: any) => (
+                    {volunteers.length > 0 ? (
+                      volunteers.map(volunteer => (
                         <TableRow key={volunteer.id} data-testid={`row-volunteer-${volunteer.id}`}>
                           <TableCell className="font-medium">{volunteer.fullName}</TableCell>
                           <TableCell>{volunteer.email}</TableCell>
                           <TableCell>{volunteer.phone}</TableCell>
                           <TableCell>{volunteer.district}</TableCell>
                           <TableCell>
-                            <Badge className={getStatusColor(volunteer.status)}>
-                              {volunteer.status}
+                            <Badge className={getStatusColor(volunteer.status ?? "pending")}>
+                              {volunteer.status ?? "pending"}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-right">

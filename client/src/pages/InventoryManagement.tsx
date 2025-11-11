@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import type { InventoryItem } from "@shared/schema";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,7 +41,7 @@ export default function InventoryManagement() {
     }
   }, [isAuthenticated, isLoading, toast]);
 
-  const { data: inventory } = useQuery({
+  const { data: inventory = [] } = useQuery<InventoryItem[]>({
     queryKey: ["/api/inventory", searchQuery],
     queryFn: async () => {
       const url = searchQuery 
@@ -140,19 +141,19 @@ export default function InventoryManagement() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {inventory && inventory.length > 0 ? (
-                      inventory.map((item: any) => (
+                    {inventory.length > 0 ? (
+                      inventory.map(item => (
                         <TableRow key={item.id} data-testid={`row-inventory-${item.id}`}>
                           <TableCell className="font-medium">{item.name}</TableCell>
                           <TableCell>
-                            <Badge className={getCategoryColor(item.category)}>
-                              {item.category.replace(/_/g, " ")}
+                            <Badge className={getCategoryColor(item.category ?? "other")}>
+                              {item.category?.replace(/_/g, " ") ?? "other"}
                             </Badge>
                           </TableCell>
                           <TableCell>{item.quantity}</TableCell>
                           <TableCell>
-                            <Badge className={getConditionColor(item.condition)}>
-                              {item.condition.replace(/_/g, " ")}
+                            <Badge className={getConditionColor(item.condition ?? "fair")}>
+                              {item.condition?.replace(/_/g, " ") ?? "fair"}
                             </Badge>
                           </TableCell>
                           <TableCell>{item.location}</TableCell>

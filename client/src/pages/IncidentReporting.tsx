@@ -190,7 +190,7 @@ export default function IncidentReporting() {
                         <FormItem>
                           <FormLabel>Latitude (Optional)</FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="GPS latitude" data-testid="input-latitude" />
+                            <Input {...field} value={field.value ?? ""} placeholder="GPS latitude" data-testid="input-latitude" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -204,7 +204,7 @@ export default function IncidentReporting() {
                         <FormItem>
                           <FormLabel>Longitude (Optional)</FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="GPS longitude" data-testid="input-longitude" />
+                            <Input {...field} value={field.value ?? ""} placeholder="GPS longitude" data-testid="input-longitude" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -218,7 +218,7 @@ export default function IncidentReporting() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Severity Level *</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} defaultValue={field.value ?? "medium"}>
                           <FormControl>
                             <SelectTrigger data-testid="select-severity">
                               <SelectValue placeholder="Select severity" />

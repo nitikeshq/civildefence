@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import type { Volunteer, Incident, InventoryItem } from "@shared/schema";
 import { 
   Users, 
   AlertTriangle, 
@@ -37,15 +38,15 @@ export default function Dashboard() {
     }
   }, [isAuthenticated, isLoading, toast]);
 
-  const { data: volunteers } = useQuery({ 
+  const { data: volunteers = [] } = useQuery<Volunteer[]>({ 
     queryKey: ["/api/volunteers"],
     enabled: isAuthenticated 
   });
-  const { data: incidents } = useQuery({ 
+  const { data: incidents = [] } = useQuery<Incident[]>({ 
     queryKey: ["/api/incidents"],
     enabled: isAuthenticated 
   });
-  const { data: inventory } = useQuery({ 
+  const { data: inventory = [] } = useQuery<InventoryItem[]>({ 
     queryKey: ["/api/inventory"],
     enabled: isAuthenticated 
   });
@@ -62,8 +63,8 @@ export default function Dashboard() {
     window.location.href = "/api/logout";
   };
 
-  const pendingVolunteers = volunteers?.filter((v: any) => v.status === "pending") || [];
-  const activeIncidents = incidents?.filter((i: any) => i.status !== "closed") || [];
+  const pendingVolunteers = volunteers.filter(v => v.status === "pending");
+  const activeIncidents = incidents.filter(i => i.status !== "closed");
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -104,7 +105,7 @@ export default function Dashboard() {
               <CardContent>
                 <div className="text-2xl font-bold" data-testid="text-incident-count">{activeIncidents.length}</div>
                 <p className="text-xs text-muted-foreground">
-                  {incidents?.length || 0} total reported
+                  {incidents.length} total reported
                 </p>
               </CardContent>
             </Card>
@@ -115,7 +116,7 @@ export default function Dashboard() {
                 <Package className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold" data-testid="text-inventory-count">{inventory?.length || 0}</div>
+                <div className="text-2xl font-bold" data-testid="text-inventory-count">{inventory.length}</div>
                 <p className="text-xs text-muted-foreground">
                   Equipment and supplies
                 </p>
