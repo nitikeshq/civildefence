@@ -30,7 +30,7 @@ export default function Header() {
   return (
     <div className="bg-background border-b-4 border-primary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-4">
             <img
               src={odishaLogo}
@@ -49,7 +49,7 @@ export default function Header() {
             </p>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col items-end gap-3">
             <div className="flex flex-col items-center gap-2">
               <img
                 src={cmPhoto}
@@ -63,7 +63,7 @@ export default function Header() {
             </div>
 
             {user && (
-              <div className="flex flex-col items-end gap-2">
+              <div className="flex items-center gap-3 border-t pt-3">
                 <div className="flex items-center gap-2 text-sm">
                   <User className="h-4 w-4 text-muted-foreground" />
                   <div className="text-right">
