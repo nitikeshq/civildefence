@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
@@ -13,15 +14,16 @@ import {
   Users, 
   AlertTriangle, 
   Package, 
-  TrendingUp,
+  Activity,
   FileText,
   Download,
-  BarChart3,
-  Activity
+  Settings,
+  UserCheck,
+  MapPin,
+  GraduationCap,
+  Plus
 } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, ComposedChart, Area } from "recharts";
-
-const COLORS = ['#FF6B35', '#004E89', '#F77F00', '#06A77D', '#8338EC', '#06FFA5'];
+import { Badge } from "@/components/ui/badge";
 
 export default function StateAdminDashboard() {
   const { toast } = useToast();
@@ -64,52 +66,12 @@ export default function StateAdminDashboard() {
     );
   }
 
-  const approvedVolunteers = volunteers.filter(v => v.status === "approved");
   const pendingVolunteers = volunteers.filter(v => v.status === "pending");
+  const approvedVolunteers = volunteers.filter(v => v.status === "approved");
   const activeIncidents = incidents.filter(i => i.status !== "closed");
-  const resolvedIncidents = incidents.filter(i => i.status === "resolved" || i.status === "closed");
-
-  // State-wide district distribution
-  const districtData = Array.from(new Set(volunteers.map(v => v.district))).map(district => ({
-    name: district,
-    volunteers: volunteers.filter(v => v.district === district).length,
-    incidents: incidents.filter(i => i.district === district).length,
-    inventory: inventory.filter(i => i.district === district).length,
-  }));
-
-  // Volunteer demographics
-  const volunteerTypes = [
-    { name: "Ex-Servicemen", value: volunteers.filter(v => v.isExServiceman).length },
-    { name: "Civilians", value: volunteers.filter(v => !v.isExServiceman).length },
-  ];
-
-  // Incident severity state-wide
-  const incidentSeverityData = [
-    { severity: "Low", count: incidents.filter(i => i.severity === "low").length },
-    { severity: "Medium", count: incidents.filter(i => i.severity === "medium").length },
-    { severity: "High", count: incidents.filter(i => i.severity === "high").length },
-    { severity: "Critical", count: incidents.filter(i => i.severity === "critical").length },
-  ];
-
-  // Inventory by category
-  const inventoryByCategory = [
-    { category: "Medical", count: inventory.filter(i => i.category === "medical_supplies").length },
-    { category: "Communication", count: inventory.filter(i => i.category === "communication_equipment").length },
-    { category: "Rescue", count: inventory.filter(i => i.category === "rescue_equipment").length },
-    { category: "Vehicles", count: inventory.filter(i => i.category === "vehicles").length },
-    { category: "Safety", count: inventory.filter(i => i.category === "safety_gear").length },
-    { category: "Other", count: inventory.filter(i => i.category === "other").length },
-  ];
-
-  // Monthly performance data
-  const performanceData = [
-    { month: "Jan", volunteers: 145, incidents: 32, resolved: 28 },
-    { month: "Feb", volunteers: 162, incidents: 45, resolved: 40 },
-    { month: "Mar", volunteers: 181, incidents: 38, resolved: 35 },
-    { month: "Apr", volunteers: 203, incidents: 42, resolved: 39 },
-    { month: "May", volunteers: 225, incidents: 50, resolved: 46 },
-    { month: "Jun", volunteers: volunteers.length, incidents: incidents.length, resolved: resolvedIncidents.length },
-  ];
+  const criticalIncidents = incidents.filter(i => i.severity === "critical");
+  
+  const districts = Array.from(new Set(volunteers.map(v => v.district)));
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -122,10 +84,11 @@ export default function StateAdminDashboard() {
               State Administration Dashboard
             </h1>
             <p className="text-muted-foreground">
-              Comprehensive oversight of all Civil Defence operations across Odisha
+              Comprehensive management of Civil Defence operations across Odisha
             </p>
           </div>
 
+          {/* Key Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
@@ -142,197 +105,285 @@ export default function StateAdminDashboard() {
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Incidents</CardTitle>
+                <CardTitle className="text-sm font-medium">Active Incidents</CardTitle>
                 <AlertTriangle className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{incidents.length}</div>
+                <div className="text-2xl font-bold">{activeIncidents.length}</div>
                 <p className="text-xs text-muted-foreground">
-                  {activeIncidents.length} active, {resolvedIncidents.length} resolved
+                  {criticalIncidents.length} critical incidents
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">State Inventory</CardTitle>
+                <CardTitle className="text-sm font-medium">Equipment</CardTitle>
                 <Package className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{inventory.length}</div>
                 <p className="text-xs text-muted-foreground">
-                  Equipment across state
+                  Items across state
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Districts Active</CardTitle>
+                <CardTitle className="text-sm font-medium">Districts</CardTitle>
                 <Activity className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{districtData.length}</div>
+                <div className="text-2xl font-bold">{districts.length}</div>
                 <p className="text-xs text-muted-foreground">
-                  Odisha state coverage
+                  Active coverage
                 </p>
               </CardContent>
             </Card>
           </div>
 
+          {/* Management Sections */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* Volunteer Management */}
             <Card>
               <CardHeader>
-                <CardTitle>District-wise Resource Distribution</CardTitle>
-                <CardDescription>Comprehensive view across all districts</CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <UserCheck className="h-5 w-5" />
+                  Volunteer Management
+                </CardTitle>
+                <CardDescription>
+                  Approve registrations and manage volunteer database
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={350}>
-                  <BarChart data={districtData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="volunteers" fill="#004E89" name="Volunteers" />
-                    <Bar dataKey="incidents" fill="#FF6B35" name="Incidents" />
-                    <Bar dataKey="inventory" fill="#06A77D" name="Inventory" />
-                  </BarChart>
-                </ResponsiveContainer>
+                <div className="space-y-3">
+                  {pendingVolunteers.length > 0 && (
+                    <div className="p-3 bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 rounded-md">
+                      <p className="text-sm font-medium text-orange-900 dark:text-orange-100">
+                        {pendingVolunteers.length} pending approval{pendingVolunteers.length !== 1 ? 's' : ''}
+                      </p>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-1 gap-2">
+                    <Link href="/volunteers/approval" asChild>
+                      <Button className="w-full" variant="default" data-testid="button-approve-volunteers">
+                        <UserCheck className="mr-2 h-4 w-4" />
+                        Review Applications ({pendingVolunteers.length})
+                      </Button>
+                    </Link>
+                    <Link href="/volunteers/approval" asChild>
+                      <Button className="w-full" variant="outline" data-testid="button-all-volunteers">
+                        <Users className="mr-2 h-4 w-4" />
+                        View All Volunteers ({volunteers.length})
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
+            {/* Incident Management */}
             <Card>
               <CardHeader>
-                <CardTitle>Volunteer Demographics</CardTitle>
-                <CardDescription>Ex-servicemen vs Civilian volunteers</CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5" />
+                  Incident Management
+                </CardTitle>
+                <CardDescription>
+                  Create, assign and track emergency incidents
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={350}>
-                  <PieChart>
-                    <Pie
-                      data={volunteerTypes}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, value }) => `${name}: ${value}`}
-                      outerRadius={120}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {volunteerTypes.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
+                <div className="space-y-3">
+                  {criticalIncidents.length > 0 && (
+                    <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+                      <p className="text-sm font-medium text-destructive">
+                        {criticalIncidents.length} critical incident{criticalIncidents.length !== 1 ? 's' : ''} require attention
+                      </p>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-1 gap-2">
+                    <Link href="/incident-reporting" asChild>
+                      <Button className="w-full" variant="default" data-testid="button-create-incident">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Report New Incident
+                      </Button>
+                    </Link>
+                    <Link href="/incident-reporting" asChild>
+                      <Button className="w-full" variant="outline" data-testid="button-manage-incidents">
+                        <MapPin className="mr-2 h-4 w-4" />
+                        Manage All Incidents ({incidents.length})
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Inventory Management */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Package className="h-5 w-5" />
+                  Inventory Management
+                </CardTitle>
+                <CardDescription>
+                  Track and manage equipment and supplies
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 gap-2">
+                  <Link href="/inventory" asChild>
+                    <Button className="w-full" variant="default" data-testid="button-manage-inventory">
+                      <Package className="mr-2 h-4 w-4" />
+                      Manage Inventory ({inventory.length})
+                    </Button>
+                  </Link>
+                  <Link href="/inventory" asChild>
+                    <Button className="w-full" variant="outline" data-testid="button-add-equipment">
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add New Equipment
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Training Management */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <GraduationCap className="h-5 w-5" />
+                  Training Management
+                </CardTitle>
+                <CardDescription>
+                  Schedule and manage training sessions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 gap-2">
+                  <Button className="w-full" variant="default" data-testid="button-create-training">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create Training Session
+                  </Button>
+                  <Button className="w-full" variant="outline" data-testid="button-manage-training">
+                    <GraduationCap className="mr-2 h-4 w-4" />
+                    View All Sessions
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <Card>
-              <CardHeader>
-                <CardTitle>State-wide Incident Severity Analysis</CardTitle>
-                <CardDescription>Breakdown of incidents by severity level</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={incidentSeverityData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="severity" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="count" fill="#FF6B35" name="Incidents" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Inventory Distribution by Category</CardTitle>
-                <CardDescription>Equipment and supplies across categories</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={inventoryByCategory} layout="vertical">
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" />
-                    <YAxis dataKey="category" type="category" width={100} />
-                    <Tooltip />
-                    <Bar dataKey="count" fill="#06A77D" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
-
+          {/* MIS Reports */}
           <Card className="mb-8">
             <CardHeader>
-              <CardTitle>State Performance Trends</CardTitle>
-              <CardDescription>Volunteers, incidents, and resolution rates over time</CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5" />
+                MIS Reports & Analytics
+              </CardTitle>
+              <CardDescription>
+                Generate comprehensive state-level reports and export data
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <ComposedChart data={performanceData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Area type="monotone" dataKey="volunteers" fill="#004E89" stroke="#004E89" fillOpacity={0.3} />
-                  <Bar dataKey="incidents" fill="#FF6B35" />
-                  <Line type="monotone" dataKey="resolved" stroke="#06A77D" strokeWidth={3} />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>MIS Reports & Data Export</CardTitle>
-              <CardDescription>Comprehensive state-level reporting and analytics</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Button className="w-full" variant="default" data-testid="button-state-summary">
-                  <BarChart3 className="mr-2 h-4 w-4" />
-                  State Summary Report
-                </Button>
-                <Button className="w-full" variant="outline" data-testid="button-district-comparison">
-                  <TrendingUp className="mr-2 h-4 w-4" />
-                  District Comparison
-                </Button>
-                <Button className="w-full" variant="outline" data-testid="button-performance-analytics">
-                  <Activity className="mr-2 h-4 w-4" />
-                  Performance Analytics
-                </Button>
-                <Button className="w-full" variant="outline" data-testid="button-custom-query">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <Button className="w-full" variant="default" data-testid="button-volunteer-report">
                   <FileText className="mr-2 h-4 w-4" />
-                  Custom Query Builder
+                  Volunteer Report
                 </Button>
-                <Button className="w-full" variant="outline" data-testid="button-export-excel-all">
-                  <Download className="mr-2 h-4 w-4" />
-                  Export All Data (Excel)
+                <Button className="w-full" variant="outline" data-testid="button-incident-report">
+                  <FileText className="mr-2 h-4 w-4" />
+                  Incident Report
                 </Button>
-                <Button className="w-full" variant="outline" data-testid="button-export-pdf-report">
+                <Button className="w-full" variant="outline" data-testid="button-inventory-report">
+                  <FileText className="mr-2 h-4 w-4" />
+                  Inventory Report
+                </Button>
+                <Button className="w-full" variant="outline" data-testid="button-district-report">
+                  <MapPin className="mr-2 h-4 w-4" />
+                  District Report
+                </Button>
+                <Button className="w-full" variant="outline" data-testid="button-export-excel">
                   <Download className="mr-2 h-4 w-4" />
-                  Generate PDF Report
+                  Export to Excel
+                </Button>
+                <Button className="w-full" variant="outline" data-testid="button-export-pdf">
+                  <Download className="mr-2 h-4 w-4" />
+                  Export to PDF
                 </Button>
                 <Button className="w-full" variant="outline" data-testid="button-export-csv">
                   <Download className="mr-2 h-4 w-4" />
-                  Export CSV Data
+                  Export to CSV
                 </Button>
-                <Button className="w-full" variant="outline" data-testid="button-scheduled-reports">
-                  <FileText className="mr-2 h-4 w-4" />
-                  Scheduled Reports
+                <Button className="w-full" variant="outline" data-testid="button-custom-report">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Custom Report
                 </Button>
               </div>
             </CardContent>
           </Card>
+
+          {/* Recent Activity */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Volunteer Registrations</CardTitle>
+                <CardDescription>Latest applications across all districts</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {volunteers.length === 0 ? (
+                  <p className="text-sm text-muted-foreground py-8 text-center">
+                    No volunteer registrations yet
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {volunteers.slice(0, 5).map((volunteer) => (
+                      <div key={volunteer.id} className="flex items-center justify-between p-3 border rounded-md">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{volunteer.fullName}</p>
+                          <p className="text-xs text-muted-foreground">{volunteer.district} District</p>
+                        </div>
+                        <Badge variant={volunteer.status === "approved" ? "default" : volunteer.status === "pending" ? "secondary" : "destructive"}>
+                          {volunteer.status}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Active Incidents</CardTitle>
+                <CardDescription>Current emergency situations</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {activeIncidents.length === 0 ? (
+                  <p className="text-sm text-muted-foreground py-8 text-center">
+                    No active incidents
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {activeIncidents.slice(0, 5).map((incident) => (
+                      <div key={incident.id} className="flex items-start gap-3 p-3 border rounded-md">
+                        <AlertTriangle className={`h-5 w-5 mt-0.5 ${incident.severity === 'critical' ? 'text-destructive' : 'text-orange-500'}`} />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{incident.title}</p>
+                          <p className="text-xs text-muted-foreground">{incident.district} District</p>
+                        </div>
+                        <Badge variant={incident.severity === "critical" ? "destructive" : "default"}>
+                          {incident.severity}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
 
           <LogoutCard />
         </div>

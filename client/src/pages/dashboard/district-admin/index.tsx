@@ -16,13 +16,12 @@ import {
   Package, 
   CheckCircle,
   Clock,
-  UserPlus,
-  FileText
+  UserCheck,
+  FileText,
+  Plus,
+  MapPin
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-
-const COLORS = ['#FF6B35', '#004E89', '#F77F00', '#06A77D'];
 
 export default function DistrictAdminDashboard() {
   const { toast } = useToast();
@@ -72,21 +71,7 @@ export default function DistrictAdminDashboard() {
   const pendingVolunteers = districtVolunteers.filter(v => v.status === "pending");
   const approvedVolunteers = districtVolunteers.filter(v => v.status === "approved");
   const activeIncidents = districtIncidents.filter(i => i.status !== "closed");
-
-  // Volunteer status breakdown for pie chart
-  const volunteerStatusData = [
-    { name: "Pending", value: districtVolunteers.filter(v => v.status === "pending").length },
-    { name: "Approved", value: districtVolunteers.filter(v => v.status === "approved").length },
-    { name: "Rejected", value: districtVolunteers.filter(v => v.status === "rejected").length },
-  ];
-
-  // Incident severity breakdown for bar chart
-  const incidentSeverityData = [
-    { name: "Low", count: districtIncidents.filter(i => i.severity === "low").length },
-    { name: "Medium", count: districtIncidents.filter(i => i.severity === "medium").length },
-    { name: "High", count: districtIncidents.filter(i => i.severity === "high").length },
-    { name: "Critical", count: districtIncidents.filter(i => i.severity === "critical").length },
-  ];
+  const criticalIncidents = districtIncidents.filter(i => i.severity === "critical");
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -103,10 +88,11 @@ export default function DistrictAdminDashboard() {
             </p>
           </div>
 
+          {/* Key Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Volunteers</CardTitle>
+                <CardTitle className="text-sm font-medium">Volunteers</CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -125,7 +111,7 @@ export default function DistrictAdminDashboard() {
               <CardContent>
                 <div className="text-2xl font-bold text-orange-600">{pendingVolunteers.length}</div>
                 <p className="text-xs text-muted-foreground">
-                  Awaiting your review
+                  Need your review
                 </p>
               </CardContent>
             </Card>
@@ -138,97 +124,181 @@ export default function DistrictAdminDashboard() {
               <CardContent>
                 <div className="text-2xl font-bold text-destructive">{activeIncidents.length}</div>
                 <p className="text-xs text-muted-foreground">
-                  Requires attention
+                  {criticalIncidents.length} critical
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Inventory Items</CardTitle>
+                <CardTitle className="text-sm font-medium">Equipment</CardTitle>
                 <Package className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{districtInventory.length}</div>
                 <p className="text-xs text-muted-foreground">
-                  Equipment & supplies
+                  Items in district
                 </p>
               </CardContent>
             </Card>
           </div>
 
+          {/* Management Sections */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* Volunteer Management */}
             <Card>
               <CardHeader>
-                <CardTitle>Volunteer Status Distribution</CardTitle>
-                <CardDescription>Breakdown of volunteer applications</CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <UserCheck className="h-5 w-5" />
+                  Volunteer Management
+                </CardTitle>
+                <CardDescription>
+                  Review and approve volunteer registrations
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={volunteerStatusData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, value }) => `${name}: ${value}`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {volunteerStatusData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
+                <div className="space-y-3">
+                  {pendingVolunteers.length > 0 && (
+                    <div className="p-3 bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 rounded-md">
+                      <p className="text-sm font-medium text-orange-900 dark:text-orange-100">
+                        {pendingVolunteers.length} application{pendingVolunteers.length !== 1 ? 's' : ''} awaiting approval
+                      </p>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-1 gap-2">
+                    <Link href="/volunteers/approval" asChild>
+                      <Button className="w-full" variant="default" data-testid="button-approve-volunteers">
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Review Applications ({pendingVolunteers.length})
+                      </Button>
+                    </Link>
+                    <Link href="/volunteers/approval" asChild>
+                      <Button className="w-full" variant="outline" data-testid="button-all-volunteers">
+                        <Users className="mr-2 h-4 w-4" />
+                        View All Volunteers ({districtVolunteers.length})
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
+            {/* Incident Management */}
             <Card>
               <CardHeader>
-                <CardTitle>Incident Severity Levels</CardTitle>
-                <CardDescription>Current incidents by severity</CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5" />
+                  Incident Management
+                </CardTitle>
+                <CardDescription>
+                  Create and manage district incidents
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={incidentSeverityData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="count" fill="#FF6B35" />
-                  </BarChart>
-                </ResponsiveContainer>
+                <div className="space-y-3">
+                  {criticalIncidents.length > 0 && (
+                    <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+                      <p className="text-sm font-medium text-destructive">
+                        {criticalIncidents.length} critical incident{criticalIncidents.length !== 1 ? 's' : ''}
+                      </p>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-1 gap-2">
+                    <Link href="/incident-reporting" asChild>
+                      <Button className="w-full" variant="default" data-testid="button-report-incident">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Report New Incident
+                      </Button>
+                    </Link>
+                    <Link href="/incident-reporting" asChild>
+                      <Button className="w-full" variant="outline" data-testid="button-manage-incidents">
+                        <MapPin className="mr-2 h-4 w-4" />
+                        Manage Incidents ({districtIncidents.length})
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Inventory Management */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Package className="h-5 w-5" />
+                  Inventory Management
+                </CardTitle>
+                <CardDescription>
+                  Track district equipment and supplies
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 gap-2">
+                  <Link href="/inventory" asChild>
+                    <Button className="w-full" variant="default" data-testid="button-manage-inventory">
+                      <Package className="mr-2 h-4 w-4" />
+                      Manage Inventory ({districtInventory.length})
+                    </Button>
+                  </Link>
+                  <Link href="/inventory" asChild>
+                    <Button className="w-full" variant="outline" data-testid="button-add-equipment">
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add Equipment
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Reports */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  District Reports
+                </CardTitle>
+                <CardDescription>
+                  Generate reports and analytics
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 gap-2">
+                  <Button className="w-full" variant="default" data-testid="button-district-report">
+                    <FileText className="mr-2 h-4 w-4" />
+                    Generate District Report
+                  </Button>
+                  <Button className="w-full" variant="outline" data-testid="button-export-data">
+                    <FileText className="mr-2 h-4 w-4" />
+                    Export Data (Excel/PDF)
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>
 
+          {/* Recent Activity */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <Card>
               <CardHeader>
                 <CardTitle>Recent Volunteer Applications</CardTitle>
-                <CardDescription>Latest registration requests</CardDescription>
+                <CardDescription>Latest registrations in your district</CardDescription>
               </CardHeader>
               <CardContent>
-                {pendingVolunteers.length === 0 ? (
+                {districtVolunteers.length === 0 ? (
                   <p className="text-sm text-muted-foreground py-8 text-center">
-                    No pending applications
+                    No volunteer applications yet
                   </p>
                 ) : (
-                  <div className="space-y-4">
-                    {pendingVolunteers.slice(0, 5).map((volunteer) => (
+                  <div className="space-y-3">
+                    {districtVolunteers.slice(0, 5).map((volunteer) => (
                       <div key={volunteer.id} className="flex items-center justify-between p-3 border rounded-md">
-                        <div className="flex items-center gap-3">
-                          <UserPlus className="h-5 w-5 text-primary" />
-                          <div>
-                            <p className="font-medium">{volunteer.fullName}</p>
-                            <p className="text-xs text-muted-foreground">{volunteer.email}</p>
-                          </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{volunteer.fullName}</p>
+                          <p className="text-xs text-muted-foreground">{volunteer.email}</p>
                         </div>
-                        <Badge variant="secondary">Pending</Badge>
+                        <Badge variant={volunteer.status === "approved" ? "default" : volunteer.status === "pending" ? "secondary" : "destructive"}>
+                          {volunteer.status}
+                        </Badge>
                       </div>
                     ))}
                   </div>
@@ -238,34 +308,30 @@ export default function DistrictAdminDashboard() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>District administration tasks</CardDescription>
+                <CardTitle>Active Incidents</CardTitle>
+                <CardDescription>Current incidents in {user?.district}</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 gap-3">
-                  <Link href="/volunteers/approval">
-                    <Button className="w-full" variant="default" data-testid="button-approve-volunteers">
-                      <CheckCircle className="mr-2 h-4 w-4" />
-                      Review Volunteer Applications ({pendingVolunteers.length})
-                    </Button>
-                  </Link>
-                  <Link href="/incident-reporting">
-                    <Button className="w-full" variant="outline" data-testid="button-report-incident">
-                      <AlertTriangle className="mr-2 h-4 w-4" />
-                      Report New Incident
-                    </Button>
-                  </Link>
-                  <Link href="/inventory">
-                    <Button className="w-full" variant="outline" data-testid="button-manage-inventory">
-                      <Package className="mr-2 h-4 w-4" />
-                      Manage Inventory
-                    </Button>
-                  </Link>
-                  <Button className="w-full" variant="outline" data-testid="button-generate-report">
-                    <FileText className="mr-2 h-4 w-4" />
-                    Generate District Report
-                  </Button>
-                </div>
+                {activeIncidents.length === 0 ? (
+                  <p className="text-sm text-muted-foreground py-8 text-center">
+                    No active incidents
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {activeIncidents.slice(0, 5).map((incident) => (
+                      <div key={incident.id} className="flex items-start gap-3 p-3 border rounded-md">
+                        <AlertTriangle className={`h-5 w-5 mt-0.5 ${incident.severity === 'critical' ? 'text-destructive' : 'text-orange-500'}`} />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium truncate">{incident.title}</p>
+                          <p className="text-xs text-muted-foreground">{incident.location}</p>
+                        </div>
+                        <Badge variant={incident.severity === "critical" ? "destructive" : "default"}>
+                          {incident.severity}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
