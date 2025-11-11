@@ -202,3 +202,86 @@ export const insertInventorySchema = createInsertSchema(inventory).omit({
 
 export type InsertInventory = z.infer<typeof insertInventorySchema>;
 export type InventoryItem = typeof inventory.$inferSelect;
+
+// Districts reference table for hierarchical data access
+export const districts = pgTable("districts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull().unique(),
+  code: varchar("code").notNull().unique(),
+  state: varchar("state").default("Odisha"),
+  region: varchar("region"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type District = typeof districts.$inferSelect;
+
+// Departments reference table
+export const departments = pgTable("departments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull().unique(),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type Department = typeof departments.$inferSelect;
+
+// Training sessions for volunteer training management
+export const trainingSessions = pgTable("training_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: varchar("title").notNull(),
+  description: text("description"),
+  departmentId: varchar("department_id").references(() => departments.id),
+  district: varchar("district"),
+  scheduledAt: timestamp("scheduled_at").notNull(),
+  duration: integer("duration"),
+  capacity: integer("capacity").default(50),
+  location: varchar("location"),
+  instructor: varchar("instructor"),
+  status: varchar("status").default("scheduled"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertTrainingSessionSchema = createInsertSchema(trainingSessions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTrainingSession = z.infer<typeof insertTrainingSessionSchema>;
+export type TrainingSession = typeof trainingSessions.$inferSelect;
+
+// Assignments table - links volunteers to incidents and training sessions
+export const assignmentStatusEnum = pgEnum("assignment_status", [
+  "assigned",
+  "accepted",
+  "in_progress",
+  "completed",
+  "declined",
+]);
+
+export const assignments = pgTable("assignments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  volunteerId: varchar("volunteer_id").references(() => volunteers.id).notNull(),
+  incidentId: varchar("incident_id").references(() => incidents.id),
+  trainingSessionId: varchar("training_session_id").references(() => trainingSessions.id),
+  role: varchar("role"),
+  status: assignmentStatusEnum("status").default("assigned"),
+  assignedBy: varchar("assigned_by").references(() => users.id),
+  assignedAt: timestamp("assigned_at").defaultNow(),
+  completedAt: timestamp("completed_at"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertAssignmentSchema = createInsertSchema(assignments).omit({
+  id: true,
+  assignedAt: true,
+  completedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertAssignment = z.infer<typeof insertAssignmentSchema>;
+export type Assignment = typeof assignments.$inferSelect;
