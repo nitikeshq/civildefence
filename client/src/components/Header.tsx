@@ -28,12 +28,13 @@ export default function Header() {
             <img
               src={cmPhoto}
               alt="Hon'ble Chief Minister of Odisha"
-              className="h-16 md:h-20 w-auto rounded-md"
+              className="h-20 md:h-28 w-auto rounded-md"
               data-testid="img-cm-photo"
             />
-            <p className="text-xs font-medium text-center hidden sm:block">
-              Hon'ble Chief Minister
-            </p>
+            <div className="text-center hidden sm:block">
+              <p className="text-xs font-medium">Hon'ble Chief Minister</p>
+              <p className="text-xs font-semibold text-primary">Mohan Ch. Majhi</p>
+            </div>
           </div>
         </div>
       </div>

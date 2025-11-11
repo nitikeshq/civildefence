@@ -17,6 +17,7 @@ import VolunteerRegistration from "@/pages/VolunteerRegistration";
 import IncidentReporting from "@/pages/IncidentReporting";
 import InventoryManagement from "@/pages/InventoryManagement";
 import VolunteerApproval from "@/pages/VolunteerApproval";
+import MISReports from "@/pages/MISReports";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -25,7 +26,16 @@ function Router() {
   return (
     <Switch>
       <Route path="/signin" component={SignIn} />
-      <Route path="/signup" component={SignUp} />
+      {/* Redirect signup to volunteer registration */}
+      <Route path="/signup">
+        {() => {
+          window.location.href = "/volunteer/register";
+          return null;
+        }}
+      </Route>
+      
+      {/* Public routes - accessible without login */}
+      <Route path="/volunteer/register" component={VolunteerRegistration} />
       
       {isLoading || !isAuthenticated ? (
         <Route path="/" component={LandingPage} />
@@ -36,11 +46,11 @@ function Router() {
           <Route path="/dashboard/district-admin" component={DistrictAdminDashboard} />
           <Route path="/dashboard/department-admin" component={DepartmentAdminDashboard} />
           <Route path="/dashboard/state-admin" component={StateAdminDashboard} />
-          <Route path="/volunteer/register" component={VolunteerRegistration} />
           <Route path="/incident-reporting" component={IncidentReporting} />
           <Route path="/incidents/report" component={IncidentReporting} />
           <Route path="/inventory" component={InventoryManagement} />
           <Route path="/volunteers/approval" component={VolunteerApproval} />
+          <Route path="/mis-reports" component={MISReports} />
         </>
       )}
       <Route component={NotFound} />
