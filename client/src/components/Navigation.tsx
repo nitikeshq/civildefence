@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Menu, X, ChevronDown } from "lucide-react";
 import {
@@ -55,12 +56,22 @@ export default function Navigation() {
             </Button>
           </div>
 
-          <Button
-            className="hidden md:inline-flex bg-primary text-primary-foreground hover:bg-primary/90"
-            data-testid="button-login"
-          >
-            Login
-          </Button>
+          <div className="hidden md:flex items-center gap-3">
+            <Link href="/signin">
+              <a>
+                <Button variant="ghost" data-testid="button-signin">
+                  Sign In
+                </Button>
+              </a>
+            </Link>
+            <Link href="/signup">
+              <a>
+                <Button className="bg-primary text-primary-foreground hover:bg-primary/90" data-testid="button-signup">
+                  Sign Up
+                </Button>
+              </a>
+            </Link>
+          </div>
 
           <Button
             variant="ghost"
@@ -90,9 +101,20 @@ export default function Navigation() {
             <Button variant="ghost" className="w-full justify-start" data-testid="button-mobile-contact">
               Contact Us
             </Button>
-            <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90" data-testid="button-mobile-login">
-              Login
-            </Button>
+            <Link href="/signin">
+              <a className="w-full">
+                <Button variant="ghost" className="w-full justify-start" data-testid="button-mobile-signin">
+                  Sign In
+                </Button>
+              </a>
+            </Link>
+            <Link href="/signup">
+              <a className="w-full">
+                <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90" data-testid="button-mobile-signup">
+                  Sign Up
+                </Button>
+              </a>
+            </Link>
           </div>
         )}
       </div>
