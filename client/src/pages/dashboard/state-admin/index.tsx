@@ -263,14 +263,18 @@ export default function StateAdminDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 gap-2">
-                  <Button className="w-full" variant="default" data-testid="button-create-training">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create Training Session
-                  </Button>
-                  <Button className="w-full" variant="outline" data-testid="button-manage-training">
-                    <GraduationCap className="mr-2 h-4 w-4" />
-                    View All Sessions
-                  </Button>
+                  <Link href="/training" asChild>
+                    <Button className="w-full" variant="default" data-testid="button-create-training">
+                      <Plus className="mr-2 h-4 w-4" />
+                      Create Training Session
+                    </Button>
+                  </Link>
+                  <Link href="/training" asChild>
+                    <Button className="w-full" variant="outline" data-testid="button-manage-training">
+                      <GraduationCap className="mr-2 h-4 w-4" />
+                      View All Sessions
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>

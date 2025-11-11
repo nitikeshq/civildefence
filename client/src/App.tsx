@@ -18,6 +18,7 @@ import IncidentReporting from "@/pages/IncidentReporting";
 import InventoryManagement from "@/pages/InventoryManagement";
 import VolunteerApproval from "@/pages/VolunteerApproval";
 import MISReports from "@/pages/MISReports";
+import TrainingManagement from "@/pages/TrainingManagement";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -51,6 +52,7 @@ function Router() {
           <Route path="/inventory" component={InventoryManagement} />
           <Route path="/volunteers/approval" component={VolunteerApproval} />
           <Route path="/mis-reports" component={MISReports} />
+          <Route path="/training" component={TrainingManagement} />
         </>
       )}
       <Route component={NotFound} />

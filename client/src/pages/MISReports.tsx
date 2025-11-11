@@ -8,8 +8,9 @@ import Footer from "@/components/Footer";
 import type { Volunteer, Incident, InventoryItem } from "@shared/schema";
 import { redirectToSignIn } from "@/lib/authRedirect";
 import { useToast } from "@/hooks/use-toast";
-import { Download, FileText, TrendingUp } from "lucide-react";
+import { Download, FileText, TrendingUp, ArrowLeft } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from "recharts";
+import { Link } from "wouter";
 
 const COLORS = ['#FF6B35', '#004E89', '#F77F00', '#06A77D', '#8338EC', '#06FFA5'];
 
@@ -92,6 +93,13 @@ export default function MISReports() {
       
       <main className="flex-1 bg-muted/30">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
+          <Link href="/" asChild>
+            <Button variant="ghost" className="mb-6" data-testid="button-back">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Dashboard
+            </Button>
+          </Link>
+
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground mb-2">
               MIS Reports & Analytics

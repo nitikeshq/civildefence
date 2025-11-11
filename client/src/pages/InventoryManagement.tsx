@@ -288,7 +288,7 @@ export default function InventoryManagement() {
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>Condition *</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
                                   <FormControl>
                                     <SelectTrigger data-testid="select-condition">
                                       <SelectValue placeholder="Select condition" />
