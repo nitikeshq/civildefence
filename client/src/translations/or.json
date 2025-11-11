@@ -1,0 +1,81 @@
+{
+  "common": {
+    "welcome": "ସ୍ୱାଗତ",
+    "loading": "ଲୋଡ୍ ହେଉଛି...",
+    "logout": "ଲଗଆଉଟ୍",
+    "signin": "ସାଇନ୍ ଇନ୍",
+    "signup": "ସାଇନ୍ ଅପ୍",
+    "save": "ସେଭ୍ କରନ୍ତୁ",
+    "cancel": "ବାତିଲ କରନ୍ତୁ",
+    "submit": "ଦାଖଲ କରନ୍ତୁ",
+    "search": "ଖୋଜନ୍ତୁ",
+    "filter": "ଫିଲ୍ଟର୍",
+    "export": "ରପ୍ତାନି",
+    "download": "ଡାଉନଲୋଡ୍"
+  },
+  "navigation": {
+    "home": "ମୁଖ୍ୟ ପୃଷ୍ଠା",
+    "aboutUs": "ଆମ ବିଷୟରେ",
+    "services": "ସେବାସମୂହ",
+    "gallery": "ଗ୍ୟାଲେରୀ",
+    "contactUs": "ଯୋଗାଯୋଗ କରନ୍ତୁ",
+    "mission": "ଲକ୍ଷ୍ୟ ଏବଂ ଦୃଷ୍ଟିକୋଣ",
+    "organization": "ସଂଗଠନ ସଂରଚନା",
+    "history": "ଇତିହାସ",
+    "volunteerRegistration": "ସ୍ୱେଚ୍ଛାସେବୀ ପଞ୍ଜୀକରଣ",
+    "incidentReporting": "ଘଟଣା ରିପୋର୍ଟିଂ",
+    "training": "ପ୍ରଶିକ୍ଷଣ କାର୍ଯ୍ୟକ୍ରମ"
+  },
+  "dashboard": {
+    "title": "ଡ୍ୟାସବୋର୍ଡ",
+    "civilDefencePortal": "ସିଭିଲ୍ ଡିଫେନ୍ସ ବିଭାଗ ପୋର୍ଟାଲ୍",
+    "redirecting": "ଆପଣଙ୍କ ଡ୍ୟାସବୋର୍ଡକୁ ପୁନ rest ନିର୍ଦ୍ଦେଶ କରୁଛି..."
+  },
+  "volunteer": {
+    "dashboard": {
+      "title": "ସ୍ୱାଗତ, {{name}}",
+      "subtitle": "ଆପଣଙ୍କ ସ୍ୱେଚ୍ଛାସେବୀ ଡ୍ୟାସବୋର୍ଡ - ଆପଣଙ୍କ କାର୍ଯ୍ୟ ଏବଂ ପ୍ରଶିକ୍ଷଣ ଟ୍ରାକ୍ କରନ୍ତୁ",
+      "activeAssignments": "ସକ୍ରିୟ କାର୍ଯ୍ୟଗୁଡିକ",
+      "assignmentsDescription": "ଆପଣଙ୍କୁ ଦିଆଯାଇଥିବା ଘଟଣା",
+      "completedTasks": "ସମ୍ପୂର୍ଣ୍ଣ କାର୍ଯ୍ୟଗୁଡିକ",
+      "completedDescription": "ସଫଳତାର ସହ ସମ୍ପୂର୍ଣ୍ଣ",
+      "upcomingTraining": "ଆଗାମୀ ପ୍ରଶିକ୍ଷଣ",
+      "trainingDescription": "ଧାର୍ଯ୍ୟ ପ୍ରଶିକ୍ଷଣ ସତ୍ର",
+      "myActiveIncidents": "ମୋର ସକ୍ରିୟ ଘଟଣା",
+      "myActiveIncidentsDesc": "ବର୍ତ୍ତମାନ ଆପଣଙ୍କୁ ଦିଆଯାଇଥିବା ଘଟଣା",
+      "noActiveAssignments": "ବର୍ତ୍ତମାନ କୌଣସି ସକ୍ରିୟ କାର୍ଯ୍ୟ ନାହିଁ",
+      "upcomingTrainingSessions": "ଆଗାମୀ ପ୍ରଶିକ୍ଷଣ ସତ୍ର",
+      "upcomingTrainingSessionsDesc": "ଆପଣଙ୍କ ଧାର୍ଯ୍ୟ ପ୍ରଶିକ୍ଷଣ କାର୍ଯ୍ୟକ୍ରମ",
+      "noUpcomingTraining": "କୌଣସି ଆଗାମୀ ପ୍ରଶିକ୍ଷଣ ସତ୍ର ନାହିଁ",
+      "quickActions": "ତ୍ୱରିତ କାର୍ଯ୍ୟ",
+      "quickActionsDesc": "ସ୍ୱେଚ୍ଛାସେବୀମାନଙ୍କ ପାଇଁ ସାଧାରଣ କାର୍ଯ୍ୟ",
+      "reportIncident": "ଘଟଣା ରିପୋର୍ଟ କରନ୍ତୁ",
+      "viewProfile": "ମୋର ପ୍ରୋଫାଇଲ୍ ଦେଖନ୍ତୁ"
+    }
+  },
+  "districtAdmin": {
+    "dashboard": {
+      "title": "ଜିଲ୍ଲା ପ୍ରଶାସନ ଡ୍ୟାସବୋର୍ଡ",
+      "subtitle": "ଆପଣଙ୍କ ଜିଲ୍ଲାରେ ସ୍ୱେଚ୍ଛାସେବୀ ଏବଂ ଘଟଣା ପରିଚାଳନା କରନ୍ତୁ"
+    }
+  },
+  "departmentAdmin": {
+    "dashboard": {
+      "title": "ବିଭାଗ ଡ୍ୟାସବୋର୍ଡ",
+      "subtitle": "ବିଭାଗ-ବ୍ୟାପୀ କାର୍ଯ୍ୟ ଏବଂ ବିଶ୍ଳେଷଣ ପରିଚାଳନା"
+    }
+  },
+  "stateAdmin": {
+    "dashboard": {
+      "title": "ରାଜ୍ୟ ପ୍ରଶାସନ ଡ୍ୟାସବୋର୍ଡ",
+      "subtitle": "ସମସ୍ତ ସିଭିଲ୍ ଡିଫେନ୍ସ କାର୍ଯ୍ୟଗୁଡିକର ସମ୍ପୂର୍ଣ୍ଣ ତଦାରଖ"
+    }
+  },
+  "auth": {
+    "unauthorized": "ଅନଧିକୃତ",
+    "pleaseSignIn": "ଦୟାକରି ସାଇନ୍ ଇନ୍ କରନ୍ତୁ"
+  },
+  "errors": {
+    "genericError": "ଏକ ତ୍ରୁଟି ଘଟିଛି। ଦୟାକରି ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।"
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "common": {
+    "welcome": "Welcome",
+    "loading": "Loading...",
+    "logout": "Logout",
+    "signin": "Sign In",
+    "signup": "Sign Up",
+    "save": "Save",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "download": "Download"
+  },
+  "navigation": {
+    "home": "Home",
+    "aboutUs": "About Us",
+    "services": "Services",
+    "gallery": "Gallery",
+    "contactUs": "Contact Us",
+    "mission": "Mission & Vision",
+    "organization": "Organization Structure",
+    "history": "History",
+    "volunteerRegistration": "Volunteer Registration",
+    "incidentReporting": "Incident Reporting",
+    "training": "Training Programs"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "civilDefencePortal": "Civil Defence Department Portal",
+    "redirecting": "Redirecting to your dashboard..."
+  },
+  "volunteer": {
+    "dashboard": {
+      "title": "Welcome, {{name}}",
+      "subtitle": "Your volunteer dashboard - Track your assignments and training",
+      "activeAssignments": "Active Assignments",
+      "assignmentsDescription": "Incidents assigned to you",
+      "completedTasks": "Completed Tasks",
+      "completedDescription": "Successfully completed",
+      "upcomingTraining": "Upcoming Training",
+      "trainingDescription": "Training sessions scheduled",
+      "myActiveIncidents": "My Active Incidents",
+      "myActiveIncidentsDesc": "Incidents currently assigned to you",
+      "noActiveAssignments": "No active assignments at the moment",
+      "upcomingTrainingSessions": "Upcoming Training Sessions",
+      "upcomingTrainingSessionsDesc": "Your scheduled training programs",
+      "noUpcomingTraining": "No upcoming training sessions",
+      "quickActions": "Quick Actions",
+      "quickActionsDesc": "Common tasks for volunteers",
+      "reportIncident": "Report Incident",
+      "viewProfile": "View My Profile"
+    }
+  },
+  "districtAdmin": {
+    "dashboard": {
+      "title": "District Administration Dashboard",
+      "subtitle": "Manage volunteers and incidents in your district"
+    }
+  },
+  "departmentAdmin": {
+    "dashboard": {
+      "title": "Department Dashboard",
+      "subtitle": "Monitor department-wide operations and analytics"
+    }
+  },
+  "stateAdmin": {
+    "dashboard": {
+      "title": "State Administration Dashboard",
+      "subtitle": "Comprehensive oversight of all Civil Defence operations"
+    }
+  },
+  "auth": {
+    "unauthorized": "Unauthorized",
+    "pleaseSignIn": "Please sign in to continue"
+  },
+  "errors": {
+    "genericError": "An error occurred. Please try again."
+  }
+}

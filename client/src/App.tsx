@@ -9,6 +9,7 @@ import LandingPage from "@/pages/LandingPage";
 import SignIn from "@/pages/SignIn";
 import SignUp from "@/pages/SignUp";
 import Dashboard from "@/pages/Dashboard";
+import VolunteerDashboard from "@/pages/dashboard/volunteer";
 import VolunteerRegistration from "@/pages/VolunteerRegistration";
 import IncidentReporting from "@/pages/IncidentReporting";
 import InventoryManagement from "@/pages/InventoryManagement";
@@ -28,7 +29,9 @@ function Router() {
       ) : (
         <>
           <Route path="/" component={Dashboard} />
+          <Route path="/dashboard/volunteer" component={VolunteerDashboard} />
           <Route path="/volunteer/register" component={VolunteerRegistration} />
+          <Route path="/incident-reporting" component={IncidentReporting} />
           <Route path="/incidents/report" component={IncidentReporting} />
           <Route path="/inventory" component={InventoryManagement} />
           <Route path="/volunteers/approval" component={VolunteerApproval} />
