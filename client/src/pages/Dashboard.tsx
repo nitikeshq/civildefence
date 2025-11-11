@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import type { Volunteer, Incident, InventoryItem } from "@shared/schema";
+import { redirectToSignIn, logout } from "@/lib/authRedirect";
 import { 
   Users, 
   AlertTriangle, 
@@ -23,16 +24,16 @@ export default function Dashboard() {
   const { toast } = useToast();
   const { user, isAuthenticated, isLoading } = useAuth();
 
-  // Redirect to home if not authenticated
+  // Redirect to signin if not authenticated
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       toast({
         title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
+        description: "Please sign in to continue",
         variant: "destructive",
       });
       setTimeout(() => {
-        window.location.href = "/api/login";
+        redirectToSignIn();
       }, 500);
       return;
     }
@@ -59,8 +60,8 @@ export default function Dashboard() {
     );
   }
 
-  const handleLogout = () => {
-    window.location.href = "/api/logout";
+  const handleLogout = async () => {
+    await logout();
   };
 
   const pendingVolunteers = volunteers.filter(v => v.status === "pending");
