@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Menu, X, ChevronDown } from "lucide-react";
 import {
@@ -11,6 +11,7 @@ import {
 
 export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [, setLocation] = useLocation();
 
   return (
     <nav className="bg-card border-b border-card-border sticky top-0 z-40">
@@ -57,16 +58,12 @@ export default function Navigation() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
-            <Link href="/signin">
-              <Button variant="ghost" asChild data-testid="button-signin">
-                <a>Sign In</a>
-              </Button>
-            </Link>
-            <Link href="/signup">
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90" asChild data-testid="button-signup">
-                <a>Sign Up</a>
-              </Button>
-            </Link>
+            <Button variant="ghost" onClick={() => setLocation("/signin")} data-testid="button-signin">
+              Sign In
+            </Button>
+            <Button className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => setLocation("/signup")} data-testid="button-signup">
+              Sign Up
+            </Button>
           </div>
 
           <Button
@@ -97,16 +94,12 @@ export default function Navigation() {
             <Button variant="ghost" className="w-full justify-start" data-testid="button-mobile-contact">
               Contact Us
             </Button>
-            <Link href="/signin">
-              <Button variant="ghost" className="w-full justify-start" asChild data-testid="button-mobile-signin">
-                <a>Sign In</a>
-              </Button>
-            </Link>
-            <Link href="/signup">
-              <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90" asChild data-testid="button-mobile-signup">
-                <a>Sign Up</a>
-              </Button>
-            </Link>
+            <Button variant="ghost" className="w-full justify-start" onClick={() => setLocation("/signin")} data-testid="button-mobile-signin">
+              Sign In
+            </Button>
+            <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => setLocation("/signup")} data-testid="button-mobile-signup">
+              Sign Up
+            </Button>
           </div>
         )}
       </div>
