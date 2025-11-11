@@ -217,12 +217,10 @@ export default function SignIn() {
                   </div>
                 </div>
 
-                <Link href="/signup">
-                  <a className="block">
-                    <Button variant="outline" className="w-full h-11 text-base" data-testid="link-signup">
-                      Create New Account
-                    </Button>
-                  </a>
+                <Link href="/signup" asChild>
+                  <Button variant="outline" className="w-full h-11 text-base" data-testid="link-signup">
+                    Create New Account
+                  </Button>
                 </Link>
               </CardContent>
             </Card>
