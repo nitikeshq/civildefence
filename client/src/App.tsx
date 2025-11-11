@@ -1,17 +1,34 @@
+// Based on Replit Auth blueprint
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useAuth } from "@/hooks/useAuth";
 import LandingPage from "@/pages/LandingPage";
-import LoginPage from "@/pages/LoginPage";
+import Dashboard from "@/pages/Dashboard";
+import VolunteerRegistration from "@/pages/VolunteerRegistration";
+import IncidentReporting from "@/pages/IncidentReporting";
+import InventoryManagement from "@/pages/InventoryManagement";
+import VolunteerApproval from "@/pages/VolunteerApproval";
 import NotFound from "@/pages/not-found";
 
 function Router() {
+  const { isAuthenticated, isLoading } = useAuth();
+
   return (
     <Switch>
-      <Route path="/" component={LandingPage} />
-      <Route path="/login" component={LoginPage} />
+      {isLoading || !isAuthenticated ? (
+        <Route path="/" component={LandingPage} />
+      ) : (
+        <>
+          <Route path="/" component={Dashboard} />
+          <Route path="/volunteer/register" component={VolunteerRegistration} />
+          <Route path="/incidents/report" component={IncidentReporting} />
+          <Route path="/inventory" component={InventoryManagement} />
+          <Route path="/volunteers/approval" component={VolunteerApproval} />
+        </>
+      )}
       <Route component={NotFound} />
     </Switch>
   );
