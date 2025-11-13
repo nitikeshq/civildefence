@@ -168,6 +168,34 @@ export default function DistrictAdminDashboard() {
           </Card>
         </div>
 
+        {/* Pending Approvals Alert */}
+        {pendingApprovals > 0 && (
+          <Card className="border-orange-200 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-800">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <UserCheck className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                <span className="text-orange-900 dark:text-orange-100">
+                  Pending Volunteer Approvals
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-orange-800 dark:text-orange-200 mb-4">
+                You have <strong>{pendingApprovals}</strong> volunteer application(s) waiting for approval.
+                Please review and approve or reject these applications.
+              </p>
+              <Button
+                onClick={() => setLocation("/dashboard/district-admin/volunteers")}
+                variant="default"
+                data-testid="button-review-volunteers"
+              >
+                <UserCheck className="h-4 w-4 mr-2" />
+                Review Pending Volunteers
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Quick Actions */}
         <Card>
           <CardHeader>

@@ -164,7 +164,7 @@ export default function DistrictAdminVolunteers() {
               <TableCell>{volunteer.district}</TableCell>
               <TableCell>
                 <Badge variant="outline">
-                  {volunteer.volunteerType === "ex_serviceman" ? "Ex-Serviceman" : "Civilian"}
+                  {volunteer.isExServiceman ? "Ex-Serviceman" : "Civilian"}
                 </Badge>
               </TableCell>
               <TableCell>{getStatusBadge(volunteer.status)}</TableCell>
@@ -305,7 +305,7 @@ export default function DistrictAdminVolunteers() {
                 <div>
                   <p className="text-sm font-medium">Volunteer Type</p>
                   <p className="text-sm text-muted-foreground">
-                    {selectedVolunteer.volunteerType === "ex_serviceman" ? "Ex-Serviceman" : "Civilian"}
+                    {selectedVolunteer.isExServiceman ? "Ex-Serviceman" : "Civilian"}
                   </p>
                 </div>
                 {selectedVolunteer.dateOfBirth && (
@@ -314,12 +314,6 @@ export default function DistrictAdminVolunteers() {
                     <p className="text-sm text-muted-foreground">
                       {new Date(selectedVolunteer.dateOfBirth).toLocaleDateString()}
                     </p>
-                  </div>
-                )}
-                {selectedVolunteer.gender && (
-                  <div>
-                    <p className="text-sm font-medium">Gender</p>
-                    <p className="text-sm text-muted-foreground capitalize">{selectedVolunteer.gender}</p>
                   </div>
                 )}
               </div>

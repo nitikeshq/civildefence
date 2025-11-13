@@ -71,7 +71,7 @@ export default function DistrictAdminInventory() {
   const editForm = useForm<Partial<InsertInventory>>({
     defaultValues: {
       quantity: 0,
-      condition: "good",
+      condition: "good" as const,
     },
   });
 
@@ -157,7 +157,7 @@ export default function DistrictAdminInventory() {
     setSelectedItem(item);
     editForm.reset({
       quantity: item.quantity,
-      condition: item.condition || "good",
+      condition: (item.condition || "good") as "excellent" | "good" | "fair" | "poor" | "needs_repair",
     });
     setShowEditDialog(true);
   };
@@ -269,8 +269,8 @@ export default function DistrictAdminInventory() {
                     <TableCell>{getConditionBadge(item.condition)}</TableCell>
                     <TableCell>{item.location}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {item.lastInspectionDate
-                        ? format(new Date(item.lastInspectionDate), "MMM dd, yyyy")
+                      {item.lastInspection
+                        ? format(new Date(item.lastInspection), "MMM dd, yyyy")
                         : "N/A"}
                     </TableCell>
                     <TableCell>
@@ -368,7 +368,7 @@ export default function DistrictAdminInventory() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Condition</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
                         <FormControl>
                           <SelectTrigger data-testid="select-condition">
                             <SelectValue placeholder="Select condition" />
@@ -485,7 +485,7 @@ export default function DistrictAdminInventory() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Condition</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
                       <FormControl>
                         <SelectTrigger data-testid="select-edit-condition">
                           <SelectValue placeholder="Select condition" />

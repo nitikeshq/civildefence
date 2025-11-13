@@ -111,7 +111,7 @@ export default function DistrictAdminIncidents() {
               <TableCell>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Calendar className="h-3 w-3" />
-                  <span>{format(new Date(incident.createdAt), "MMM dd, yyyy")}</span>
+                  <span>{incident.createdAt ? format(new Date(incident.createdAt), "MMM dd, yyyy") : "N/A"}</span>
                 </div>
               </TableCell>
               <TableCell>
@@ -263,14 +263,14 @@ export default function DistrictAdminIncidents() {
                 <div>
                   <p className="text-sm font-medium">Reported On</p>
                   <p className="text-sm text-muted-foreground">
-                    {format(new Date(selectedIncident.createdAt), "PPP p")}
+                    {selectedIncident.createdAt ? format(new Date(selectedIncident.createdAt), "PPP p") : "N/A"}
                   </p>
                 </div>
                 {selectedIncident.resolvedAt && (
                   <div>
                     <p className="text-sm font-medium">Resolved On</p>
                     <p className="text-sm text-muted-foreground">
-                      {format(new Date(selectedIncident.resolvedAt), "PPP p")}
+                      {selectedIncident.resolvedAt ? format(new Date(selectedIncident.resolvedAt), "PPP p") : "N/A"}
                     </p>
                   </div>
                 )}
@@ -285,11 +285,11 @@ export default function DistrictAdminIncidents() {
                 </div>
               )}
 
-              {selectedIncident.assignedVolunteers && selectedIncident.assignedVolunteers.length > 0 && (
+              {selectedIncident.assignedTo && (
                 <div>
-                  <p className="text-sm font-medium mb-2">Assigned Volunteers</p>
+                  <p className="text-sm font-medium mb-2">Assigned To</p>
                   <p className="text-sm text-muted-foreground">
-                    {selectedIncident.assignedVolunteers.length} volunteer(s) assigned
+                    {selectedIncident.assignedTo}
                   </p>
                 </div>
               )}

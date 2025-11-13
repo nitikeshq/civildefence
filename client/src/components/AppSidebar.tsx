@@ -35,7 +35,7 @@ export function AppSidebar({ title, subtitle, navItems, user }: AppSidebarProps)
 
   return (
     <Sidebar>
-      <SidebarHeader className="border-b p-4">
+      <SidebarHeader className="border-b p-4 bg-gradient-to-b from-orange-50 to-transparent dark:from-orange-950/20">
         <h1 className="text-lg font-bold text-sidebar-foreground">{title}</h1>
         {subtitle && (
           <p className="text-sm text-sidebar-foreground/70">{subtitle}</p>
