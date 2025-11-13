@@ -169,31 +169,40 @@ Preferred communication style: Simple, everyday language.
 - **Volunteer Registrations**: 8 volunteer registrations across multiple districts (5 approved, 3 pending)
 - **Incidents**: 8 diverse incidents across multiple districts
 - **Inventory**: 15 inventory items with varied categories and conditions
+- **Trainings**: 10 training sessions across multiple districts (3 statewide, 7 district-specific)
 - All test users have password format: `{role}123` (e.g., volunteer123, district123, department123)
+
+**Training Management System** (November 2025)
+- **Status**: Fully implemented and operational
+- **Database Schema**: Complete `trainings` and `trainingRegistrations` tables with foreign key relationships
+- **Storage Layer**: Full CRUD operations with role-based filtering and enrollment management
+- **API Routes**: Complete REST API with district-based permissions and registration endpoints
+- **Admin Interface** (`/dashboard/trainings`):
+  - Full CRUD operations for creating, editing, and deleting trainings
+  - District filter dropdown (defaults to "All Districts" for department/state admins)
+  - Statewide training checkbox for department/state admins
+  - District admins restricted to their district and can see statewide trainings
+  - Real-time enrollment count display
+  - Status filtering (upcoming, ongoing, completed, cancelled)
+- **Volunteer Interface** (`/dashboard/volunteer/trainings`):
+  - List view with search and status filtering
+  - Registration/unregistration functionality with capacity enforcement
+  - Display of enrolled count and capacity
+  - Clear indication of statewide vs district-specific trainings
+- **Key Features**:
+  - Statewide trainings visible across all districts
+  - Capacity limits with duplicate registration prevention
+  - Transactional enrollment updates
+  - Predicate-based cache invalidation for cross-role consistency
+  - Individual volunteer enrollment tracking
+- **Permissions**:
+  - District admins: Create trainings for their district only, view their district + statewide
+  - Department/State admins: Create trainings for any district or statewide
+  - Volunteers: View and register for trainings in their district + statewide
 
 ### Pending Features
 
-**Training Management System** (Not Yet Implemented)
-- **Status**: Feature not implemented. User has asked about this feature.
-- **Planned Who Creates**: Both district admins and department/state admins
-  - District admins: Create and manage local training sessions for their district
-  - Department/State admins: Create statewide training sessions accessible across all districts
-- **Planned Implementation Scope**:
-  - New `trainings` table in database schema
-  - CRUD endpoints in `server/routes.ts`
-  - Storage methods in `server/storage.ts`
-  - Dedicated admin page for training management
-  - Volunteer interface to view and register for trainings
-  - District filter support for department/state admins
-- **Planned Schema Requirements**:
-  - Training title, description, date/time, location
-  - District association (specific district or "All Districts" for statewide)
-  - Capacity limits and current enrollment
-  - Skills/topics covered
-  - Created by (admin user reference)
-  - Registration tracking for volunteers
-
-**NOTE**: This feature is in the roadmap but has not been developed yet. When user asks about "where is training creation", inform them it hasn't been implemented and is on the pending features list.
+**None** - All planned features have been implemented.
 
 ### Known Infrastructure Issues
 
