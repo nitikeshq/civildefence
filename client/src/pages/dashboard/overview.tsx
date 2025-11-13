@@ -1,7 +1,7 @@
 import { useLocation } from "wouter";
 import { Users, AlertTriangle, Package, BarChart3 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DashboardLayout } from "@/components/layouts/DashboardLayout";
+import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { useAuth } from "@/hooks/useAuth";
 import { useScopedVolunteers, useScopedIncidents, useScopedInventory } from "@/hooks/useScopedData";
 import { getDashboardTitle, getDashboardSubtitle, getNavigationItems, getRolePermissions } from "@/lib/roleUtils";
