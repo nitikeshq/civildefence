@@ -6,9 +6,9 @@ export function redirectToSignIn() {
 }
 
 export function getDashboardRouteFromRole(role: UserRole | string): string {
-  // Volunteers go to their own dashboard
+  // Volunteers go to their own dashboard overview
   if (role === "volunteer") {
-    return "/dashboard/volunteer/trainings";
+    return "/dashboard/volunteer";
   }
   
   // All admin roles go to the overview dashboard
@@ -18,7 +18,7 @@ export function getDashboardRouteFromRole(role: UserRole | string): string {
   
   // CMS managers go to CMS dashboard
   if (role === "cms_manager") {
-    return "/dashboard/cms-manager";
+    return "/dashboard/cms";
   }
   
   // Default fallback

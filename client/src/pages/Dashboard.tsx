@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
-import { redirectToSignIn } from "@/lib/authRedirect";
+import { redirectToSignIn, getDashboardRouteFromRole } from "@/lib/authRedirect";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
@@ -23,27 +23,9 @@ export default function Dashboard() {
     }
 
     if (user && isAuthenticated && user.role) {
-      // Unified dashboard routing - all admin roles use same dashboard with role-based filtering
-      const rolePaths: Record<string, string> = {
-        volunteer: "/dashboard/volunteer",
-        district_admin: "/dashboard/overview",
-        department_admin: "/dashboard/overview",
-        state_admin: "/dashboard/overview",
-        cms_manager: "/cms/dashboard",
-      };
-
-      const targetPath = rolePaths[user.role];
-      if (targetPath) {
-        setLocation(targetPath);
-      } else {
-        console.error("Unknown role:", user.role);
-        toast({
-          title: "Error",
-          description: "Unknown user role. Please contact support.",
-          variant: "destructive",
-        });
-        redirectToSignIn();
-      }
+      // Use centralized redirect logic for consistency
+      const targetPath = getDashboardRouteFromRole(user.role);
+      setLocation(targetPath);
     }
   }, [user, isAuthenticated, isLoading, setLocation, toast]);
 

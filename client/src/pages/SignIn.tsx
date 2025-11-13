@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import { getDashboardRouteFromRole } from "@/lib/authRedirect";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -90,7 +91,7 @@ export default function SignIn() {
       
       return response.json();
     },
-    onSuccess: async () => {
+    onSuccess: async (userData) => {
       // Clear all cached queries first
       queryClient.clear();
       // Refetch user data to ensure fresh state
@@ -99,7 +100,9 @@ export default function SignIn() {
         title: "Success",
         description: "Logged in successfully",
       });
-      setLocation("/");
+      // Redirect to role-based dashboard
+      const dashboardRoute = getDashboardRouteFromRole(userData.role);
+      setLocation(dashboardRoute);
     },
     onError: (error) => {
       toast({
