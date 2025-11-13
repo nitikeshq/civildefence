@@ -204,6 +204,74 @@ export const insertInventorySchema = createInsertSchema(inventory).omit({
 export type InsertInventory = z.infer<typeof insertInventorySchema>;
 export type InventoryItem = typeof inventory.$inferSelect;
 
+// Training status enum
+export const trainingStatusEnum = pgEnum("training_status", [
+  "upcoming",
+  "ongoing",
+  "completed",
+  "cancelled",
+]);
+
+// Training registration status enum
+export const trainingRegistrationStatusEnum = pgEnum("training_registration_status", [
+  "pending",
+  "confirmed",
+  "waitlisted",
+  "cancelled",
+  "attended",
+]);
+
+// Trainings table
+export const trainings = pgTable("trainings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: varchar("title").notNull(),
+  description: text("description").notNull(),
+  district: varchar("district").notNull(),
+  location: varchar("location").notNull(),
+  startAt: timestamp("start_at").notNull(),
+  endAt: timestamp("end_at").notNull(),
+  capacity: integer("capacity").notNull().default(30),
+  enrolledCount: integer("enrolled_count").notNull().default(0),
+  skills: text("skills").array(),
+  createdBy: varchar("created_by").references(() => users.id).notNull(),
+  status: trainingStatusEnum("status").default("upcoming"),
+  isStatewide: boolean("is_statewide").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertTrainingSchema = createInsertSchema(trainings).omit({
+  id: true,
+  enrolledCount: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTraining = z.infer<typeof insertTrainingSchema>;
+export type Training = typeof trainings.$inferSelect;
+
+// Training registrations table
+export const trainingRegistrations = pgTable("training_registrations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  trainingId: varchar("training_id").references(() => trainings.id).notNull(),
+  volunteerId: varchar("volunteer_id").references(() => volunteers.id).notNull(),
+  status: trainingRegistrationStatusEnum("status").default("pending"),
+  attended: boolean("attended").default(false),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertTrainingRegistrationSchema = createInsertSchema(trainingRegistrations).omit({
+  id: true,
+  attended: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTrainingRegistration = z.infer<typeof insertTrainingRegistrationSchema>;
+export type TrainingRegistration = typeof trainingRegistrations.$inferSelect;
+
 // Districts reference table for hierarchical data access
 export const districts = pgTable("districts", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
