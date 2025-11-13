@@ -678,7 +678,11 @@ function HeroBannersManager() {
                     <FormItem>
                       <FormLabel>Display Order</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} />
+                        <Input 
+                          type="number" 
+                          value={field.value ?? 0}
+                          onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -952,36 +956,623 @@ function SiteSettingsManager() {
   );
 }
 
-// About Content and Services managers - same pattern, abbreviated to save tokens
-// These are fully functional but condensed for brevity
+// About Content Manager - Full CRUD implementation
 function AboutContentManager() {
+  const { toast } = useToast();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<AboutContent | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const { data: content = [], isLoading } = useQuery<AboutContent[]>({
+    queryKey: ['/api/cms/about'],
+  });
+
+  const form = useForm<InsertAboutContent>({
+    resolver: zodResolver(insertAboutContentSchema),
+    defaultValues: {
+      section: "",
+      titleEn: "",
+      titleOr: "",
+      contentEn: "",
+      contentOr: "",
+      iconName: "",
+      order: 0,
+      isActive: true,
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data: InsertAboutContent) => apiRequest('/api/cms/about', 'POST', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/cms/about'] });
+      toast({ title: "Success", description: "Content created successfully" });
+      setIsDialogOpen(false);
+      form.reset();
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: InsertAboutContent }) =>
+      apiRequest(`/api/cms/about/${id}`, 'PATCH', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/cms/about'] });
+      toast({ title: "Success", description: "Content updated successfully" });
+      setIsDialogOpen(false);
+      setEditingItem(null);
+      form.reset();
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => apiRequest(`/api/cms/about/${id}`, 'DELETE'),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/cms/about'] });
+      toast({ title: "Success", description: "Content deleted successfully" });
+      setDeleteId(null);
+    },
+  });
+
+  const handleOpenDialog = (item?: AboutContent) => {
+    if (item) {
+      setEditingItem(item);
+      form.reset({
+        section: item.section,
+        titleEn: item.titleEn,
+        titleOr: item.titleOr,
+        contentEn: item.contentEn,
+        contentOr: item.contentOr,
+        iconName: item.iconName || "",
+        order: item.order || 0,
+        isActive: item.isActive ?? true,
+      });
+    } else {
+      setEditingItem(null);
+      form.reset();
+    }
+    setIsDialogOpen(true);
+  };
+
+  const onSubmit = (data: InsertAboutContent) => {
+    if (editingItem) {
+      updateMutation.mutate({ id: editingItem.id, data });
+    } else {
+      createMutation.mutate(data);
+    }
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>About Content</CardTitle>
-        <CardDescription>Full CRUD implementation follows Site Settings pattern using insertAboutContentSchema</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-muted-foreground text-center py-8">
-          About Content CRUD - Pattern identical to above managers with fields: section, titleEn/Or, contentEn/Or, iconName, order, isActive
-        </p>
-      </CardContent>
-    </Card>
+    <>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between gap-2 flex-wrap">
+          <div>
+            <CardTitle>About Content</CardTitle>
+            <CardDescription>Manage about section content blocks</CardDescription>
+          </div>
+          <Button onClick={() => handleOpenDialog()} data-testid="button-add-about">
+            <Plus className="w-4 h-4 mr-2" />
+            Add Content
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <p className="text-muted-foreground">Loading content...</p>
+          ) : content.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-8">
+              No content blocks yet. Click "Add Content" to create one.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Section</TableHead>
+                    <TableHead>Title (EN)</TableHead>
+                    <TableHead>Order</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {content.sort((a, b) => (a.order || 0) - (b.order || 0)).map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{item.section}</TableCell>
+                      <TableCell>{item.titleEn}</TableCell>
+                      <TableCell>{item.order}</TableCell>
+                      <TableCell>
+                        <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
+                          item.isActive ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
+                        }`}>
+                          {item.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button size="sm" variant="ghost" onClick={() => handleOpenDialog(item)}>
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          <Button size="sm" variant="ghost" onClick={() => setDeleteId(item.id)}>
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingItem ? "Edit About Content" : "Add About Content"}</DialogTitle>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="section"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Section</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., mission, vision, history" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="titleEn"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title (English)</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="titleOr"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title (Odia)</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="contentEn"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Content (English)</FormLabel>
+                      <FormControl>
+                        <Textarea rows={5} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="contentOr"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Content (Odia)</FormLabel>
+                      <FormControl>
+                        <Textarea rows={5} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="iconName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Icon (Optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Shield" {...field} value={field.value || ""} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="order"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Order</FormLabel>
+                      <FormControl>
+                        <Input type="number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="isActive"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormControl>
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Active</FormLabel>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
+                  {editingItem ? "Update" : "Create"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Content</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteId && deleteMutation.mutate(deleteId)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 
+// Services Manager - Full CRUD implementation
 function ServicesManager() {
+  const { toast } = useToast();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<Service | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const { data: services = [], isLoading } = useQuery<Service[]>({
+    queryKey: ['/api/cms/services'],
+  });
+
+  const form = useForm<InsertService>({
+    resolver: zodResolver(insertServiceSchema),
+    defaultValues: {
+      titleEn: "",
+      titleOr: "",
+      descriptionEn: "",
+      descriptionOr: "",
+      iconName: "",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
+      order: 0,
+      isActive: true,
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data: InsertService) => apiRequest('/api/cms/services', 'POST', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/cms/services'] });
+      toast({ title: "Success", description: "Service created successfully" });
+      setIsDialogOpen(false);
+      form.reset();
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: InsertService }) =>
+      apiRequest(`/api/cms/services/${id}`, 'PATCH', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/cms/services'] });
+      toast({ title: "Success", description: "Service updated successfully" });
+      setIsDialogOpen(false);
+      setEditingItem(null);
+      form.reset();
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => apiRequest(`/api/cms/services/${id}`, 'DELETE'),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/cms/services'] });
+      toast({ title: "Success", description: "Service deleted successfully" });
+      setDeleteId(null);
+    },
+  });
+
+  const handleOpenDialog = (item?: Service) => {
+    if (item) {
+      setEditingItem(item);
+      form.reset({
+        titleEn: item.titleEn,
+        titleOr: item.titleOr,
+        descriptionEn: item.descriptionEn,
+        descriptionOr: item.descriptionOr,
+        iconName: item.iconName,
+        color: item.color || "text-primary",
+        bgColor: item.bgColor || "bg-primary/10",
+        order: item.order || 0,
+        isActive: item.isActive ?? true,
+      });
+    } else {
+      setEditingItem(null);
+      form.reset();
+    }
+    setIsDialogOpen(true);
+  };
+
+  const onSubmit = (data: InsertService) => {
+    if (editingItem) {
+      updateMutation.mutate({ id: editingItem.id, data });
+    } else {
+      createMutation.mutate(data);
+    }
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Services</CardTitle>
-        <CardDescription>Full CRUD implementation follows Site Settings pattern using insertServiceSchema</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-muted-foreground text-center py-8">
-          Services CRUD - Pattern identical to above managers with fields: titleEn/Or, descriptionEn/Or, iconName, color, bgColor, order, isActive
-        </p>
-      </CardContent>
-    </Card>
+    <>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between gap-2 flex-wrap">
+          <div>
+            <CardTitle>Services</CardTitle>
+            <CardDescription>Manage services offered by Civil Defence</CardDescription>
+          </div>
+          <Button onClick={() => handleOpenDialog()} data-testid="button-add-service">
+            <Plus className="w-4 h-4 mr-2" />
+            Add Service
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <p className="text-muted-foreground">Loading services...</p>
+          ) : services.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-8">
+              No services yet. Click "Add Service" to create one.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Icon</TableHead>
+                    <TableHead>Title (EN)</TableHead>
+                    <TableHead>Order</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {services.sort((a, b) => (a.order || 0) - (b.order || 0)).map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-mono text-sm">{item.iconName}</TableCell>
+                      <TableCell className="font-semibold">{item.titleEn}</TableCell>
+                      <TableCell>{item.order}</TableCell>
+                      <TableCell>
+                        <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
+                          item.isActive ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
+                        }`}>
+                          {item.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button size="sm" variant="ghost" onClick={() => handleOpenDialog(item)}>
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          <Button size="sm" variant="ghost" onClick={() => setDeleteId(item.id)}>
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingItem ? "Edit Service" : "Add Service"}</DialogTitle>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="titleEn"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title (English)</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="titleOr"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title (Odia)</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="descriptionEn"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description (English)</FormLabel>
+                      <FormControl>
+                        <Textarea rows={4} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="descriptionOr"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description (Odia)</FormLabel>
+                      <FormControl>
+                        <Textarea rows={4} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="iconName"
+                  render={({ field}) => (
+                    <FormItem>
+                      <FormLabel>Icon Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Shield, Activity" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="order"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Order</FormLabel>
+                      <FormControl>
+                        <Input type="number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="color"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Text Color</FormLabel>
+                      <FormControl>
+                        <Input placeholder="text-primary" {...field} value={field.value || ""} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="bgColor"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Background</FormLabel>
+                      <FormControl>
+                        <Input placeholder="bg-primary/10" {...field} value={field.value || ""} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="isActive"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormControl>
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Active</FormLabel>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
+                  {editingItem ? "Update" : "Create"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Service</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteId && deleteMutation.mutate(deleteId)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

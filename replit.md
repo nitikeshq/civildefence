@@ -200,6 +200,40 @@ Preferred communication style: Simple, everyday language.
   - Department/State admins: Create trainings for any district or statewide
   - Volunteers: View and register for trainings in their district + statewide
 
+**CMS Manager System** (November 2025)
+- **Status**: Fully implemented and operational with complete CRUD for all 5 content types
+- **Database Schemas**: Complete CMS tables with camelCase TypeScript properties, snake_case database columns
+  - `translations`: key/language/value for UI text internationalization
+  - `hero_banners`: Bilingual slider content (title_en/or, subtitle_en/or, button_text_en/or, button_link, image_url, order, is_active)
+  - `site_settings`: Key/value configuration pairs
+  - `about_content`: Bilingual content blocks (section, title_en/or, content_en/or, icon_name, order, is_active)
+  - `services`: Bilingual service cards (title_en/or, description_en/or, icon_name, color, bg_color, order, is_active)
+- **Frontend Implementation** (`/dashboard/cms`):
+  - Tab-based interface for managing all 5 content types
+  - React Hook Form with zodResolver using shared insert schemas from `@shared/schema`
+  - Number inputs properly convert strings to integers with parseInt
+  - Boolean inputs use Checkbox with onCheckedChange for proper boolean values
+  - TanStack Query for data fetching with proper cache invalidation
+  - Consistent UI patterns: Table views, modal dialogs for create/edit, alert dialogs for delete confirmation
+  - Loading states, empty states, and error handling throughout
+  - All forms use camelCase properties matching normalized schema
+- **Backend Implementation** (`server/routes.ts`):
+  - All 10 CMS mutation endpoints (5 POST + 5 PATCH) with Zod validation
+  - POST routes: Use `insertSchema.strict().parse(req.body)` to reject unknown fields
+  - PATCH routes: Use `insertSchema.partial().strict().parse(req.body)` with empty guard
+  - Proper error handling: 400 for validation errors, 500 for server errors
+  - Authorization via requireRole("department_admin", "state_admin", "cms_manager")
+- **Shared Schemas** (`shared/schema.ts`):
+  - All CMS insert schemas created with `createInsertSchema().omit({id: true})`
+  - camelCase property names in TypeScript (titleEn, subtitleEn, buttonTextEn, etc.)
+  - snake_case column names in database (title_en, subtitle_en, button_text_en, etc.)
+  - Type-safe insert types exported for all content types
+- **Access Control**:
+  - CMS Manager: Full access to all CMS content types
+  - Department Admin: Full access to all CMS content types
+  - State Admin: Full access to all CMS content types
+- **Usage**: Frontend developers can fetch CMS data via `/api/cms/*` endpoints to dynamically populate landing pages, about sections, services listings, and site configuration
+
 
 ### Pending Features
 

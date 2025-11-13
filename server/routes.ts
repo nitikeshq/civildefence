@@ -4,9 +4,9 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, hashPassword } from "./auth";
 import passport from "passport";
-import { insertVolunteerSchema, insertIncidentSchema, insertInventorySchema, insertUserSchema } from "@shared/schema";
-import { requireRole, isAuthenticated } from "./middleware";
+import { insertVolunteerSchema, insertIncidentSchema, insertInventorySchema, insertUserSchema, insertTranslationSchema, insertHeroBannerSchema, insertSiteSettingSchema, insertAboutContentSchema, insertServiceSchema } from "@shared/schema";
 import { z } from "zod";
+import { requireRole, isAuthenticated } from "./middleware";
 
 // Validation schemas for mutations
 const updateVolunteerStatusSchema = z.object({
@@ -676,9 +676,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/cms/translations', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
-      const translation = await storage.createTranslation(req.body);
+      const parsed = insertTranslationSchema.strict().parse(req.body);
+      const translation = await storage.createTranslation(parsed);
       res.status(201).json(translation);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating translation:", error);
       res.status(500).json({ message: "Failed to create translation" });
     }
@@ -686,9 +690,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/cms/translations/:id', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
-      const translation = await storage.updateTranslation(req.params.id, req.body);
+      const partial = insertTranslationSchema.partial().strict();
+      const parsed = partial.parse(req.body);
+      if (Object.keys(parsed).length === 0) {
+        return res.status(400).json({ message: "At least one field required" });
+      }
+      const translation = await storage.updateTranslation(req.params.id, parsed);
       res.json(translation);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error updating translation:", error);
       res.status(500).json({ message: "Failed to update translation" });
     }
@@ -717,9 +729,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/cms/hero-banners', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
-      const banner = await storage.createHeroBanner(req.body);
+      const parsed = insertHeroBannerSchema.strict().parse(req.body);
+      const banner = await storage.createHeroBanner(parsed);
       res.status(201).json(banner);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating hero banner:", error);
       res.status(500).json({ message: "Failed to create hero banner" });
     }
@@ -727,9 +743,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/cms/hero-banners/:id', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
-      const banner = await storage.updateHeroBanner(req.params.id, req.body);
+      const partial = insertHeroBannerSchema.partial().strict();
+      const parsed = partial.parse(req.body);
+      if (Object.keys(parsed).length === 0) {
+        return res.status(400).json({ message: "At least one field required" });
+      }
+      const banner = await storage.updateHeroBanner(req.params.id, parsed);
       res.json(banner);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error updating hero banner:", error);
       res.status(500).json({ message: "Failed to update hero banner" });
     }
@@ -758,9 +782,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/cms/about', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
-      const content = await storage.createAboutContent(req.body);
+      const parsed = insertAboutContentSchema.strict().parse(req.body);
+      const content = await storage.createAboutContent(parsed);
       res.status(201).json(content);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating about content:", error);
       res.status(500).json({ message: "Failed to create about content" });
     }
@@ -768,9 +796,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/cms/about/:id', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
-      const content = await storage.updateAboutContent(req.params.id, req.body);
+      const partial = insertAboutContentSchema.partial().strict();
+      const parsed = partial.parse(req.body);
+      if (Object.keys(parsed).length === 0) {
+        return res.status(400).json({ message: "At least one field required" });
+      }
+      const content = await storage.updateAboutContent(req.params.id, parsed);
       res.json(content);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error updating about content:", error);
       res.status(500).json({ message: "Failed to update about content" });
     }
@@ -799,9 +835,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/cms/services', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
-      const service = await storage.createService(req.body);
+      const parsed = insertServiceSchema.strict().parse(req.body);
+      const service = await storage.createService(parsed);
       res.status(201).json(service);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating service:", error);
       res.status(500).json({ message: "Failed to create service" });
     }
@@ -809,9 +849,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/cms/services/:id', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
-      const service = await storage.updateService(req.params.id, req.body);
+      const partial = insertServiceSchema.partial().strict();
+      const parsed = partial.parse(req.body);
+      if (Object.keys(parsed).length === 0) {
+        return res.status(400).json({ message: "At least one field required" });
+      }
+      const service = await storage.updateService(req.params.id, parsed);
       res.json(service);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error updating service:", error);
       res.status(500).json({ message: "Failed to update service" });
     }
@@ -840,9 +888,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/cms/settings', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
-      const setting = await storage.createSiteSetting(req.body);
+      const parsed = insertSiteSettingSchema.strict().parse(req.body);
+      const setting = await storage.createSiteSetting(parsed);
       res.status(201).json(setting);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error creating site setting:", error);
       res.status(500).json({ message: "Failed to create site setting" });
     }
@@ -850,9 +902,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch('/api/cms/settings/:id', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
-      const setting = await storage.updateSiteSetting(req.params.id, req.body);
+      const partial = insertSiteSettingSchema.partial().strict();
+      const parsed = partial.parse(req.body);
+      if (Object.keys(parsed).length === 0) {
+        return res.status(400).json({ message: "At least one field required" });
+      }
+      const setting = await storage.updateSiteSetting(req.params.id, parsed);
       res.json(setting);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
       console.error("Error updating site setting:", error);
       res.status(500).json({ message: "Failed to update site setting" });
     }
