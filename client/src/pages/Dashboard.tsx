@@ -23,12 +23,12 @@ export default function Dashboard() {
     }
 
     if (user && isAuthenticated && user.role) {
-      // Role-to-path mapping - State and Department Admin merged to unified dashboard
+      // Unified dashboard routing - all admin roles use same dashboard with role-based filtering
       const rolePaths: Record<string, string> = {
         volunteer: "/dashboard/volunteer",
-        district_admin: "/dashboard/district-admin",
-        department_admin: "/dashboard/admin",
-        state_admin: "/dashboard/admin",
+        district_admin: "/dashboard/overview",
+        department_admin: "/dashboard/overview",
+        state_admin: "/dashboard/overview",
         cms_manager: "/cms/dashboard",
       };
 

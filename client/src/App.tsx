@@ -13,16 +13,11 @@ import VolunteerDashboard from "@/pages/dashboard/volunteer";
 import VolunteerTasks from "@/pages/dashboard/volunteer/tasks";
 import VolunteerTraining from "@/pages/dashboard/volunteer/training";
 import VolunteerProfile from "@/pages/dashboard/volunteer/profile";
-import DistrictAdminDashboard from "@/pages/dashboard/district-admin";
-import DistrictAdminVolunteers from "@/pages/dashboard/district-admin/volunteers";
-import DistrictAdminIncidents from "@/pages/dashboard/district-admin/incidents";
-import DistrictAdminInventory from "@/pages/dashboard/district-admin/inventory";
-import StateAdminDashboard from "@/pages/dashboard/state-admin";
-import StateAdminVolunteers from "@/pages/dashboard/state-admin/volunteers";
-import StateAdminIncidents from "@/pages/dashboard/state-admin/incidents";
-import StateAdminInventory from "@/pages/dashboard/state-admin/inventory";
-import StateAdminReports from "@/pages/dashboard/state-admin/reports";
-import AdminDashboard from "@/pages/dashboard/admin";
+import DashboardOverview from "@/pages/dashboard/overview";
+import DashboardVolunteers from "@/pages/dashboard/volunteers";
+import DashboardIncidents from "@/pages/dashboard/incidents";
+import DashboardInventory from "@/pages/dashboard/inventory";
+import DashboardReports from "@/pages/dashboard/reports";
 import CMSDashboard from "@/pages/dashboard/cms-manager";
 import VolunteerRegistration from "@/pages/VolunteerRegistration";
 import IncidentReporting from "@/pages/IncidentReporting";
@@ -54,22 +49,22 @@ function Router() {
       ) : (
         <>
           <Route path="/" component={Dashboard} />
+          {/* Volunteer Routes */}
           <Route path="/dashboard/volunteer" component={VolunteerDashboard} />
           <Route path="/dashboard/volunteer/tasks" component={VolunteerTasks} />
           <Route path="/dashboard/volunteer/training" component={VolunteerTraining} />
           <Route path="/dashboard/volunteer/profile" component={VolunteerProfile} />
-          <Route path="/dashboard/district-admin" component={DistrictAdminDashboard} />
-          <Route path="/dashboard/district-admin/volunteers" component={DistrictAdminVolunteers} />
-          <Route path="/dashboard/district-admin/incidents" component={DistrictAdminIncidents} />
-          <Route path="/dashboard/district-admin/inventory" component={DistrictAdminInventory} />
-          <Route path="/dashboard/state-admin" component={StateAdminDashboard} />
-          <Route path="/dashboard/state-admin/volunteers" component={StateAdminVolunteers} />
-          <Route path="/dashboard/state-admin/incidents" component={StateAdminIncidents} />
-          <Route path="/dashboard/state-admin/inventory" component={StateAdminInventory} />
-          <Route path="/dashboard/state-admin/reports" component={StateAdminReports} />
-          <Route path="/dashboard/admin" component={AdminDashboard} />
+          {/* Unified Admin Dashboard Routes - Role-based filtering */}
+          <Route path="/dashboard/overview" component={DashboardOverview} />
+          <Route path="/dashboard/volunteers" component={DashboardVolunteers} />
+          <Route path="/dashboard/incidents" component={DashboardIncidents} />
+          <Route path="/dashboard/inventory" component={DashboardInventory} />
+          <Route path="/dashboard/reports" component={DashboardReports} />
+          {/* CMS Routes */}
           <Route path="/cms/dashboard" component={CMSDashboard} />
           <Route path="/cms/:page" component={CMSDashboard} />
+          {/* Legacy/Public Routes */}
+          <Route path="/volunteer/register" component={VolunteerRegistration} />
           <Route path="/incident-reporting" component={IncidentReporting} />
           <Route path="/incidents/report" component={IncidentReporting} />
           <Route path="/inventory" component={InventoryManagement} />
