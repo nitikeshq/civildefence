@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
-import { LogIn, ShieldCheck, Users, Building2, Flag, Settings } from "lucide-react";
+import { LogIn, ShieldCheck, Users, Building2, Settings } from "lucide-react";
 import AccessibilityBar from "@/components/AccessibilityBar";
 
 const signInSchema = z.object({
@@ -51,14 +51,6 @@ const testCredentials = [
     icon: ShieldCheck,
     description: "State-level department administration",
     color: "text-orange-600 dark:text-orange-400",
-  },
-  {
-    role: "State Admin",
-    username: "state_admin",
-    password: "state123",
-    icon: Flag,
-    description: "State-wide system oversight",
-    color: "text-red-600 dark:text-red-400",
   },
   {
     role: "CMS Manager",
@@ -140,12 +132,10 @@ export default function SignIn() {
               <p className="text-sm md:text-base text-primary-foreground/90">Government of Odisha</p>
             </div>
             <div className="flex items-center gap-3">
-              <Link href="/">
-                <a>
-                  <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20" data-testid="link-home">
-                    ← Back to Home
-                  </Button>
-                </a>
+              <Link href="/" asChild>
+                <Button variant="outline" className="bg-white/10 border-white/20 text-white hover:bg-white/20" data-testid="link-home">
+                  ← Back to Home
+                </Button>
               </Link>
             </div>
           </div>
