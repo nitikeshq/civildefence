@@ -51,7 +51,7 @@ export default function DashboardVolunteers() {
   // Fetch volunteers with district filter
   const { data: volunteers = [], isLoading } = useQuery<Volunteer[]>({
     queryKey: ["/api/volunteers", userDistrict || "all"],
-    enabled: isDistrictAdmin || (isDepartmentAdmin && !!selectedDistrict),
+    enabled: isDistrictAdmin || (isDepartmentAdmin && selectedDistrict !== ""),
   });
 
   const approveMutation = useMutation({
@@ -168,6 +168,7 @@ export default function DashboardVolunteers() {
                     <SelectValue placeholder="Select District" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="all">All Districts</SelectItem>
                     {ODISHA_DISTRICTS.map((district) => (
                       <SelectItem key={district} value={district}>
                         {district}
@@ -199,8 +200,15 @@ export default function DashboardVolunteers() {
           </div>
         )}
 
+        {/* Department Admin - District Info */}
+        {isDepartmentAdmin && selectedDistrict === "all" && (
+          <div className="p-3 bg-muted rounded-lg">
+            <p className="text-sm font-medium">Showing volunteers from: All Districts</p>
+          </div>
+        )}
+        
         {/* Department Admin - No District Selected */}
-        {isDepartmentAdmin && !selectedDistrict && (
+        {isDepartmentAdmin && selectedDistrict === "" && (
           <div className="p-4 bg-muted rounded-lg text-center">
             <Filter className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
             <p className="text-sm font-medium text-muted-foreground">
