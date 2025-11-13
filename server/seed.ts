@@ -1,7 +1,7 @@
 import { storage } from "./storage";
 import { hashPassword } from "./auth";
 import { db } from "./db";
-import { incidents, inventory, volunteers } from "@shared/schema";
+import { incidents, inventory, volunteers, trainings } from "@shared/schema";
 
 async function seedDatabase() {
   console.log("Seeding database with test users...");
@@ -554,6 +554,155 @@ async function seedDatabase() {
       console.log(`✓ Added inventory: ${item.name}`);
     } catch (error) {
       console.error(`✗ Failed to add inventory ${item.name}:`, error);
+    }
+  }
+
+  // Seed trainings
+  console.log("\n🎓 Seeding trainings...");
+  const departmentAdminUser = createdUsers.get("dept_admin");
+  const districtAdminUser = createdUsers.get("district_admin");
+  
+  const sampleTrainings = [
+    {
+      title: "Basic First Aid and CPR Training",
+      description: "Comprehensive training on first aid procedures, CPR techniques, and emergency medical response",
+      district: "Khordha",
+      location: "Civil Defence Training Center, Bhubaneswar",
+      startAt: new Date("2025-02-15T09:00:00"),
+      endAt: new Date("2025-02-15T17:00:00"),
+      capacity: 40,
+      skills: ["First Aid", "CPR", "Medical Response"],
+      status: "upcoming" as const,
+      isStatewide: true,
+      createdBy: departmentAdminUser?.id || "",
+    },
+    {
+      title: "Flood Rescue Operations Workshop",
+      description: "Hands-on training for flood rescue operations, boat handling, and water safety",
+      district: "Puri",
+      location: "Coastal Training Facility, Puri",
+      startAt: new Date("2025-02-20T08:00:00"),
+      endAt: new Date("2025-02-21T18:00:00"),
+      capacity: 30,
+      skills: ["Water Rescue", "Boat Operation", "Swimming"],
+      status: "upcoming" as const,
+      isStatewide: false,
+      createdBy: districtAdminUser?.id || "",
+    },
+    {
+      title: "Fire Safety and Prevention Seminar",
+      description: "Fire safety awareness, fire extinguisher usage, and evacuation procedures",
+      district: "Cuttack",
+      location: "Fire Services Training Ground, Cuttack",
+      startAt: new Date("2025-03-01T10:00:00"),
+      endAt: new Date("2025-03-01T16:00:00"),
+      capacity: 50,
+      skills: ["Fire Safety", "Fire Fighting", "Evacuation"],
+      status: "upcoming" as const,
+      isStatewide: false,
+      createdBy: districtAdminUser?.id || "",
+    },
+    {
+      title: "Disaster Management Coordination",
+      description: "Statewide training on disaster management coordination, command centers, and emergency protocols",
+      district: "Khordha",
+      location: "State Emergency Operations Center, Bhubaneswar",
+      startAt: new Date("2025-03-10T09:00:00"),
+      endAt: new Date("2025-03-12T17:00:00"),
+      capacity: 60,
+      skills: ["Disaster Management", "Coordination", "Emergency Planning"],
+      status: "upcoming" as const,
+      isStatewide: true,
+      createdBy: departmentAdminUser?.id || "",
+    },
+    {
+      title: "Search and Rescue Techniques",
+      description: "Advanced search and rescue techniques for disaster scenarios",
+      district: "Balasore",
+      location: "Disaster Response Training Campus, Balasore",
+      startAt: new Date("2025-02-25T08:00:00"),
+      endAt: new Date("2025-02-26T18:00:00"),
+      capacity: 35,
+      skills: ["Search & Rescue", "Rope Techniques", "Team Coordination"],
+      status: "upcoming" as const,
+      isStatewide: false,
+      createdBy: districtAdminUser?.id || "",
+    },
+    {
+      title: "Emergency Communication Systems",
+      description: "Training on radio communication, emergency hotlines, and coordination protocols",
+      district: "Sambalpur",
+      location: "Communication Training Center, Sambalpur",
+      startAt: new Date("2025-03-15T09:00:00"),
+      endAt: new Date("2025-03-15T17:00:00"),
+      capacity: 25,
+      skills: ["Radio Communication", "Emergency Protocols"],
+      status: "upcoming" as const,
+      isStatewide: false,
+      createdBy: districtAdminUser?.id || "",
+    },
+    {
+      title: "Cyclone Preparedness Workshop",
+      description: "Statewide cyclone preparedness training for coastal and inland volunteers",
+      district: "Puri",
+      location: "Coastal Disaster Management Hub, Puri",
+      startAt: new Date("2025-04-01T09:00:00"),
+      endAt: new Date("2025-04-02T17:00:00"),
+      capacity: 70,
+      skills: ["Cyclone Response", "Evacuation Planning", "Shelter Management"],
+      status: "upcoming" as const,
+      isStatewide: true,
+      createdBy: departmentAdminUser?.id || "",
+    },
+    {
+      title: "Medical Emergency Response Training",
+      description: "Advanced medical emergency response for trauma, cardiac events, and mass casualties",
+      district: "Ganjam",
+      location: "District Hospital Training Wing, Berhampur",
+      startAt: new Date("2025-03-20T08:00:00"),
+      endAt: new Date("2025-03-21T18:00:00"),
+      capacity: 30,
+      skills: ["Emergency Medicine", "Trauma Care", "Mass Casualty Management"],
+      status: "upcoming" as const,
+      isStatewide: false,
+      createdBy: districtAdminUser?.id || "",
+    },
+    {
+      title: "Community Awareness and Outreach",
+      description: "Training volunteers on community awareness programs and public engagement",
+      district: "Mayurbhanj",
+      location: "Community Development Center, Baripada",
+      startAt: new Date("2025-04-10T09:00:00"),
+      endAt: new Date("2025-04-10T16:00:00"),
+      capacity: 45,
+      skills: ["Public Speaking", "Community Engagement", "Awareness Programs"],
+      status: "upcoming" as const,
+      isStatewide: false,
+      createdBy: districtAdminUser?.id || "",
+    },
+    {
+      title: "Advanced Rescue Equipment Handling",
+      description: "Hands-on training with advanced rescue equipment and machinery",
+      district: "Jagatsinghpur",
+      location: "Equipment Training Yard, Jagatsinghpur",
+      startAt: new Date("2025-04-15T08:00:00"),
+      endAt: new Date("2025-04-16T17:00:00"),
+      capacity: 20,
+      skills: ["Equipment Operation", "Heavy Machinery", "Technical Rescue"],
+      status: "upcoming" as const,
+      isStatewide: false,
+      createdBy: districtAdminUser?.id || "",
+    },
+  ];
+
+  for (const training of sampleTrainings) {
+    try {
+      if (training.createdBy) {
+        await db.insert(trainings).values(training);
+        console.log(`✓ Added training: ${training.title}`);
+      }
+    } catch (error) {
+      console.error(`✗ Failed to add training ${training.title}:`, error);
     }
   }
 
