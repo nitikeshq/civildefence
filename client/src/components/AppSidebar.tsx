@@ -34,17 +34,17 @@ export function AppSidebar({ title, subtitle, navItems, user }: AppSidebarProps)
   const [location] = useLocation();
 
   return (
-    <Sidebar>
-      <SidebarHeader className="border-b p-4 bg-gradient-to-b from-orange-50 to-transparent dark:from-orange-950/20">
-        <h1 className="text-lg font-bold text-sidebar-foreground">{title}</h1>
+    <Sidebar className="bg-gradient-to-b from-orange-600 to-orange-500 dark:from-orange-700 dark:to-orange-600">
+      <SidebarHeader className="border-b border-white/20 p-4">
+        <h1 className="text-lg font-bold text-white">{title}</h1>
         {subtitle && (
-          <p className="text-sm text-sidebar-foreground/70">{subtitle}</p>
+          <p className="text-sm text-white/90">{subtitle}</p>
         )}
       </SidebarHeader>
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-white/80">Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => {
@@ -72,16 +72,16 @@ export function AppSidebar({ title, subtitle, navItems, user }: AppSidebarProps)
       </SidebarContent>
 
       {user && (
-        <SidebarFooter className="border-t p-4">
+        <SidebarFooter className="border-t border-white/20 p-4">
           <div className="flex items-center gap-3 text-sm">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-sidebar-accent">
-              <User className="h-4 w-4 text-sidebar-accent-foreground" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-white/20">
+              <User className="h-4 w-4 text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-sidebar-foreground truncate">
+              <p className="font-medium text-white truncate">
                 {user.firstName} {user.lastName}
               </p>
-              <p className="text-xs text-sidebar-foreground/70 truncate">
+              <p className="text-xs text-white/80 truncate">
                 {user.email}
               </p>
             </div>
