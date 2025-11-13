@@ -50,16 +50,8 @@ const testCredentials = [
     username: "dept_admin",
     password: "department123",
     icon: ShieldCheck,
-    description: "State-level department administration",
+    description: "State-level department administration & CMS access",
     color: "text-orange-600 dark:text-orange-400",
-  },
-  {
-    role: "CMS Manager",
-    username: "cms_manager",
-    password: "cms123",
-    icon: Settings,
-    description: "Content management & site configuration",
-    color: "text-purple-600 dark:text-purple-400",
   },
 ];
 
