@@ -14,6 +14,9 @@ import VolunteerTasks from "@/pages/dashboard/volunteer/tasks";
 import VolunteerTraining from "@/pages/dashboard/volunteer/training";
 import VolunteerProfile from "@/pages/dashboard/volunteer/profile";
 import DistrictAdminDashboard from "@/pages/dashboard/district-admin";
+import DistrictAdminVolunteers from "@/pages/dashboard/district-admin/volunteers";
+import DistrictAdminIncidents from "@/pages/dashboard/district-admin/incidents";
+import DistrictAdminInventory from "@/pages/dashboard/district-admin/inventory";
 import AdminDashboard from "@/pages/dashboard/admin";
 import CMSDashboard from "@/pages/dashboard/cms-manager";
 import VolunteerRegistration from "@/pages/VolunteerRegistration";
@@ -51,6 +54,9 @@ function Router() {
           <Route path="/dashboard/volunteer/training" component={VolunteerTraining} />
           <Route path="/dashboard/volunteer/profile" component={VolunteerProfile} />
           <Route path="/dashboard/district-admin" component={DistrictAdminDashboard} />
+          <Route path="/dashboard/district-admin/volunteers" component={DistrictAdminVolunteers} />
+          <Route path="/dashboard/district-admin/incidents" component={DistrictAdminIncidents} />
+          <Route path="/dashboard/district-admin/inventory" component={DistrictAdminInventory} />
           <Route path="/dashboard/admin" component={AdminDashboard} />
           <Route path="/cms/dashboard" component={CMSDashboard} />
           <Route path="/cms/:page" component={CMSDashboard} />
