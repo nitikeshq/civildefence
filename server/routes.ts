@@ -664,7 +664,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // CMS API Routes - Admin only
   
   // Translations CRUD
-  app.get('/api/cms/translations', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+  app.get('/api/cms/translations', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
       const translations = await storage.getAllTranslations();
       res.json(translations);
@@ -674,7 +674,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/cms/translations', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+  app.post('/api/cms/translations', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
       const translation = await storage.createTranslation(req.body);
       res.status(201).json(translation);
@@ -684,7 +684,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/cms/translations/:id', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+  app.patch('/api/cms/translations/:id', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
       const translation = await storage.updateTranslation(req.params.id, req.body);
       res.json(translation);
@@ -694,7 +694,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/cms/translations/:id', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+  app.delete('/api/cms/translations/:id', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
       await storage.deleteTranslation(req.params.id);
       res.status(204).send();
@@ -705,7 +705,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Hero Banners CRUD
-  app.get('/api/cms/hero-banners', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+  app.get('/api/cms/hero-banners', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
       const banners = await storage.getAllHeroBanners();
       res.json(banners);
@@ -715,7 +715,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/cms/hero-banners', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+  app.post('/api/cms/hero-banners', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
       const banner = await storage.createHeroBanner(req.body);
       res.status(201).json(banner);
@@ -725,7 +725,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/cms/hero-banners/:id', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+  app.patch('/api/cms/hero-banners/:id', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
       const banner = await storage.updateHeroBanner(req.params.id, req.body);
       res.json(banner);
@@ -735,7 +735,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/cms/hero-banners/:id', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+  app.delete('/api/cms/hero-banners/:id', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
       await storage.deleteHeroBanner(req.params.id);
       res.status(204).send();
@@ -746,7 +746,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // About Content CRUD
-  app.get('/api/cms/about', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+  app.get('/api/cms/about', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
       const content = await storage.getAllAboutContent();
       res.json(content);
@@ -756,7 +756,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/cms/about', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+  app.post('/api/cms/about', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
       const content = await storage.createAboutContent(req.body);
       res.status(201).json(content);
@@ -766,7 +766,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/cms/about/:id', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+  app.patch('/api/cms/about/:id', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
       const content = await storage.updateAboutContent(req.params.id, req.body);
       res.json(content);
@@ -776,7 +776,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/cms/about/:id', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+  app.delete('/api/cms/about/:id', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
       await storage.deleteAboutContent(req.params.id);
       res.status(204).send();
@@ -787,7 +787,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Services CRUD
-  app.get('/api/cms/services', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+  app.get('/api/cms/services', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
       const services = await storage.getAllServices();
       res.json(services);
@@ -797,7 +797,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/cms/services', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+  app.post('/api/cms/services', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
       const service = await storage.createService(req.body);
       res.status(201).json(service);
@@ -807,7 +807,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/cms/services/:id', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+  app.patch('/api/cms/services/:id', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
       const service = await storage.updateService(req.params.id, req.body);
       res.json(service);
@@ -817,7 +817,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/cms/services/:id', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+  app.delete('/api/cms/services/:id', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
       await storage.deleteService(req.params.id);
       res.status(204).send();
@@ -828,7 +828,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Site Settings CRUD
-  app.get('/api/cms/settings', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+  app.get('/api/cms/settings', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
       const settings = await storage.getAllSiteSettings();
       res.json(settings);
@@ -838,7 +838,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/cms/settings', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+  app.post('/api/cms/settings', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
       const setting = await storage.createSiteSetting(req.body);
       res.status(201).json(setting);
@@ -848,7 +848,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch('/api/cms/settings/:id', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+  app.patch('/api/cms/settings/:id', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
       const setting = await storage.updateSiteSetting(req.params.id, req.body);
       res.json(setting);
@@ -858,7 +858,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete('/api/cms/settings/:id', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+  app.delete('/api/cms/settings/:id', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
       await storage.deleteSiteSetting(req.params.id);
       res.status(204).send();
