@@ -3,6 +3,7 @@ import {
   volunteers,
   incidents,
   inventory,
+  assignments,
   type User,
   type UpsertUser,
   type Volunteer,
@@ -11,6 +12,8 @@ import {
   type InsertIncident,
   type InventoryItem,
   type InsertInventory,
+  type Assignment,
+  type InsertAssignment,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, ilike, or } from "drizzle-orm";
@@ -55,6 +58,8 @@ export interface IStorage {
   searchInventory(query: string): Promise<InventoryItem[]>;
   
   // Assignment operations
+  getAllAssignments(): Promise<Assignment[]>;
+  createAssignment(assignment: InsertAssignment): Promise<Assignment>;
   getMyAssignments(userId: string): Promise<any[]>;
   updateAssignmentStatus(id: string, status: string, userId: string): Promise<any>;
   
@@ -282,6 +287,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Assignment operations
+  async getAllAssignments(): Promise<Assignment[]> {
+    return await db
+      .select()
+      .from(assignments)
+      .orderBy(desc(assignments.createdAt));
+  }
+
+  async createAssignment(assignment: InsertAssignment): Promise<Assignment> {
+    const [newAssignment] = await db
+      .insert(assignments)
+      .values(assignment)
+      .returning();
+    return newAssignment;
+  }
+
   async getMyAssignments(userId: string): Promise<any[]> {
     // First get the volunteer record for this user
     const [volunteer] = await db

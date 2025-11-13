@@ -184,3 +184,19 @@ export function getDashboardSubtitle(role: UserRole | null | undefined, district
   
   return "Civil Defence, Odisha";
 }
+
+// Import icons for navigation
+import { LayoutDashboard, Users, AlertTriangle, ClipboardList, Package, FileText } from "lucide-react";
+
+export function getAdminNavItems(role: string) {
+  const baseItems = [
+    { label: "Overview", path: "/dashboard/overview", icon: LayoutDashboard },
+    { label: "Volunteers", path: "/dashboard/volunteers", icon: Users },
+    { label: "Incidents", path: "/dashboard/incidents", icon: AlertTriangle },
+    { label: "Tasks", path: "/dashboard/tasks", icon: ClipboardList },
+    { label: "Inventory", path: "/dashboard/inventory", icon: Package },
+    { label: "Reports", path: "/dashboard/reports", icon: FileText },
+  ];
+
+  return baseItems;
+}

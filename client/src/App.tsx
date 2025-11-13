@@ -18,6 +18,7 @@ import DashboardVolunteers from "@/pages/dashboard/volunteers";
 import DashboardIncidents from "@/pages/dashboard/incidents";
 import DashboardInventory from "@/pages/dashboard/inventory";
 import DashboardReports from "@/pages/dashboard/reports";
+import DashboardTasks from "@/pages/dashboard/tasks";
 import CMSDashboard from "@/pages/dashboard/cms-manager";
 import VolunteerRegistration from "@/pages/VolunteerRegistration";
 import IncidentReporting from "@/pages/IncidentReporting";
@@ -58,6 +59,7 @@ function Router() {
           <Route path="/dashboard/overview" component={DashboardOverview} />
           <Route path="/dashboard/volunteers" component={DashboardVolunteers} />
           <Route path="/dashboard/incidents" component={DashboardIncidents} />
+          <Route path="/dashboard/tasks" component={DashboardTasks} />
           <Route path="/dashboard/inventory" component={DashboardInventory} />
           <Route path="/dashboard/reports" component={DashboardReports} />
           {/* CMS Routes */}

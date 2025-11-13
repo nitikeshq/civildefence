@@ -360,6 +360,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Assignment routes - Admin routes
+  app.get('/api/assignments', isAuthenticated, requireRole("district_admin", "department_admin", "state_admin"), async (req: any, res) => {
+    try {
+      const user = req.authenticatedUser;
+      let assignments = await storage.getAllAssignments();
+      
+      // District admins only see assignments for their district
+      if (user.role === "district_admin" && user.district) {
+        assignments = assignments.filter((a: any) => a.district === user.district);
+      }
+      
+      res.json(assignments);
+    } catch (error) {
+      console.error("Error fetching assignments:", error);
+      res.status(500).json({ message: "Failed to fetch assignments" });
+    }
+  });
+
+  app.post('/api/assignments', isAuthenticated, requireRole("district_admin", "department_admin", "state_admin"), async (req: any, res) => {
+    try {
+      const assignmentData = req.body;
+      const assignedBy = (req.user as any).id;
+      
+      const assignment = await storage.createAssignment({
+        ...assignmentData,
+        assignedBy,
+      });
+      
+      res.json(assignment);
+    } catch (error: any) {
+      console.error("Error creating assignment:", error);
+      res.status(400).json({ message: error.message || "Failed to create assignment" });
+    }
+  });
+
   // Assignment routes - Volunteer-specific
   app.get('/api/my-assignments', isAuthenticated, requireRole("volunteer"), async (req: any, res) => {
     try {
