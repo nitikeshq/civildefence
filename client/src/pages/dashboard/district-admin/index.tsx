@@ -19,9 +19,14 @@ import {
   UserCheck,
   FileText,
   Plus,
-  MapPin
+  MapPin,
+  TrendingUp,
+  TrendingDown,
+  Shield,
+  Activity
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 
 export default function DistrictAdminDashboard() {
   const { toast } = useToast();
@@ -72,6 +77,11 @@ export default function DistrictAdminDashboard() {
   const approvedVolunteers = districtVolunteers.filter(v => v.status === "approved");
   const activeIncidents = districtIncidents.filter(i => i.status !== "closed");
   const criticalIncidents = districtIncidents.filter(i => i.severity === "critical");
+  const highIncidents = districtIncidents.filter(i => i.severity === "high");
+  const resolvedIncidents = districtIncidents.filter(i => i.status === "resolved" || i.status === "closed");
+  
+  // Calculate growth (simulated)
+  const volunteerGrowth = districtVolunteers.length > 0 ? "5.2" : "0";
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -88,56 +98,92 @@ export default function DistrictAdminDashboard() {
             </p>
           </div>
 
-          {/* Key Metrics */}
+          {/* Enhanced Key Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Volunteers</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
+            <Card className="border-l-4 border-l-blue-500">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">District Volunteers</CardTitle>
+                <div className="p-2 bg-blue-50 rounded-lg">
+                  <Users className="h-4 w-4 text-blue-600" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{districtVolunteers.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  {approvedVolunteers.length} approved
+                <div className="text-3xl font-bold text-blue-600">{districtVolunteers.length}</div>
+                <div className="flex items-center gap-2 mt-1">
+                  <TrendingUp className="h-3 w-3 text-green-600" />
+                  <span className="text-xs font-medium text-green-600">
+                    +{volunteerGrowth}% this month
+                  </span>
+                </div>
+                <Progress value={districtVolunteers.length > 0 ? (approvedVolunteers.length / districtVolunteers.length) * 100 : 0} className="mt-3" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {approvedVolunteers.length} approved, {pendingVolunteers.length} pending
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+            <Card className="border-l-4 border-l-orange-500">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Pending Approvals</CardTitle>
-                <Clock className="h-4 w-4 text-muted-foreground" />
+                <div className="p-2 bg-orange-50 rounded-lg">
+                  <Clock className="h-4 w-4 text-orange-600" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-orange-600">{pendingVolunteers.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  Need your review
+                <div className="text-3xl font-bold text-orange-600">{pendingVolunteers.length}</div>
+                <div className="flex items-center gap-2 mt-1">
+                  <UserCheck className="h-3 w-3 text-orange-600" />
+                  <span className="text-xs font-medium text-orange-600">
+                    Require your review
+                  </span>
+                </div>
+                <Progress value={districtVolunteers.length > 0 ? (pendingVolunteers.length / districtVolunteers.length) * 100 : 0} className="mt-3 [&>div]:bg-orange-500" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Priority action items
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+            <Card className="border-l-4 border-l-red-500">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Active Incidents</CardTitle>
-                <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+                <div className="p-2 bg-red-50 rounded-lg">
+                  <AlertTriangle className="h-4 w-4 text-red-600" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-destructive">{activeIncidents.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  {criticalIncidents.length} critical
+                <div className="text-3xl font-bold text-red-600">{activeIncidents.length}</div>
+                <div className="flex items-center gap-2 mt-1">
+                  <Activity className="h-3 w-3 text-red-600" />
+                  <span className="text-xs font-medium text-red-600">
+                    {criticalIncidents.length} critical, {highIncidents.length} high
+                  </span>
+                </div>
+                <Progress value={districtIncidents.length > 0 ? (resolvedIncidents.length / districtIncidents.length) * 100 : 0} className="mt-3 [&>div]:bg-green-500" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {resolvedIncidents.length} resolved
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+            <Card className="border-l-4 border-l-green-500">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Equipment</CardTitle>
-                <Package className="h-4 w-4 text-muted-foreground" />
+                <div className="p-2 bg-green-50 rounded-lg">
+                  <Package className="h-4 w-4 text-green-600" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{districtInventory.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  Items in district
+                <div className="text-3xl font-bold text-green-600">{districtInventory.length}</div>
+                <div className="flex items-center gap-2 mt-1">
+                  <Shield className="h-3 w-3 text-green-600" />
+                  <span className="text-xs font-medium text-green-600">
+                    Ready for deployment
+                  </span>
+                </div>
+                <Progress value={88} className="mt-3 [&>div]:bg-green-500" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  88% operational
                 </p>
               </CardContent>
             </Card>

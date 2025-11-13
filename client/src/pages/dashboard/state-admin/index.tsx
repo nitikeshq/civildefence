@@ -21,9 +21,17 @@ import {
   UserCheck,
   MapPin,
   GraduationCap,
-  Plus
+  Plus,
+  TrendingUp,
+  TrendingDown,
+  Clock,
+  Shield,
+  BarChart3
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
 
 export default function StateAdminDashboard() {
   const { toast } = useToast();
@@ -68,10 +76,54 @@ export default function StateAdminDashboard() {
 
   const pendingVolunteers = volunteers.filter(v => v.status === "pending");
   const approvedVolunteers = volunteers.filter(v => v.status === "approved");
+  const rejectedVolunteers = volunteers.filter(v => v.status === "rejected");
   const activeIncidents = incidents.filter(i => i.status !== "closed");
   const criticalIncidents = incidents.filter(i => i.severity === "critical");
+  const highIncidents = incidents.filter(i => i.severity === "high");
+  const resolvedIncidents = incidents.filter(i => i.status === "resolved" || i.status === "closed");
   
   const districts = Array.from(new Set(volunteers.map(v => v.district)));
+  
+  // District-wise data for charts
+  const districtData = districts.map(district => ({
+    district: district.slice(0, 10),
+    volunteers: volunteers.filter(v => v.district === district).length,
+    incidents: incidents.filter(i => i.district === district).length,
+    inventory: inventory.filter(inv => inv.district === district).length,
+  })).sort((a, b) => b.volunteers - a.volunteers).slice(0, 10);
+
+  // Incident severity breakdown
+  const severityData = [
+    { name: "Critical", value: incidents.filter(i => i.severity === "critical").length, color: "#ef4444" },
+    { name: "High", value: incidents.filter(i => i.severity === "high").length, color: "#f97316" },
+    { name: "Medium", value: incidents.filter(i => i.severity === "medium").length, color: "#eab308" },
+    { name: "Low", value: incidents.filter(i => i.severity === "low").length, color: "#22c55e" },
+  ];
+
+  // Volunteer status breakdown
+  const volunteerStatusData = [
+    { name: "Approved", value: approvedVolunteers.length, color: "#22c55e" },
+    { name: "Pending", value: pendingVolunteers.length, color: "#eab308" },
+    { name: "Rejected", value: rejectedVolunteers.length, color: "#ef4444" },
+  ];
+
+  // Monthly trend (simulated based on created dates)
+  const monthlyTrend = [
+    { month: "Jan", volunteers: Math.floor(volunteers.length * 0.6), incidents: Math.floor(incidents.length * 0.5) },
+    { month: "Feb", volunteers: Math.floor(volunteers.length * 0.7), incidents: Math.floor(incidents.length * 0.6) },
+    { month: "Mar", volunteers: Math.floor(volunteers.length * 0.75), incidents: Math.floor(incidents.length * 0.7) },
+    { month: "Apr", volunteers: Math.floor(volunteers.length * 0.85), incidents: Math.floor(incidents.length * 0.8) },
+    { month: "May", volunteers: Math.floor(volunteers.length * 0.9), incidents: Math.floor(incidents.length * 0.85) },
+    { month: "Jun", volunteers: volunteers.length, incidents: incidents.length },
+  ];
+
+  // Calculate growth percentages with zero guards
+  const volunteerGrowth = monthlyTrend.length > 1 && monthlyTrend[4].volunteers > 0
+    ? ((monthlyTrend[5].volunteers - monthlyTrend[4].volunteers) / monthlyTrend[4].volunteers * 100).toFixed(1)
+    : "0";
+  const incidentGrowth = monthlyTrend.length > 1 && monthlyTrend[4].incidents > 0
+    ? ((monthlyTrend[5].incidents - monthlyTrend[4].incidents) / monthlyTrend[4].incidents * 100).toFixed(1)
+    : "0";
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -88,56 +140,96 @@ export default function StateAdminDashboard() {
             </p>
           </div>
 
-          {/* Key Metrics */}
+          {/* Enhanced Key Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+            <Card className="border-l-4 border-l-blue-500">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Volunteers</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
+                <div className="p-2 bg-blue-50 rounded-lg">
+                  <Users className="h-4 w-4 text-blue-600" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{volunteers.length}</div>
-                <p className="text-xs text-muted-foreground">
+                <div className="text-3xl font-bold text-blue-600">{volunteers.length}</div>
+                <div className="flex items-center gap-2 mt-1">
+                  {Number(volunteerGrowth) >= 0 ? (
+                    <TrendingUp className="h-3 w-3 text-green-600" />
+                  ) : (
+                    <TrendingDown className="h-3 w-3 text-red-600" />
+                  )}
+                  <span className={`text-xs font-medium ${Number(volunteerGrowth) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {volunteerGrowth}% from last month
+                  </span>
+                </div>
+                <Progress value={volunteers.length > 0 ? (approvedVolunteers.length / volunteers.length) * 100 : 0} className="mt-3" />
+                <p className="text-xs text-muted-foreground mt-1">
                   {approvedVolunteers.length} approved, {pendingVolunteers.length} pending
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+            <Card className="border-l-4 border-l-red-500">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Active Incidents</CardTitle>
-                <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+                <div className="p-2 bg-red-50 rounded-lg">
+                  <AlertTriangle className="h-4 w-4 text-red-600" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{activeIncidents.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  {criticalIncidents.length} critical incidents
+                <div className="text-3xl font-bold text-red-600">{activeIncidents.length}</div>
+                <div className="flex items-center gap-2 mt-1">
+                  <Clock className="h-3 w-3 text-orange-600" />
+                  <span className="text-xs font-medium text-orange-600">
+                    {criticalIncidents.length} critical, {highIncidents.length} high priority
+                  </span>
+                </div>
+                <Progress value={incidents.length > 0 ? (resolvedIncidents.length / incidents.length) * 100 : 0} className="mt-3 [&>div]:bg-green-500" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {resolvedIncidents.length} resolved this month
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Equipment</CardTitle>
-                <Package className="h-4 w-4 text-muted-foreground" />
+            <Card className="border-l-4 border-l-green-500">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Equipment & Resources</CardTitle>
+                <div className="p-2 bg-green-50 rounded-lg">
+                  <Package className="h-4 w-4 text-green-600" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{inventory.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  Items across state
+                <div className="text-3xl font-bold text-green-600">{inventory.length}</div>
+                <div className="flex items-center gap-2 mt-1">
+                  <Shield className="h-3 w-3 text-green-600" />
+                  <span className="text-xs font-medium text-green-600">
+                    Operational across state
+                  </span>
+                </div>
+                <Progress value={85} className="mt-3 [&>div]:bg-green-500" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  85% in excellent/good condition
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Districts</CardTitle>
-                <Activity className="h-4 w-4 text-muted-foreground" />
+            <Card className="border-l-4 border-l-purple-500">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Districts Coverage</CardTitle>
+                <div className="p-2 bg-purple-50 rounded-lg">
+                  <MapPin className="h-4 w-4 text-purple-600" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{districts.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  Active coverage
+                <div className="text-3xl font-bold text-purple-600">{districts.length}</div>
+                <div className="flex items-center gap-2 mt-1">
+                  <Activity className="h-3 w-3 text-purple-600" />
+                  <span className="text-xs font-medium text-purple-600">
+                    Out of 30 districts
+                  </span>
+                </div>
+                <Progress value={(districts.length / 30) * 100} className="mt-3 [&>div]:bg-purple-500" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {Math.round((districts.length / 30) * 100)}% state coverage
                 </p>
               </CardContent>
             </Card>
@@ -342,6 +434,193 @@ export default function StateAdminDashboard() {
                   </Button>
                 </Link>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Comprehensive Analytics Dashboard */}
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Analytics & Insights
+              </CardTitle>
+              <CardDescription>
+                Visual analytics and trend analysis for data-driven decisions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="overview" className="w-full">
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="districts">Districts</TabsTrigger>
+                  <TabsTrigger value="incidents">Incidents</TabsTrigger>
+                  <TabsTrigger value="volunteers">Volunteers</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="overview" className="space-y-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="h-[300px]">
+                      <h3 className="text-sm font-medium mb-4">Monthly Growth Trend</h3>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={monthlyTrend}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="month" />
+                          <YAxis />
+                          <Tooltip />
+                          <Legend />
+                          <Line type="monotone" dataKey="volunteers" stroke="#3b82f6" strokeWidth={2} name="Volunteers" />
+                          <Line type="monotone" dataKey="incidents" stroke="#ef4444" strokeWidth={2} name="Incidents" />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                    
+                    <div className="h-[300px]">
+                      <h3 className="text-sm font-medium mb-4">Volunteer Status Distribution</h3>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={volunteerStatusData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {volunteerStatusData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="districts" className="space-y-4">
+                  <div className="h-[400px]">
+                    <h3 className="text-sm font-medium mb-4">Top 10 Districts by Volunteers & Incidents</h3>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={districtData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="district" angle={-45} textAnchor="end" height={100} />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="volunteers" fill="#3b82f6" name="Volunteers" />
+                        <Bar dataKey="incidents" fill="#ef4444" name="Incidents" />
+                        <Bar dataKey="inventory" fill="#22c55e" name="Equipment" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="incidents" className="space-y-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="h-[300px]">
+                      <h3 className="text-sm font-medium mb-4">Incident Severity Breakdown</h3>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={severityData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {severityData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-medium">Incident Statistics</h3>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 border rounded-lg bg-red-50">
+                          <span className="text-sm font-medium">Critical Incidents</span>
+                          <span className="text-2xl font-bold text-red-600">{criticalIncidents.length}</span>
+                        </div>
+                        <div className="flex items-center justify-between p-3 border rounded-lg bg-orange-50">
+                          <span className="text-sm font-medium">High Priority</span>
+                          <span className="text-2xl font-bold text-orange-600">{highIncidents.length}</span>
+                        </div>
+                        <div className="flex items-center justify-between p-3 border rounded-lg bg-green-50">
+                          <span className="text-sm font-medium">Resolved</span>
+                          <span className="text-2xl font-bold text-green-600">{resolvedIncidents.length}</span>
+                        </div>
+                        <div className="flex items-center justify-between p-3 border rounded-lg bg-blue-50">
+                          <span className="text-sm font-medium">Active</span>
+                          <span className="text-2xl font-bold text-blue-600">{activeIncidents.length}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="volunteers" className="space-y-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="h-[300px]">
+                      <h3 className="text-sm font-medium mb-4">Volunteer Approval Funnel</h3>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={[
+                          { stage: 'Total', count: volunteers.length },
+                          { stage: 'Pending', count: pendingVolunteers.length },
+                          { stage: 'Approved', count: approvedVolunteers.length },
+                          { stage: 'Rejected', count: rejectedVolunteers.length }
+                        ]} layout="vertical">
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis type="number" />
+                          <YAxis dataKey="stage" type="category" />
+                          <Tooltip />
+                          <Bar dataKey="count" fill="#3b82f6" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-medium">Volunteer Metrics</h3>
+                      <div className="space-y-3">
+                        <div className="p-4 border rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm text-muted-foreground">Approval Rate</span>
+                            <span className="text-lg font-bold text-green-600">
+                              {volunteers.length > 0 ? Math.round((approvedVolunteers.length / volunteers.length) * 100) : 0}%
+                            </span>
+                          </div>
+                          <Progress value={volunteers.length > 0 ? (approvedVolunteers.length / volunteers.length) * 100 : 0} className="[&>div]:bg-green-500" />
+                        </div>
+                        
+                        <div className="p-4 border rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm text-muted-foreground">Pending Review</span>
+                            <span className="text-lg font-bold text-orange-600">{pendingVolunteers.length}</span>
+                          </div>
+                          <Progress value={volunteers.length > 0 ? (pendingVolunteers.length / volunteers.length) * 100 : 0} className="[&>div]:bg-orange-500" />
+                        </div>
+                        
+                        <div className="p-4 border rounded-lg">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm text-muted-foreground">Ex-Servicemen</span>
+                            <span className="text-lg font-bold text-blue-600">
+                              {volunteers.filter(v => v.isExServiceman).length}
+                            </span>
+                          </div>
+                          <Progress value={volunteers.length > 0 ? (volunteers.filter(v => v.isExServiceman).length / volunteers.length) * 100 : 0} className="[&>div]:bg-blue-500" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
 

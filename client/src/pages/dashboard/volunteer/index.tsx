@@ -15,9 +15,12 @@ import {
   Calendar,
   CheckCircle,
   Clock,
-  MapPin
+  MapPin,
+  TrendingUp,
+  Award
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 
 export default function VolunteerDashboard() {
   const { toast } = useToast();
@@ -84,41 +87,68 @@ export default function VolunteerDashboard() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+            <Card className="border-l-4 border-l-orange-500">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Active Assignments</CardTitle>
-                <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+                <div className="p-2 bg-orange-50 rounded-lg">
+                  <AlertTriangle className="h-4 w-4 text-orange-600" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{activeAssignments.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  Incidents assigned to you
+                <div className="text-3xl font-bold text-orange-600">{activeAssignments.length}</div>
+                <div className="flex items-center gap-2 mt-1">
+                  <Clock className="h-3 w-3 text-orange-600" />
+                  <span className="text-xs font-medium text-orange-600">
+                    Requires your attention
+                  </span>
+                </div>
+                <Progress value={assignments.length > 0 ? (activeAssignments.length / assignments.length) * 100 : 0} className="mt-3 [&>div]:bg-orange-500" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {assignments.length} total assignments
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+            <Card className="border-l-4 border-l-green-500">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Completed Tasks</CardTitle>
-                <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                <div className="p-2 bg-green-50 rounded-lg">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{completedAssignments.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  Successfully completed
+                <div className="text-3xl font-bold text-green-600">{completedAssignments.length}</div>
+                <div className="flex items-center gap-2 mt-1">
+                  <Award className="h-3 w-3 text-green-600" />
+                  <span className="text-xs font-medium text-green-600">
+                    Successfully completed
+                  </span>
+                </div>
+                <Progress value={assignments.length > 0 ? (completedAssignments.length / assignments.length) * 100 : 0} className="mt-3 [&>div]:bg-green-500" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {assignments.length > 0 ? Math.round((completedAssignments.length / assignments.length) * 100) : 0}% completion rate
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+            <Card className="border-l-4 border-l-blue-500">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Upcoming Training</CardTitle>
-                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <div className="p-2 bg-blue-50 rounded-lg">
+                  <Calendar className="h-4 w-4 text-blue-600" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{upcomingTraining.length}</div>
-                <p className="text-xs text-muted-foreground">
-                  Training sessions scheduled
+                <div className="text-3xl font-bold text-blue-600">{upcomingTraining.length}</div>
+                <div className="flex items-center gap-2 mt-1">
+                  <TrendingUp className="h-3 w-3 text-blue-600" />
+                  <span className="text-xs font-medium text-blue-600">
+                    Sessions scheduled
+                  </span>
+                </div>
+                <Progress value={trainingSessions.length > 0 ? (upcomingTraining.length / trainingSessions.length) * 100 : 0} className="mt-3 [&>div]:bg-blue-500" />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Enhance your skills
                 </p>
               </CardContent>
             </Card>
