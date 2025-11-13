@@ -1,0 +1,69 @@
+ PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+10:27:34 PM [express] GET /api/auth/me 304 in 198ms :: {"id":"7b052473-9d3d-4765-b0aa-c430f264f38c","…
+10:27:35 PM [express] GET /api/volunteers 304 in 264ms :: [{"id":"5aa202f4-8293-4b90-bd64-14113d5cbf2…
+10:27:35 PM [express] GET /api/incidents 304 in 273ms :: [{"id":"64ad133e-96f0-483f-bc70-fdf8ac972cea…
+10:27:35 PM [express] GET /api/inventory 304 in 336ms :: [{"id":"b8f76af9-2e5b-4cb4-8bd6-8728dd7750d6…
+10:27:43 PM [express] GET /api/inventory 304 in 326ms :: [{"id":"b8f76af9-2e5b-4cb4-8bd6-8728dd7750d6…
+Error fetching trainings: TypeError: Cannot read properties of undefined (reading 'role')
+    at <anonymous> (/home/runner/workspace/server/routes.ts:469:23)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/workspace/node_modules/express/lib/router/route.js:149:13)
+    at isAuthenticated (/home/runner/workspace/server/middleware.ts:7:12)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/workspace/node_modules/express/lib/router/route.js:149:13)
+    at Route.dispatch (/home/runner/workspace/node_modules/express/lib/router/route.js:119:3)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:284:15
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+    at strategy.pass (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:355:9)
+    at /home/runner/workspace/node_modules/passport/lib/strategies/session.js:120:12
+    at pass (/home/runner/workspace/node_modules/passport/lib/authenticator.js:352:31)
+    at deserialized (/home/runner/workspace/node_modules/passport/lib/authenticator.js:364:7)
+    at <anonymous> (/home/runner/workspace/server/auth.ts:71:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+10:27:45 PM [express] GET /api/trainings 500 in 204ms :: {"message":"Failed to fetch trainings"}
+10:27:46 PM [express] GET /api/incidents 304 in 328ms :: [{"id":"64ad133e-96f0-483f-bc70-fdf8ac972cea…
+10:27:51 PM [express] GET /api/volunteers 304 in 329ms :: [{"id":"5aa202f4-8293-4b90-bd64-14113d5cbf2…
+10:28:13 PM [vite] hmr update /src/pages/dashboard/volunteer/index.tsx, /src/index.css?v=tQ4aAFG7v9cw4fQ0KLfVX
+10:28:14 PM [vite] hmr update /src/pages/dashboard/volunteer/profile.tsx, /src/index.css?v=tQ4aAFG7v9cw4fQ0KLfVX
+10:28:15 PM [vite] hmr update /src/pages/dashboard/volunteer/tasks.tsx, /src/index.css?v=tQ4aAFG7v9cw4fQ0KLfVX
+10:28:15 PM [vite] page reload src/pages/dashboard/volunteer/training.tsx
+10:28:25 PM [express] GET /api/auth/me 304 in 195ms :: {"id":"7b052473-9d3d-4765-b0aa-c430f264f38c","…
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

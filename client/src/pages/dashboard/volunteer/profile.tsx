@@ -55,7 +55,7 @@ export default function Profile() {
   };
 
   return (
-    <DashboardLayout navItems={navItems} title="Volunteer Portal">
+    <DashboardLayout navItems={navItems}>
       <div className="p-6 space-y-6">
         {/* Page Header */}
         <div>
@@ -78,7 +78,7 @@ export default function Profile() {
                 <div className="flex items-start gap-6 flex-wrap">
                   <Avatar className="h-24 w-24">
                     <AvatarFallback className="text-2xl">
-                      {getInitials(volunteer?.fullName || user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : null)}
+                      {getInitials(volunteer?.fullName || (user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : null))}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">

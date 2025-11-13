@@ -461,12 +461,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/trainings', isAuthenticated, async (req: any, res) => {
     try {
       const { district } = req.query;
-      const user = req.authenticatedUser;
+      const user = req.user; // Use req.user instead of req.authenticatedUser
       
       let trainings;
       if (district) {
         trainings = await storage.getTrainingsByDistrict(district);
-      } else if (user.role === "district_admin" && user.district) {
+      } else if (user?.role === "district_admin" && user?.district) {
         trainings = await storage.getTrainingsByDistrict(user.district);
       } else {
         trainings = await storage.getAllTrainings();
@@ -641,6 +641,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching volunteer profile:", error);
       res.status(500).json({ message: "Failed to fetch volunteer profile" });
+    }
+  });
+
+  // District Statistics API - for map visualization
+  app.get('/api/district-stats', isAuthenticated, async (req: any, res) => {
+    try {
+      const { district } = req.query;
+      const stats = await storage.getDistrictStats(district as string | undefined);
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching district stats:", error);
+      res.status(500).json({ message: "Failed to fetch district statistics" });
     }
   });
 

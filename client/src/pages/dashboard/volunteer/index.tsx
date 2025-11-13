@@ -98,7 +98,7 @@ export default function VolunteerDashboard() {
   const StatusIcon = statusDisplay?.icon;
 
   return (
-    <DashboardLayout navItems={navItems} title="Volunteer Portal">
+    <DashboardLayout navItems={navItems}>
       <div className="p-6 space-y-6">
         {/* Page Header */}
         <div>

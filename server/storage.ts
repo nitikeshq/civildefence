@@ -88,6 +88,9 @@ export interface IStorage {
   
   // Volunteer profile
   getVolunteerByUserId(userId: string): Promise<Volunteer | undefined>;
+  
+  // District statistics
+  getDistrictStats(district?: string): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -562,6 +565,74 @@ export class DatabaseStorage implements IStorage {
       .from(volunteers)
       .where(eq(volunteers.userId, userId));
     return volunteer;
+  }
+
+  // District statistics - aggregated data for all districts or specific district
+  async getDistrictStats(district?: string): Promise<any[]> {
+    // Get all Odisha districts
+    const allDistricts = [
+      "Angul", "Balangir", "Balasore", "Bargarh", "Bhadrak", "Boudh",
+      "Cuttack", "Deogarh", "Dhenkanal", "Gajapati", "Ganjam", "Jagatsinghpur",
+      "Jajpur", "Jharsuguda", "Kalahandi", "Kandhamal", "Kendrapara", "Kendujhar",
+      "Khordha", "Koraput", "Malkangiri", "Mayurbhanj", "Nabarangpur", "Nayagarh",
+      "Nuapada", "Puri", "Rayagada", "Sambalpur", "Subarnapur", "Sundargarh"
+    ];
+
+    const districtsToQuery = district ? [district] : allDistricts;
+    const stats = [];
+
+    for (const dist of districtsToQuery) {
+      const [volunteerStats] = await db
+        .select({
+          total: sql<number>`COUNT(*)`,
+          approved: sql<number>`COUNT(CASE WHEN ${volunteers.status} = 'approved' THEN 1 END)`,
+          pending: sql<number>`COUNT(CASE WHEN ${volunteers.status} = 'pending' THEN 1 END)`,
+        })
+        .from(volunteers)
+        .where(eq(volunteers.district, dist));
+
+      const [incidentStats] = await db
+        .select({
+          total: sql<number>`COUNT(*)`,
+          active: sql<number>`COUNT(CASE WHEN ${incidents.status} IN ('reported', 'assigned', 'in_progress') THEN 1 END)`,
+          critical: sql<number>`COUNT(CASE WHEN ${incidents.severity} = 'critical' THEN 1 END)`,
+        })
+        .from(incidents)
+        .where(eq(incidents.district, dist));
+
+      const [trainingStats] = await db
+        .select({
+          total: sql<number>`COUNT(*)`,
+          upcoming: sql<number>`COUNT(CASE WHEN ${trainings.status} = 'scheduled' THEN 1 END)`,
+        })
+        .from(trainings)
+        .where(
+          or(
+            eq(trainings.district, dist),
+            eq(trainings.isStatewide, true)
+          )
+        );
+
+      stats.push({
+        district: dist,
+        volunteers: {
+          total: Number(volunteerStats?.total || 0),
+          approved: Number(volunteerStats?.approved || 0),
+          pending: Number(volunteerStats?.pending || 0),
+        },
+        incidents: {
+          total: Number(incidentStats?.total || 0),
+          active: Number(incidentStats?.active || 0),
+          critical: Number(incidentStats?.critical || 0),
+        },
+        trainings: {
+          total: Number(trainingStats?.total || 0),
+          upcoming: Number(trainingStats?.upcoming || 0),
+        },
+      });
+    }
+
+    return stats;
   }
 }
 
