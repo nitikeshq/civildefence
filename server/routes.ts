@@ -661,6 +661,213 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // CMS API Routes - Admin only
+  
+  // Translations CRUD
+  app.get('/api/cms/translations', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+    try {
+      const translations = await storage.getAllTranslations();
+      res.json(translations);
+    } catch (error) {
+      console.error("Error fetching translations:", error);
+      res.status(500).json({ message: "Failed to fetch translations" });
+    }
+  });
+
+  app.post('/api/cms/translations', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+    try {
+      const translation = await storage.createTranslation(req.body);
+      res.status(201).json(translation);
+    } catch (error) {
+      console.error("Error creating translation:", error);
+      res.status(500).json({ message: "Failed to create translation" });
+    }
+  });
+
+  app.patch('/api/cms/translations/:id', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+    try {
+      const translation = await storage.updateTranslation(req.params.id, req.body);
+      res.json(translation);
+    } catch (error) {
+      console.error("Error updating translation:", error);
+      res.status(500).json({ message: "Failed to update translation" });
+    }
+  });
+
+  app.delete('/api/cms/translations/:id', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+    try {
+      await storage.deleteTranslation(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting translation:", error);
+      res.status(500).json({ message: "Failed to delete translation" });
+    }
+  });
+
+  // Hero Banners CRUD
+  app.get('/api/cms/hero-banners', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+    try {
+      const banners = await storage.getAllHeroBanners();
+      res.json(banners);
+    } catch (error) {
+      console.error("Error fetching hero banners:", error);
+      res.status(500).json({ message: "Failed to fetch hero banners" });
+    }
+  });
+
+  app.post('/api/cms/hero-banners', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+    try {
+      const banner = await storage.createHeroBanner(req.body);
+      res.status(201).json(banner);
+    } catch (error) {
+      console.error("Error creating hero banner:", error);
+      res.status(500).json({ message: "Failed to create hero banner" });
+    }
+  });
+
+  app.patch('/api/cms/hero-banners/:id', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+    try {
+      const banner = await storage.updateHeroBanner(req.params.id, req.body);
+      res.json(banner);
+    } catch (error) {
+      console.error("Error updating hero banner:", error);
+      res.status(500).json({ message: "Failed to update hero banner" });
+    }
+  });
+
+  app.delete('/api/cms/hero-banners/:id', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+    try {
+      await storage.deleteHeroBanner(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting hero banner:", error);
+      res.status(500).json({ message: "Failed to delete hero banner" });
+    }
+  });
+
+  // About Content CRUD
+  app.get('/api/cms/about', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+    try {
+      const content = await storage.getAllAboutContent();
+      res.json(content);
+    } catch (error) {
+      console.error("Error fetching about content:", error);
+      res.status(500).json({ message: "Failed to fetch about content" });
+    }
+  });
+
+  app.post('/api/cms/about', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+    try {
+      const content = await storage.createAboutContent(req.body);
+      res.status(201).json(content);
+    } catch (error) {
+      console.error("Error creating about content:", error);
+      res.status(500).json({ message: "Failed to create about content" });
+    }
+  });
+
+  app.patch('/api/cms/about/:id', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+    try {
+      const content = await storage.updateAboutContent(req.params.id, req.body);
+      res.json(content);
+    } catch (error) {
+      console.error("Error updating about content:", error);
+      res.status(500).json({ message: "Failed to update about content" });
+    }
+  });
+
+  app.delete('/api/cms/about/:id', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+    try {
+      await storage.deleteAboutContent(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting about content:", error);
+      res.status(500).json({ message: "Failed to delete about content" });
+    }
+  });
+
+  // Services CRUD
+  app.get('/api/cms/services', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+    try {
+      const services = await storage.getAllServices();
+      res.json(services);
+    } catch (error) {
+      console.error("Error fetching services:", error);
+      res.status(500).json({ message: "Failed to fetch services" });
+    }
+  });
+
+  app.post('/api/cms/services', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+    try {
+      const service = await storage.createService(req.body);
+      res.status(201).json(service);
+    } catch (error) {
+      console.error("Error creating service:", error);
+      res.status(500).json({ message: "Failed to create service" });
+    }
+  });
+
+  app.patch('/api/cms/services/:id', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+    try {
+      const service = await storage.updateService(req.params.id, req.body);
+      res.json(service);
+    } catch (error) {
+      console.error("Error updating service:", error);
+      res.status(500).json({ message: "Failed to update service" });
+    }
+  });
+
+  app.delete('/api/cms/services/:id', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+    try {
+      await storage.deleteService(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting service:", error);
+      res.status(500).json({ message: "Failed to delete service" });
+    }
+  });
+
+  // Site Settings CRUD
+  app.get('/api/cms/settings', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+    try {
+      const settings = await storage.getAllSiteSettings();
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching site settings:", error);
+      res.status(500).json({ message: "Failed to fetch site settings" });
+    }
+  });
+
+  app.post('/api/cms/settings', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+    try {
+      const setting = await storage.createSiteSetting(req.body);
+      res.status(201).json(setting);
+    } catch (error) {
+      console.error("Error creating site setting:", error);
+      res.status(500).json({ message: "Failed to create site setting" });
+    }
+  });
+
+  app.patch('/api/cms/settings/:id', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+    try {
+      const setting = await storage.updateSiteSetting(req.params.id, req.body);
+      res.json(setting);
+    } catch (error) {
+      console.error("Error updating site setting:", error);
+      res.status(500).json({ message: "Failed to update site setting" });
+    }
+  });
+
+  app.delete('/api/cms/settings/:id', isAuthenticated, requireRole("department_admin", "state_admin"), async (req, res) => {
+    try {
+      await storage.deleteSiteSetting(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting site setting:", error);
+      res.status(500).json({ message: "Failed to delete site setting" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -21,6 +21,7 @@ import DashboardTasks from "@/pages/dashboard/tasks";
 import DashboardTrainings from "@/pages/dashboard/trainings";
 import VolunteerTrainings from "@/pages/volunteer/trainings";
 import CMSDashboard from "@/pages/dashboard/cms-manager";
+import CMSManager from "@/pages/dashboard/cms";
 import VolunteerRegistration from "@/pages/VolunteerRegistration";
 import NotFound from "@/pages/not-found";
 
@@ -59,7 +60,8 @@ function Router() {
           <Route path="/dashboard/trainings" component={DashboardTrainings} />
           <Route path="/dashboard/inventory" component={DashboardInventory} />
           <Route path="/dashboard/reports" component={DashboardReports} />
-          {/* CMS Routes */}
+          <Route path="/dashboard/cms" component={CMSManager} />
+          {/* Legacy CMS Routes */}
           <Route path="/cms/dashboard" component={CMSDashboard} />
           <Route path="/cms/:page" component={CMSDashboard} />
         </>

@@ -10,6 +10,7 @@ export interface RolePermissions {
   canExportData: boolean;
   canViewAllDistricts: boolean;
   canManageUsers: boolean;
+  canManageCMS: boolean;
   scope: "district" | "state" | "volunteer";
 }
 
@@ -23,6 +24,7 @@ export function getRolePermissions(role: UserRole | null | undefined): RolePermi
       canExportData: false,
       canViewAllDistricts: false,
       canManageUsers: false,
+      canManageCMS: false,
       scope: "volunteer",
     };
   }
@@ -36,6 +38,7 @@ export function getRolePermissions(role: UserRole | null | undefined): RolePermi
       canExportData: false,
       canViewAllDistricts: false,
       canManageUsers: false,
+      canManageCMS: false,
       scope: "volunteer",
     },
     district_admin: {
@@ -46,6 +49,7 @@ export function getRolePermissions(role: UserRole | null | undefined): RolePermi
       canExportData: true,
       canViewAllDistricts: false,
       canManageUsers: false,
+      canManageCMS: false,
       scope: "district",
     },
     department_admin: {
@@ -56,6 +60,7 @@ export function getRolePermissions(role: UserRole | null | undefined): RolePermi
       canExportData: true,
       canViewAllDistricts: true,
       canManageUsers: true,
+      canManageCMS: true,
       scope: "state",
     },
     state_admin: {
@@ -66,6 +71,7 @@ export function getRolePermissions(role: UserRole | null | undefined): RolePermi
       canExportData: true,
       canViewAllDistricts: true,
       canManageUsers: true,
+      canManageCMS: true,
       scope: "state",
     },
     cms_manager: {
@@ -76,6 +82,7 @@ export function getRolePermissions(role: UserRole | null | undefined): RolePermi
       canExportData: false,
       canViewAllDistricts: false,
       canManageUsers: false,
+      canManageCMS: true,
       scope: "state",
     },
   };
@@ -186,9 +193,11 @@ export function getDashboardSubtitle(role: UserRole | null | undefined, district
 }
 
 // Import icons for navigation
-import { LayoutDashboard, Users, AlertTriangle, ClipboardList, Package, FileText, GraduationCap } from "lucide-react";
+import { LayoutDashboard, Users, AlertTriangle, ClipboardList, Package, FileText, GraduationCap, Settings } from "lucide-react";
 
 export function getAdminNavItems(role: string) {
+  const permissions = getRolePermissions(role as UserRole);
+  
   const baseItems = [
     { label: "Overview", path: "/dashboard/overview", icon: LayoutDashboard },
     { label: "Volunteers", path: "/dashboard/volunteers", icon: Users },
@@ -198,6 +207,11 @@ export function getAdminNavItems(role: string) {
     { label: "Inventory", path: "/dashboard/inventory", icon: Package },
     { label: "Reports", path: "/dashboard/reports", icon: FileText },
   ];
+
+  // Add CMS navigation for authorized roles
+  if (permissions.canManageCMS) {
+    baseItems.push({ label: "CMS Manager", path: "/dashboard/cms", icon: Settings });
+  }
 
   return baseItems;
 }

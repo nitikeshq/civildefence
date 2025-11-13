@@ -106,6 +106,42 @@ export interface IStorage {
   
   // District statistics
   getDistrictStats(district?: string): Promise<any[]>;
+  
+  // CMS - Translations
+  getAllTranslations(): Promise<Translation[]>;
+  getTranslation(id: string): Promise<Translation | undefined>;
+  createTranslation(translation: InsertTranslation): Promise<Translation>;
+  updateTranslation(id: string, updates: Partial<InsertTranslation>): Promise<Translation>;
+  deleteTranslation(id: string): Promise<void>;
+  
+  // CMS - Hero Banners
+  getAllHeroBanners(): Promise<HeroBanner[]>;
+  getHeroBanner(id: string): Promise<HeroBanner | undefined>;
+  createHeroBanner(banner: InsertHeroBanner): Promise<HeroBanner>;
+  updateHeroBanner(id: string, updates: Partial<InsertHeroBanner>): Promise<HeroBanner>;
+  deleteHeroBanner(id: string): Promise<void>;
+  
+  // CMS - About Content
+  getAllAboutContent(): Promise<AboutContent[]>;
+  getAboutContent(id: string): Promise<AboutContent | undefined>;
+  createAboutContent(content: InsertAboutContent): Promise<AboutContent>;
+  updateAboutContent(id: string, updates: Partial<InsertAboutContent>): Promise<AboutContent>;
+  deleteAboutContent(id: string): Promise<void>;
+  
+  // CMS - Services
+  getAllServices(): Promise<Service[]>;
+  getService(id: string): Promise<Service | undefined>;
+  createService(service: InsertService): Promise<Service>;
+  updateService(id: string, updates: Partial<InsertService>): Promise<Service>;
+  deleteService(id: string): Promise<void>;
+  
+  // CMS - Site Settings
+  getAllSiteSettings(): Promise<SiteSetting[]>;
+  getSiteSetting(id: string): Promise<SiteSetting | undefined>;
+  getSiteSettingByKey(key: string): Promise<SiteSetting | undefined>;
+  createSiteSetting(setting: InsertSiteSetting): Promise<SiteSetting>;
+  updateSiteSetting(id: string, updates: Partial<InsertSiteSetting>): Promise<SiteSetting>;
+  deleteSiteSetting(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -648,6 +684,151 @@ export class DatabaseStorage implements IStorage {
     }
 
     return stats;
+  }
+
+  // CMS - Translations
+  async getAllTranslations(): Promise<Translation[]> {
+    return db.select().from(translations).orderBy(desc(translations.createdAt));
+  }
+
+  async getTranslation(id: string): Promise<Translation | undefined> {
+    const [translation] = await db.select().from(translations).where(eq(translations.id, id));
+    return translation;
+  }
+
+  async createTranslation(translationData: InsertTranslation): Promise<Translation> {
+    const [translation] = await db.insert(translations).values(translationData).returning();
+    return translation;
+  }
+
+  async updateTranslation(id: string, updates: Partial<InsertTranslation>): Promise<Translation> {
+    const [translation] = await db
+      .update(translations)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(translations.id, id))
+      .returning();
+    return translation;
+  }
+
+  async deleteTranslation(id: string): Promise<void> {
+    await db.delete(translations).where(eq(translations.id, id));
+  }
+
+  // CMS - Hero Banners
+  async getAllHeroBanners(): Promise<HeroBanner[]> {
+    return db.select().from(heroBanners).orderBy(heroBanners.order);
+  }
+
+  async getHeroBanner(id: string): Promise<HeroBanner | undefined> {
+    const [banner] = await db.select().from(heroBanners).where(eq(heroBanners.id, id));
+    return banner;
+  }
+
+  async createHeroBanner(bannerData: InsertHeroBanner): Promise<HeroBanner> {
+    const [banner] = await db.insert(heroBanners).values(bannerData).returning();
+    return banner;
+  }
+
+  async updateHeroBanner(id: string, updates: Partial<InsertHeroBanner>): Promise<HeroBanner> {
+    const [banner] = await db
+      .update(heroBanners)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(heroBanners.id, id))
+      .returning();
+    return banner;
+  }
+
+  async deleteHeroBanner(id: string): Promise<void> {
+    await db.delete(heroBanners).where(eq(heroBanners.id, id));
+  }
+
+  // CMS - About Content
+  async getAllAboutContent(): Promise<AboutContent[]> {
+    return db.select().from(aboutContent).orderBy(aboutContent.order);
+  }
+
+  async getAboutContent(id: string): Promise<AboutContent | undefined> {
+    const [content] = await db.select().from(aboutContent).where(eq(aboutContent.id, id));
+    return content;
+  }
+
+  async createAboutContent(contentData: InsertAboutContent): Promise<AboutContent> {
+    const [content] = await db.insert(aboutContent).values(contentData).returning();
+    return content;
+  }
+
+  async updateAboutContent(id: string, updates: Partial<InsertAboutContent>): Promise<AboutContent> {
+    const [content] = await db
+      .update(aboutContent)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(aboutContent.id, id))
+      .returning();
+    return content;
+  }
+
+  async deleteAboutContent(id: string): Promise<void> {
+    await db.delete(aboutContent).where(eq(aboutContent.id, id));
+  }
+
+  // CMS - Services
+  async getAllServices(): Promise<Service[]> {
+    return db.select().from(services).orderBy(services.order);
+  }
+
+  async getService(id: string): Promise<Service | undefined> {
+    const [service] = await db.select().from(services).where(eq(services.id, id));
+    return service;
+  }
+
+  async createService(serviceData: InsertService): Promise<Service> {
+    const [service] = await db.insert(services).values(serviceData).returning();
+    return service;
+  }
+
+  async updateService(id: string, updates: Partial<InsertService>): Promise<Service> {
+    const [service] = await db
+      .update(services)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(services.id, id))
+      .returning();
+    return service;
+  }
+
+  async deleteService(id: string): Promise<void> {
+    await db.delete(services).where(eq(services.id, id));
+  }
+
+  // CMS - Site Settings
+  async getAllSiteSettings(): Promise<SiteSetting[]> {
+    return db.select().from(siteSettings).orderBy(desc(siteSettings.createdAt));
+  }
+
+  async getSiteSetting(id: string): Promise<SiteSetting | undefined> {
+    const [setting] = await db.select().from(siteSettings).where(eq(siteSettings.id, id));
+    return setting;
+  }
+
+  async getSiteSettingByKey(key: string): Promise<SiteSetting | undefined> {
+    const [setting] = await db.select().from(siteSettings).where(eq(siteSettings.key, key));
+    return setting;
+  }
+
+  async createSiteSetting(settingData: InsertSiteSetting): Promise<SiteSetting> {
+    const [setting] = await db.insert(siteSettings).values(settingData).returning();
+    return setting;
+  }
+
+  async updateSiteSetting(id: string, updates: Partial<InsertSiteSetting>): Promise<SiteSetting> {
+    const [setting] = await db
+      .update(siteSettings)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(siteSettings.id, id))
+      .returning();
+    return setting;
+  }
+
+  async deleteSiteSetting(id: string): Promise<void> {
+    await db.delete(siteSettings).where(eq(siteSettings.id, id));
   }
 }
 
