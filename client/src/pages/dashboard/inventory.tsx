@@ -229,8 +229,8 @@ export default function DashboardInventory() {
                 <div>
                   <Label>Last Inspection</Label>
                   <p className="text-sm">
-                    {selectedItem.lastInspectionDate
-                      ? new Date(selectedItem.lastInspectionDate).toLocaleDateString()
+                    {selectedItem.lastInspection
+                      ? new Date(selectedItem.lastInspection).toLocaleDateString()
                       : "N/A"}
                   </p>
                 </div>
