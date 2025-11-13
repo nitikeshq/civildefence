@@ -5,15 +5,19 @@ import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function LogoutCard() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
 
   const handleLogout = async () => {
     try {
       await apiRequest("POST", "/api/auth/logout", undefined);
+      // Invalidate all queries to clear cached data
+      queryClient.clear();
       toast({
         title: "Logged out successfully",
         description: "You have been signed out of your account",

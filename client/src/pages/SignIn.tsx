@@ -98,15 +98,18 @@ export default function SignIn() {
       
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+    onSuccess: async () => {
+      // Clear all cached queries first
+      queryClient.clear();
+      // Refetch user data to ensure fresh state
+      await queryClient.refetchQueries({ queryKey: ["/api/auth/me"] });
       toast({
         title: "Success",
         description: "Logged in successfully",
       });
       setLocation("/");
     },
-    onError: (error: Error) => {
+    onError: (error: Error) {
       toast({
         title: "Error",
         description: error.message,

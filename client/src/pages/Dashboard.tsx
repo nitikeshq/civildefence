@@ -22,22 +22,27 @@ export default function Dashboard() {
       return;
     }
 
-    if (user && isAuthenticated) {
-      switch (user.role) {
-        case "volunteer":
-          setLocation("/dashboard/volunteer");
-          break;
-        case "district_admin":
-          setLocation("/dashboard/district-admin");
-          break;
-        case "department_admin":
-          setLocation("/dashboard/department-admin");
-          break;
-        case "state_admin":
-          setLocation("/dashboard/state-admin");
-          break;
-        default:
-          setLocation("/dashboard/volunteer");
+    if (user && isAuthenticated && user.role) {
+      // Role-to-path mapping
+      const rolePaths: Record<string, string> = {
+        volunteer: "/dashboard/volunteer",
+        district_admin: "/dashboard/district-admin",
+        department_admin: "/dashboard/department-admin",
+        state_admin: "/dashboard/state-admin",
+        cms_manager: "/cms/dashboard",
+      };
+
+      const targetPath = rolePaths[user.role];
+      if (targetPath) {
+        setLocation(targetPath);
+      } else {
+        console.error("Unknown role:", user.role);
+        toast({
+          title: "Error",
+          description: "Unknown user role. Please contact support.",
+          variant: "destructive",
+        });
+        redirectToSignIn();
       }
     }
   }, [user, isAuthenticated, isLoading, setLocation, toast]);
