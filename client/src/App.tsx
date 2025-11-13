@@ -17,6 +17,11 @@ import DistrictAdminDashboard from "@/pages/dashboard/district-admin";
 import DistrictAdminVolunteers from "@/pages/dashboard/district-admin/volunteers";
 import DistrictAdminIncidents from "@/pages/dashboard/district-admin/incidents";
 import DistrictAdminInventory from "@/pages/dashboard/district-admin/inventory";
+import StateAdminDashboard from "@/pages/dashboard/state-admin";
+import StateAdminVolunteers from "@/pages/dashboard/state-admin/volunteers";
+import StateAdminIncidents from "@/pages/dashboard/state-admin/incidents";
+import StateAdminInventory from "@/pages/dashboard/state-admin/inventory";
+import StateAdminReports from "@/pages/dashboard/state-admin/reports";
 import AdminDashboard from "@/pages/dashboard/admin";
 import CMSDashboard from "@/pages/dashboard/cms-manager";
 import VolunteerRegistration from "@/pages/VolunteerRegistration";
@@ -57,6 +62,11 @@ function Router() {
           <Route path="/dashboard/district-admin/volunteers" component={DistrictAdminVolunteers} />
           <Route path="/dashboard/district-admin/incidents" component={DistrictAdminIncidents} />
           <Route path="/dashboard/district-admin/inventory" component={DistrictAdminInventory} />
+          <Route path="/dashboard/state-admin" component={StateAdminDashboard} />
+          <Route path="/dashboard/state-admin/volunteers" component={StateAdminVolunteers} />
+          <Route path="/dashboard/state-admin/incidents" component={StateAdminIncidents} />
+          <Route path="/dashboard/state-admin/inventory" component={StateAdminInventory} />
+          <Route path="/dashboard/state-admin/reports" component={StateAdminReports} />
           <Route path="/dashboard/admin" component={AdminDashboard} />
           <Route path="/cms/dashboard" component={CMSDashboard} />
           <Route path="/cms/:page" component={CMSDashboard} />
