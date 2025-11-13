@@ -55,11 +55,12 @@ export function AppSidebar({ title, subtitle, navItems, user }: AppSidebarProps)
                 return (
                   <SidebarMenuItem key={item.path}>
                     <SidebarMenuButton asChild isActive={isActive}>
-                      <Link href={item.path}>
-                        <a data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}>
-                          <Icon className="h-4 w-4" />
-                          <span>{item.label}</span>
-                        </a>
+                      <Link 
+                        href={item.path}
+                        data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+                      >
+                        <Icon className="h-4 w-4" />
+                        <span>{item.label}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

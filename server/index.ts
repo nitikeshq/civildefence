@@ -1,3 +1,6 @@
+// Set UV_THREADPOOL_SIZE before any I/O operations to prevent DNS lookup issues
+process.env.UV_THREADPOOL_SIZE = '128';
+
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
