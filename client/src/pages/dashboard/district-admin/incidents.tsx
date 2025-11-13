@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +24,7 @@ import {
 import { Search, Eye, MapPin, Calendar, AlertCircle } from "lucide-react";
 import type { Incident } from "@shared/schema";
 import { format } from "date-fns";
+import { districtAdminNav } from "./nav-config";
 
 export default function DistrictAdminIncidents() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -135,7 +137,8 @@ export default function DistrictAdminIncidents() {
   );
 
   return (
-    <div className="space-y-6 p-6">
+    <DashboardLayout navItems={districtAdminNav} title="District Admin" subtitle="Manage district operations">
+      <div className="space-y-6 p-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-3xl font-bold">Incident Management</h1>
@@ -298,5 +301,6 @@ export default function DistrictAdminIncidents() {
         </DialogContent>
       </Dialog>
     </div>
+    </DashboardLayout>
   );
 }

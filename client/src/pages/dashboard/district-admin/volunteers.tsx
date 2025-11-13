@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +27,7 @@ import { Search, CheckCircle, XCircle, Eye, Phone, Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { Volunteer } from "@shared/schema";
+import { districtAdminNav } from "./nav-config";
 
 export default function DistrictAdminVolunteers() {
   const { toast } = useToast();
@@ -189,7 +191,8 @@ export default function DistrictAdminVolunteers() {
   );
 
   return (
-    <div className="space-y-6 p-6">
+    <DashboardLayout navItems={districtAdminNav} title="District Admin" subtitle="Manage district operations">
+      <div className="space-y-6 p-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-3xl font-bold">Volunteer Management</h1>
@@ -411,5 +414,6 @@ export default function DistrictAdminVolunteers() {
         </DialogContent>
       </Dialog>
     </div>
+    </DashboardLayout>
   );
 }

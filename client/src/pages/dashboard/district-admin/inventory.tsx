@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -43,6 +44,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertInventorySchema, type InventoryItem, type InsertInventory } from "@shared/schema";
 import { format } from "date-fns";
+import { districtAdminNav } from "./nav-config";
 
 export default function DistrictAdminInventory() {
   const { toast } = useToast();
@@ -172,7 +174,8 @@ export default function DistrictAdminInventory() {
   };
 
   return (
-    <div className="space-y-6 p-6">
+    <DashboardLayout navItems={districtAdminNav} title="District Admin" subtitle="Manage district operations">
+      <div className="space-y-6 p-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-3xl font-bold">Inventory Management</h1>
@@ -517,5 +520,6 @@ export default function DistrictAdminInventory() {
         </DialogContent>
       </Dialog>
     </div>
+    </DashboardLayout>
   );
 }
