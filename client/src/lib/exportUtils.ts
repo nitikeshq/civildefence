@@ -52,9 +52,13 @@ export function prepareVolunteersForExport(volunteers: Volunteer[]) {
     District: v.district || "",
     Status: v.status || "",
     "Date of Birth": v.dateOfBirth || "",
-    Gender: v.gender || "",
     Address: v.address || "",
+    "Ex-Serviceman": v.isExServiceman ? "Yes" : "No",
+    "Service History": v.serviceHistory || "",
     Skills: v.skills?.join(", ") || "",
+    Qualifications: v.qualifications || "",
+    "Emergency Contact": v.emergencyContact || "",
+    "Emergency Phone": v.emergencyPhone || "",
     "Created At": v.createdAt ? new Date(v.createdAt).toLocaleDateString() : "",
   }));
 }
@@ -81,8 +85,8 @@ export function prepareInventoryForExport(inventory: InventoryItem[]) {
     Condition: item.condition || "",
     Location: item.location || "",
     District: item.district || "",
-    "Last Inspection": item.lastInspectionDate
-      ? new Date(item.lastInspectionDate).toLocaleDateString()
+    "Last Inspection": item.lastInspection
+      ? new Date(item.lastInspection).toLocaleDateString()
       : "",
   }));
 }

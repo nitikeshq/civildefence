@@ -63,14 +63,6 @@ function Router() {
           {/* CMS Routes */}
           <Route path="/cms/dashboard" component={CMSDashboard} />
           <Route path="/cms/:page" component={CMSDashboard} />
-          {/* Legacy/Public Routes */}
-          <Route path="/volunteer/register" component={VolunteerRegistration} />
-          <Route path="/incident-reporting" component={IncidentReporting} />
-          <Route path="/incidents/report" component={IncidentReporting} />
-          <Route path="/inventory" component={InventoryManagement} />
-          <Route path="/volunteers/approval" component={VolunteerApproval} />
-          <Route path="/mis-reports" component={MISReports} />
-          <Route path="/training" component={TrainingManagement} />
         </>
       )}
       <Route component={NotFound} />

@@ -36,10 +36,6 @@ export default function DashboardReports() {
   const { user } = useAuth();
   const permissions = getRolePermissions(user?.role);
 
-  const { data: volunteers = [] } = useScopedVolunteers();
-  const { data: incidents = [] } = useScopedIncidents();
-  const { data: inventory = [] } = useScopedInventory();
-
   // Navigation items with icons
   const navItemsWithIcons = getNavigationItems(user?.role).map((item) => {
     const iconMap: Record<string, any> = {
@@ -56,7 +52,7 @@ export default function DashboardReports() {
     };
   });
 
-  // Only state-level users can access reports
+  // Only state-level users can access reports - early return before fetching hooks
   if (permissions.scope !== "state") {
     return (
       <DashboardLayout 
@@ -76,6 +72,11 @@ export default function DashboardReports() {
       </DashboardLayout>
     );
   }
+
+  // Only fetch data after authorization check
+  const { data: volunteers = [] } = useScopedVolunteers();
+  const { data: incidents = [] } = useScopedIncidents();
+  const { data: inventory = [] } = useScopedInventory();
 
   // ========== 1. VOLUNTEER PIPELINE REPORT ==========
   const volunteerStats = useMemo(() => {
