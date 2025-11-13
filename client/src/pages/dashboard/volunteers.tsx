@@ -27,7 +27,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { getAdminNavItems } from "@/lib/roleUtils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { ODISHA_DISTRICTS } from "@/lib/constants";
+import { ODISHA_DISTRICTS } from "@shared/constants";
 import type { Volunteer } from "@shared/schema";
 
 export default function DashboardVolunteers() {
