@@ -200,3 +200,23 @@ export function getAdminNavItems(role: string) {
 
   return baseItems;
 }
+
+// Get constant sidebar header title based on role and district
+export function getSidebarTitle(role: UserRole | null | undefined, district?: string | null): string {
+  if (!role) return "Volunteer Management";
+  
+  switch (role) {
+    case "district_admin":
+      return district ? `District Admin - ${district}` : "District Admin";
+    case "department_admin":
+      return "Department Admin - Odisha";
+    case "state_admin":
+      return "State Admin - Odisha";
+    case "volunteer":
+      return "Volunteer Portal";
+    case "cms_manager":
+      return "CMS Manager - Odisha";
+    default:
+      return "Volunteer Management";
+  }
+}

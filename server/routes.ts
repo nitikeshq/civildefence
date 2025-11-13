@@ -266,6 +266,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin-only: Update incident (full)
+  app.patch('/api/incidents/:id', isAuthenticated, requireRole("district_admin", "department_admin", "state_admin"), async (req: any, res) => {
+    try {
+      const validatedData = insertIncidentSchema.partial().parse(req.body);
+      const incident = await storage.updateIncident(req.params.id, validatedData);
+      res.json(incident);
+    } catch (error: any) {
+      console.error("Error updating incident:", error);
+      if (error.name === "ZodError") {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update incident" });
+    }
+  });
+
   // Admin-only: Update incident status
   app.patch('/api/incidents/:id/status', isAuthenticated, requireRole("district_admin", "department_admin", "state_admin"), async (req: any, res) => {
     try {
@@ -282,6 +297,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid request data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to update incident status" });
+    }
+  });
+
+  // Admin-only: Delete incident
+  app.delete('/api/incidents/:id', isAuthenticated, requireRole("district_admin", "department_admin", "state_admin"), async (req: any, res) => {
+    try {
+      await storage.deleteIncident(req.params.id);
+      res.json({ message: "Incident deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting incident:", error);
+      res.status(500).json({ message: "Failed to delete incident" });
     }
   });
 

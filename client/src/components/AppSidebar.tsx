@@ -12,6 +12,8 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { User } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { getSidebarTitle } from "@/lib/roleUtils";
 
 interface NavItem {
   label: string;
@@ -20,26 +22,20 @@ interface NavItem {
 }
 
 interface AppSidebarProps {
-  title: string;
-  subtitle?: string;
   navItems: NavItem[];
-  user?: {
-    firstName: string | null;
-    lastName: string | null;
-    email: string | null;
-  };
 }
 
-export function AppSidebar({ title, subtitle, navItems, user }: AppSidebarProps) {
+export function AppSidebar({ navItems }: AppSidebarProps) {
   const [location] = useLocation();
+  const { user } = useAuth();
+  
+  // Generate constant role-based title
+  const sidebarTitle = getSidebarTitle(user?.role, user?.district);
 
   return (
     <Sidebar className="bg-gradient-to-b from-orange-600 to-orange-500 dark:from-orange-700 dark:to-orange-600">
       <SidebarHeader className="border-b border-white/20 p-4">
-        <h1 className="text-lg font-bold text-white">{title}</h1>
-        {subtitle && (
-          <p className="text-sm text-white/90">{subtitle}</p>
-        )}
+        <h1 className="text-lg font-bold text-white">{sidebarTitle}</h1>
       </SidebarHeader>
 
       <SidebarContent>

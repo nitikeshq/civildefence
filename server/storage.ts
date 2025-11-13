@@ -42,7 +42,9 @@ export interface IStorage {
   getAllIncidents(): Promise<Incident[]>;
   getIncidentsByDistrict(district: string): Promise<Incident[]>;
   getIncidentsByStatus(status: string): Promise<Incident[]>;
+  updateIncident(id: string, updates: Partial<InsertIncident>): Promise<Incident>;
   updateIncidentStatus(id: string, status: string, assignedTo?: string[]): Promise<Incident>;
+  deleteIncident(id: string): Promise<void>;
   
   // Inventory operations
   createInventoryItem(item: InsertInventory): Promise<InventoryItem>;
@@ -183,6 +185,15 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(incidents).where(eq(incidents.status, status as any)).orderBy(desc(incidents.createdAt));
   }
 
+  async updateIncident(id: string, updates: Partial<InsertIncident>): Promise<Incident> {
+    const [incident] = await db
+      .update(incidents)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(incidents.id, id))
+      .returning();
+    return incident;
+  }
+
   async updateIncidentStatus(id: string, status: string, assignedTo?: string[]): Promise<Incident> {
     const updates: any = {
       status: status as any,
@@ -203,6 +214,10 @@ export class DatabaseStorage implements IStorage {
       .where(eq(incidents.id, id))
       .returning();
     return incident;
+  }
+
+  async deleteIncident(id: string): Promise<void> {
+    await db.delete(incidents).where(eq(incidents.id, id));
   }
 
   // Inventory operations

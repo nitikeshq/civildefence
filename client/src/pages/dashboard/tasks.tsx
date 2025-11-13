@@ -141,7 +141,11 @@ export default function TasksPage() {
   };
 
   return (
-    <DashboardLayout navItems={navItems} title="Task Management">
+    <DashboardLayout 
+      navItems={navItems} 
+      title="Task Management"
+      subtitle={isDepartmentAdmin ? "All Districts" : (isDistrictAdmin ? user?.district || "" : "")}
+    >
       <div className="p-6 space-y-6">
         {/* Page Header */}
         <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -162,7 +166,8 @@ export default function TasksPage() {
               <DialogHeader>
                 <DialogTitle>Assign Volunteers to Task</DialogTitle>
                 <DialogDescription>
-                  Select an incident and assign volunteers from the selected district
+                  Select an incident and assign volunteers from the selected district. 
+                  <strong className="block mt-2 text-foreground">Note: Each selected volunteer will receive an individual task assignment for this incident.</strong>
                 </DialogDescription>
               </DialogHeader>
 

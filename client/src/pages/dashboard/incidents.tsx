@@ -1,46 +1,160 @@
 import { useState } from "react";
-import { AlertTriangle, Search, Eye } from "lucide-react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AlertTriangle, Search, Eye, Plus, Pencil, Trash2, Activity } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { useAuth } from "@/hooks/useAuth";
-import { useScopedIncidents } from "@/hooks/useScopedData";
-import { getDashboardTitle, getDashboardSubtitle, getNavigationItems } from "@/lib/roleUtils";
-import { LayoutDashboard, Users, Package, BarChart3, ClipboardList, Activity } from "lucide-react";
-import type { Incident } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { getAdminNavItems } from "@/lib/roleUtils";
+import { ODISHA_DISTRICTS } from "@shared/constants";
+import { insertIncidentSchema, type Incident, type InsertIncident } from "@shared/schema";
+import { z } from "zod";
 
 export default function DashboardIncidents() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const { data: incidents = [], isLoading } = useScopedIncidents();
+  const navItems = user ? getAdminNavItems(user.role) : [];
+  const isDistrictAdmin = user?.role === "district_admin";
+  const isDepartmentAdmin = user?.role === "department_admin" || user?.role === "state_admin";
 
-  // Navigation items with icons
-  const navItemsWithIcons = getNavigationItems(user?.role).map((item) => {
-    const iconMap: Record<string, any> = {
-      LayoutDashboard,
-      Users,
-      AlertTriangle,
-      Package,
-      BarChart3,
-      ClipboardList,
-    };
-    return {
-      ...item,
-      icon: iconMap[item.icon] || Activity,
-    };
+  // Fetch incidents
+  const { data: incidents = [], isLoading } = useQuery<Incident[]>({
+    queryKey: ["/api/incidents"],
+  });
+
+  // Create form
+  const createForm = useForm<z.infer<typeof insertIncidentSchema>>({
+    resolver: zodResolver(insertIncidentSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      location: "",
+      district: isDistrictAdmin ? user?.district || "" : "",
+      severity: "medium",
+      status: "reported",
+    },
+  });
+
+  // Edit form
+  const editForm = useForm<z.infer<typeof insertIncidentSchema>>({
+    resolver: zodResolver(insertIncidentSchema),
+  });
+
+  // Create mutation
+  const createMutation = useMutation({
+    mutationFn: async (data: z.infer<typeof insertIncidentSchema>) => {
+      return await apiRequest("POST", "/api/incidents", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/incidents"] });
+      toast({
+        title: "Success",
+        description: "Incident created successfully",
+      });
+      setShowCreateDialog(false);
+      createForm.reset();
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to create incident",
+      });
+    },
+  });
+
+  // Update mutation
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Partial<InsertIncident> }) => {
+      return await apiRequest("PATCH", `/api/incidents/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/incidents"] });
+      toast({
+        title: "Success",
+        description: "Incident updated successfully",
+      });
+      setShowEditDialog(false);
+      setSelectedIncident(null);
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to update incident",
+      });
+    },
+  });
+
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return await apiRequest("DELETE", `/api/incidents/${id}`, {});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/incidents"] });
+      toast({
+        title: "Success",
+        description: "Incident deleted successfully",
+      });
+      setShowDeleteDialog(false);
+      setSelectedIncident(null);
+    },
+    onError: (error: any) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to delete incident",
+      });
+    },
   });
 
   const filteredIncidents = incidents.filter(
@@ -84,12 +198,37 @@ export default function DashboardIncidents() {
     );
   };
 
+  const handleCreate = createForm.handleSubmit((data) => {
+    createMutation.mutate(data);
+  });
+
+  const handleEdit = editForm.handleSubmit((data) => {
+    if (selectedIncident) {
+      updateMutation.mutate({ id: selectedIncident.id, data });
+    }
+  });
+
+  const handleDelete = () => {
+    if (selectedIncident) {
+      deleteMutation.mutate(selectedIncident.id);
+    }
+  };
+
+  const openEditDialog = (incident: Incident) => {
+    setSelectedIncident(incident);
+    editForm.reset({
+      title: incident.title || "",
+      description: incident.description || "",
+      location: incident.location || "",
+      district: incident.district || "",
+      severity: incident.severity || "medium",
+      status: incident.status || "reported",
+    });
+    setShowEditDialog(true);
+  };
+
   return (
-    <DashboardLayout 
-      navItems={navItemsWithIcons} 
-      title={getDashboardTitle(user?.role)}
-      subtitle={getDashboardSubtitle(user?.role, user?.district)}
-    >
+    <DashboardLayout navItems={navItems}>
       <div className="p-6 space-y-6">
         {/* Page Header */}
         <div className="flex flex-wrap items-center justify-between gap-4">
@@ -99,15 +238,21 @@ export default function DashboardIncidents() {
               Monitor and manage emergency incidents
             </p>
           </div>
-          <div className="relative w-full md:w-96">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search incidents..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-              data-testid="input-search-incidents"
-            />
+          <div className="flex gap-2">
+            <div className="relative w-full md:w-96">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search incidents..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+                data-testid="input-search-incidents"
+              />
+            </div>
+            <Button onClick={() => setShowCreateDialog(true)} data-testid="button-create-incident">
+              <Plus className="h-4 w-4 mr-1" />
+              Create Incident
+            </Button>
           </div>
         </div>
 
@@ -134,7 +279,7 @@ export default function DashboardIncidents() {
           <Card data-testid="card-resolved-incidents">
             <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Resolved</CardTitle>
-              <Package className="h-4 w-4 text-muted-foreground" />
+              <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{isLoading ? "..." : resolvedIncidents.length}</div>
@@ -186,6 +331,27 @@ export default function DashboardIncidents() {
                         <Eye className="h-4 w-4 mr-1" />
                         View
                       </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => openEditDialog(incident)}
+                        data-testid={`button-edit-${incident.id}`}
+                      >
+                        <Pencil className="h-4 w-4 mr-1" />
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => {
+                          setSelectedIncident(incident);
+                          setShowDeleteDialog(true);
+                        }}
+                        data-testid={`button-delete-${incident.id}`}
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Delete
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -195,7 +361,295 @@ export default function DashboardIncidents() {
         </Card>
       </div>
 
-      {/* Incident Details Dialog */}
+      {/* Create Incident Dialog */}
+      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Create New Incident</DialogTitle>
+            <DialogDescription>
+              Report a new emergency incident
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...createForm}>
+            <form onSubmit={handleCreate} className="space-y-4">
+              <FormField
+                control={createForm.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter incident title" data-testid="input-create-title" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={createForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} placeholder="Describe the incident" rows={3} data-testid="input-create-description" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={createForm.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Location</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Specific location" data-testid="input-create-location" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={createForm.control}
+                  name="district"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>District</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value} disabled={isDistrictAdmin}>
+                        <FormControl>
+                          <SelectTrigger data-testid="select-create-district">
+                            <SelectValue placeholder="Select district" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {ODISHA_DISTRICTS.map((district) => (
+                            <SelectItem key={district} value={district}>
+                              {district}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={createForm.control}
+                  name="severity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Severity</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger data-testid="select-create-severity">
+                            <SelectValue placeholder="Select severity" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="low">Low</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="high">High</SelectItem>
+                          <SelectItem value="critical">Critical</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={createForm.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger data-testid="select-create-status">
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="reported">Reported</SelectItem>
+                          <SelectItem value="assigned">Assigned</SelectItem>
+                          <SelectItem value="in_progress">In Progress</SelectItem>
+                          <SelectItem value="resolved">Resolved</SelectItem>
+                          <SelectItem value="closed">Closed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setShowCreateDialog(false)} data-testid="button-cancel-create">
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={createMutation.isPending} data-testid="button-submit-create">
+                  {createMutation.isPending ? "Creating..." : "Create Incident"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Incident Dialog */}
+      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Incident</DialogTitle>
+            <DialogDescription>
+              Update incident information
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...editForm}>
+            <form onSubmit={handleEdit} className="space-y-4">
+              <FormField
+                control={editForm.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter incident title" data-testid="input-edit-title" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={editForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} placeholder="Describe the incident" rows={3} data-testid="input-edit-description" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={editForm.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Location</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Specific location" data-testid="input-edit-location" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={editForm.control}
+                  name="district"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>District</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger data-testid="select-edit-district">
+                            <SelectValue placeholder="Select district" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {ODISHA_DISTRICTS.map((district) => (
+                            <SelectItem key={district} value={district}>
+                              {district}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={editForm.control}
+                  name="severity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Severity</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger data-testid="select-edit-severity">
+                            <SelectValue placeholder="Select severity" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="low">Low</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="high">High</SelectItem>
+                          <SelectItem value="critical">Critical</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={editForm.control}
+                  name="status"
+                  render={({ field}) => (
+                    <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger data-testid="select-edit-status">
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="reported">Reported</SelectItem>
+                          <SelectItem value="assigned">Assigned</SelectItem>
+                          <SelectItem value="in_progress">In Progress</SelectItem>
+                          <SelectItem value="resolved">Resolved</SelectItem>
+                          <SelectItem value="closed">Closed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setShowEditDialog(false)} data-testid="button-cancel-edit">
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={updateMutation.isPending} data-testid="button-submit-edit">
+                  {updateMutation.isPending ? "Updating..." : "Update Incident"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Details Dialog */}
       <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -232,10 +686,6 @@ export default function DashboardIncidents() {
                   <div className="mt-1">{getStatusBadge(selectedIncident.status)}</div>
                 </div>
                 <div>
-                  <Label>Reported By</Label>
-                  <p className="text-sm">{selectedIncident.reportedBy || "Unknown"}</p>
-                </div>
-                <div>
                   <Label>Reported On</Label>
                   <p className="text-sm">
                     {selectedIncident.createdAt ? new Date(selectedIncident.createdAt).toLocaleString() : "N/A"}
@@ -246,6 +696,29 @@ export default function DashboardIncidents() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the incident "{selectedIncident?.title}". This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel data-testid="button-cancel-delete">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={deleteMutation.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="button-confirm-delete"
+            >
+              {deleteMutation.isPending ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }

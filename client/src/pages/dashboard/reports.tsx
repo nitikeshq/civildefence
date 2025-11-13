@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { useAuth } from "@/hooks/useAuth";
 import { useScopedVolunteers, useScopedIncidents, useScopedInventory } from "@/hooks/useScopedData";
-import { getDashboardTitle, getDashboardSubtitle, getNavigationItems, getRolePermissions } from "@/lib/roleUtils";
+import { getAdminNavItems, getRolePermissions } from "@/lib/roleUtils";
 import { 
   downloadCSV, 
   downloadExcel, 
@@ -13,7 +13,6 @@ import {
   prepareIncidentsForExport, 
   prepareInventoryForExport 
 } from "@/lib/exportUtils";
-import { LayoutDashboard, ClipboardList, Activity } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -36,29 +35,18 @@ export default function DashboardReports() {
   const { user } = useAuth();
   const permissions = getRolePermissions(user?.role);
 
-  // Navigation items with icons
-  const navItemsWithIcons = getNavigationItems(user?.role).map((item) => {
-    const iconMap: Record<string, any> = {
-      LayoutDashboard,
-      Users,
-      AlertTriangle,
-      Package,
-      BarChart3,
-      ClipboardList,
-    };
-    return {
-      ...item,
-      icon: iconMap[item.icon] || Activity,
-    };
-  });
+  // Get consistent navigation items for all admin pages
+  const navItems = user ? getAdminNavItems(user.role || "volunteer") : [];
+  const isDistrictAdmin = user?.role === "district_admin";
+  const isDepartmentAdmin = user?.role === "department_admin" || user?.role === "state_admin";
 
   // Only state-level users can access reports - early return before fetching hooks
   if (permissions.scope !== "state") {
     return (
       <DashboardLayout 
-        navItems={navItemsWithIcons} 
-        title={getDashboardTitle(user?.role)}
-        subtitle={getDashboardSubtitle(user?.role, user?.district)}
+        navItems={navItems} 
+        
+        
       >
         <div className="p-6">
           <Card>
@@ -233,9 +221,9 @@ export default function DashboardReports() {
 
   return (
     <DashboardLayout 
-      navItems={navItemsWithIcons} 
-      title={getDashboardTitle(user?.role)}
-      subtitle={getDashboardSubtitle(user?.role, user?.district)}
+      navItems={navItems} 
+      
+      
     >
       <div className="p-6 space-y-6">
         {/* Page Header */}

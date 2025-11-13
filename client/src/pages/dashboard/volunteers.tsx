@@ -19,9 +19,8 @@ import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useScopedVolunteers } from "@/hooks/useScopedData";
-import { getDashboardTitle, getDashboardSubtitle, getNavigationItems } from "@/lib/roleUtils";
+import { getAdminNavItems } from "@/lib/roleUtils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { LayoutDashboard, AlertTriangle, Package, BarChart3, ClipboardList, Activity } from "lucide-react";
 import type { Volunteer } from "@shared/schema";
 
 export default function DashboardVolunteers() {
@@ -35,21 +34,10 @@ export default function DashboardVolunteers() {
 
   const { data: volunteers = [], isLoading } = useScopedVolunteers();
 
-  // Navigation items with icons
-  const navItemsWithIcons = getNavigationItems(user?.role).map((item) => {
-    const iconMap: Record<string, any> = {
-      LayoutDashboard,
-      Users,
-      AlertTriangle,
-      Package,
-      BarChart3,
-      ClipboardList,
-    };
-    return {
-      ...item,
-      icon: iconMap[item.icon] || Activity,
-    };
-  });
+  // Get consistent navigation items for all admin pages
+  const navItems = user ? getAdminNavItems(user.role || "volunteer") : [];
+  const isDistrictAdmin = user?.role === "district_admin";
+  const isDepartmentAdmin = user?.role === "department_admin" || user?.role === "state_admin";
 
   const approveMutation = useMutation({
     mutationFn: async (volunteerId: string) => {
@@ -141,9 +129,9 @@ export default function DashboardVolunteers() {
 
   return (
     <DashboardLayout 
-      navItems={navItemsWithIcons} 
-      title={getDashboardTitle(user?.role)}
-      subtitle={getDashboardSubtitle(user?.role, user?.district)}
+      navItems={navItems} 
+      title="Volunteer Management"
+      subtitle={isDepartmentAdmin ? "All Districts" : (isDistrictAdmin ? user?.district || "" : "")}
     >
       <div className="p-6 space-y-6">
         {/* Page Header */}

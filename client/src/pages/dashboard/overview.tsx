@@ -4,8 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { useAuth } from "@/hooks/useAuth";
 import { useScopedVolunteers, useScopedIncidents, useScopedInventory } from "@/hooks/useScopedData";
-import { getDashboardTitle, getDashboardSubtitle, getNavigationItems, getRolePermissions } from "@/lib/roleUtils";
-import { LayoutDashboard, ClipboardList, Activity } from "lucide-react";
+import { getAdminNavItems, getRolePermissions } from "@/lib/roleUtils";
 
 export default function DashboardOverview() {
   const [, setLocation] = useLocation();
@@ -17,21 +16,10 @@ export default function DashboardOverview() {
 
   const permissions = getRolePermissions(user?.role);
   
-  // Navigation items with icons
-  const navItemsWithIcons = getNavigationItems(user?.role).map((item) => {
-    const iconMap: Record<string, any> = {
-      LayoutDashboard,
-      Users,
-      AlertTriangle,
-      Package,
-      BarChart3,
-      ClipboardList,
-    };
-    return {
-      ...item,
-      icon: iconMap[item.icon] || Activity,
-    };
-  });
+  // Get consistent navigation items for all admin pages
+  const navItems = user ? getAdminNavItems(user.role || "volunteer") : [];
+  const isDistrictAdmin = user?.role === "district_admin";
+  const isDepartmentAdmin = user?.role === "department_admin" || user?.role === "state_admin";
 
   // Calculate metrics
   const totalVolunteers = volunteers.length;
@@ -50,11 +38,7 @@ export default function DashboardOverview() {
   const isLoading = loadingVolunteers || loadingIncidents || loadingInventory;
 
   return (
-    <DashboardLayout 
-      navItems={navItemsWithIcons} 
-      title={getDashboardTitle(user?.role)}
-      subtitle={getDashboardSubtitle(user?.role, user?.district)}
-    >
+    <DashboardLayout navItems={navItems}>
       <div className="p-6 space-y-6">
         {/* Page Header */}
         <div>

@@ -133,3 +133,70 @@ Preferred communication style: Simple, everyday language.
 - Build output: `dist/public` for frontend, `dist/index.js` for backend
 - Production mode uses built assets, development uses Vite middleware
 - Session cookie security flags adjust based on NODE_ENV
+
+## Implemented Features
+
+### Recent Updates (November 2025)
+
+**Navigation Consistency**
+- All admin dashboard pages now use `getAdminNavItems()` for unified navigation
+- Consistent headers and subtitles across all dashboard views
+- Role-based navigation with automatic scoping
+
+**CRUD Operations**
+- **Incidents**: Full CRUD with edit/delete functionality, district-based filtering
+- **Inventory**: Full CRUD with pagination (10 items per page), district-based filtering
+- **Volunteers**: Create, view, approve/reject workflows
+- **Tasks/Assignments**: Individual task assignment per volunteer (not group assignments)
+
+**Task Assignment Workflow**
+- Each selected volunteer receives an individual task assignment
+- UI clearly communicates this behavior in the assignment dialog
+- District admins auto-scoped to their district
+- Department/State admins must select district before creating assignments
+
+**Data Seeding**
+- 8 diverse incidents across multiple districts
+- 15 inventory items with varied categories and conditions
+- Realistic test data for development and demonstration
+
+### Pending Features
+
+**Training Management System** (Recommended Implementation)
+- **Who Creates**: Both district admins and department/state admins
+  - District admins: Create and manage local training sessions for their district
+  - Department/State admins: Create statewide training sessions accessible across all districts
+- **Implementation Scope**:
+  - New `trainings` table in database schema
+  - CRUD endpoints in `server/routes.ts`
+  - Storage methods in `server/storage.ts`
+  - Dedicated admin page for training management
+  - Volunteer interface to view and register for trainings
+- **Schema Requirements**:
+  - Training title, description, date/time, location
+  - District association (specific district or "All Districts" for statewide)
+  - Capacity limits and current enrollment
+  - Skills/topics covered
+  - Created by (admin user reference)
+
+### Known Infrastructure Issues
+
+**Neon Database Connection**
+- Intermittent connection termination messages: `error: terminating connection due to administrator command`
+- This is a Neon infrastructure behavior (auto-scaling, connection pooling)
+- Application auto-reconnects automatically via Drizzle ORM connection pool
+- No code changes required; connection recovery is handled transparently
+
+### Architecture Notes
+
+**District-Based Access Control**
+- District admins: Automatically scoped to their assigned district
+- Department admins: Must manually select district for creating incidents/inventory/tasks
+- State admins: Full access across all 28-29 districts
+- Filtering applied at query level via `useScopedData` hooks
+
+**Navigation Pattern**
+- All admin pages use `getAdminNavItems(role)` helper
+- Consistent title/subtitle formatting based on role and district
+- Sidebar navigation managed through shadcn/ui `<Sidebar>` component
+- No residual references to deprecated `getNavigationItems`, `getDashboardTitle`, or `getDashboardSubtitle`

@@ -19,15 +19,11 @@ interface NavItem {
 interface DashboardLayoutProps {
   children: ReactNode;
   navItems: NavItem[];
-  title: string;
-  subtitle?: string;
 }
 
 export default function DashboardLayout({
   children,
   navItems,
-  title,
-  subtitle,
 }: DashboardLayoutProps) {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
@@ -60,20 +56,7 @@ export default function DashboardLayout({
   return (
     <SidebarProvider style={sidebarStyle as React.CSSProperties}>
       <div className="flex h-screen w-full">
-        <AppSidebar
-          title={title}
-          subtitle={subtitle || "Civil Defence, Odisha"}
-          navItems={navItems}
-          user={
-            user
-              ? {
-                  firstName: user.firstName,
-                  lastName: user.lastName,
-                  email: user.email,
-                }
-              : undefined
-          }
-        />
+        <AppSidebar navItems={navItems} />
         <div className="flex flex-col flex-1">
           <header className="flex items-center justify-between gap-4 p-4 border-b min-h-[57px] bg-gradient-to-r from-orange-600 to-orange-500 dark:from-orange-700 dark:to-orange-600">
             <div className="flex items-center gap-4">
