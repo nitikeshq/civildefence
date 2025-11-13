@@ -6,6 +6,11 @@ import {
   assignments,
   trainings,
   trainingRegistrations,
+  translations,
+  heroBanners,
+  aboutContent,
+  services,
+  siteSettings,
   type User,
   type UpsertUser,
   type Volunteer,
@@ -20,6 +25,16 @@ import {
   type InsertTraining,
   type TrainingRegistration,
   type InsertTrainingRegistration,
+  type Translation,
+  type InsertTranslation,
+  type HeroBanner,
+  type InsertHeroBanner,
+  type AboutContent,
+  type InsertAboutContent,
+  type Service,
+  type InsertService,
+  type SiteSetting,
+  type InsertSiteSetting,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, ilike, or, gte } from "drizzle-orm";
