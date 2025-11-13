@@ -46,7 +46,7 @@ export default function TasksPage() {
   // Determine district for filtering
   const isDistrictAdmin = user?.role === "district_admin";
   const isDepartmentAdmin = user?.role === "department_admin" || user?.role === "state_admin";
-  const userDistrict = isDistrictAdmin ? user?.district : selectedDistrict;
+  const userDistrict = isDistrictAdmin ? (user?.district || "") : selectedDistrict;
 
   // Fetch incidents (for district admin: only their district, for department admin: selected district)
   const { data: incidents = [] } = useQuery<Incident[]>({
