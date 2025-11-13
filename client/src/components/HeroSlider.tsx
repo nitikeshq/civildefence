@@ -1,31 +1,53 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import type { HeroBanner } from "@shared/schema";
 import trainingImg from "@assets/generated_images/Civil_Defence_training_f1298099.png";
 import emergencyImg from "@assets/generated_images/Emergency_response_operations_6dd70f83.png";
 import controlRoomImg from "@assets/generated_images/Civil_Defence_control_room_fe29f826.png";
 
-const slides = [
+const fallbackSlides = [
   {
-    image: trainingImg,
-    title: "Building Resilient Communities",
-    subtitle: "Professional training for Civil Defence volunteers across Odisha",
+    imageUrl: trainingImg,
+    titleEn: "Building Resilient Communities",
+    subtitleEn: "Professional training for Civil Defence volunteers across Odisha",
+    buttonTextEn: "Learn More",
+    buttonLink: "#",
+    order: 0,
+    isActive: true,
   },
   {
-    image: emergencyImg,
-    title: "Emergency Response Excellence",
-    subtitle: "Rapid disaster relief and community protection services",
+    imageUrl: emergencyImg,
+    titleEn: "Emergency Response Excellence",
+    subtitleEn: "Rapid disaster relief and community protection services",
+    buttonTextEn: "Learn More",
+    buttonLink: "#",
+    order: 1,
+    isActive: true,
   },
   {
-    image: controlRoomImg,
-    title: "Modern Emergency Operations",
-    subtitle: "State-of-the-art control room for coordinated response",
+    imageUrl: controlRoomImg,
+    titleEn: "Modern Emergency Operations",
+    subtitleEn: "State-of-the-art control room for coordinated response",
+    buttonTextEn: "Learn More",
+    buttonLink: "#",
+    order: 2,
+    isActive: true,
   },
 ];
 
 export default function HeroSlider() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  
+  const { data: cmsSlides } = useQuery<HeroBanner[]>({
+    queryKey: ['/api/cms/hero-banners'],
+  });
+
+  const slides = (cmsSlides && cmsSlides.length > 0) 
+    ? cmsSlides.filter(s => s.isActive).sort((a, b) => (a.order || 0) - (b.order || 0))
+    : fallbackSlides;
 
   useEffect(() => {
     if (!isPaused) {
@@ -59,8 +81,8 @@ export default function HeroSlider() {
           }`}
         >
           <img
-            src={slide.image}
-            alt={slide.title}
+            src={slide.imageUrl}
+            alt={slide.titleEn}
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
@@ -68,18 +90,21 @@ export default function HeroSlider() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
               <div className="max-w-2xl">
                 <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
-                  {slide.title}
+                  {slide.titleEn}
                 </h2>
                 <p className="text-lg md:text-xl text-white/90 mb-6">
-                  {slide.subtitle}
+                  {slide.subtitleEn}
                 </p>
-                <Button
-                  variant="outline"
-                  className="bg-white/20 backdrop-blur-sm border-white text-white hover:bg-white hover:text-foreground"
-                  data-testid="button-learn-more"
-                >
-                  Learn More
-                </Button>
+                {slide.buttonTextEn && (
+                  <Button
+                    variant="outline"
+                    className="bg-white/20 backdrop-blur-sm border-white text-white hover:bg-white hover:text-foreground"
+                    data-testid="button-learn-more"
+                    onClick={() => slide.buttonLink && window.location.href !== slide.buttonLink && (window.location.href = slide.buttonLink)}
+                  >
+                    {slide.buttonTextEn}
+                  </Button>
+                )}
               </div>
             </div>
           </div>
