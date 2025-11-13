@@ -55,6 +55,7 @@ export default function DashboardIncidents() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -65,9 +66,22 @@ export default function DashboardIncidents() {
   const isDistrictAdmin = user?.role === "district_admin";
   const isDepartmentAdmin = user?.role === "department_admin" || user?.role === "state_admin";
 
-  // Fetch incidents
+  // Determine the district to filter by
+  const userDistrict = isDistrictAdmin ? (user?.district || "") : selectedDistrict;
+
+  // Fetch incidents with district filter
   const { data: incidents = [], isLoading } = useQuery<Incident[]>({
-    queryKey: ["/api/incidents"],
+    queryKey: ["/api/incidents", userDistrict || "all"],
+    queryFn: async () => {
+      const url = userDistrict && userDistrict !== "all"
+        ? `/api/incidents?district=${encodeURIComponent(userDistrict)}`
+        : "/api/incidents";
+      const res = await fetch(url, { credentials: "include" });
+      if (!res.ok) {
+        throw new Error(`${res.status}: ${await res.text()}`);
+      }
+      return res.json();
+    },
   });
 
   // Create form
@@ -238,7 +252,27 @@ export default function DashboardIncidents() {
               Monitor and manage emergency incidents
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            {/* District Filter for Department Admins */}
+            {isDepartmentAdmin && (
+              <div className="w-full md:w-60">
+                <Label htmlFor="district-filter-incidents" className="sr-only">Filter by District</Label>
+                <Select value={selectedDistrict} onValueChange={setSelectedDistrict}>
+                  <SelectTrigger id="district-filter-incidents" data-testid="select-district-filter-incidents">
+                    <SelectValue placeholder="Select District" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Districts</SelectItem>
+                    {ODISHA_DISTRICTS.map((district) => (
+                      <SelectItem key={district} value={district}>
+                        {district}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            
             <div className="relative w-full md:w-96">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input

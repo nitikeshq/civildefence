@@ -57,6 +57,7 @@ export default function DashboardInventory() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
@@ -69,9 +70,22 @@ export default function DashboardInventory() {
   const isDistrictAdmin = user?.role === "district_admin";
   const isDepartmentAdmin = user?.role === "department_admin" || user?.role === "state_admin";
 
-  // Fetch inventory
+  // Determine the district to filter by
+  const userDistrict = isDistrictAdmin ? (user?.district || "") : selectedDistrict;
+
+  // Fetch inventory with district filter
   const { data: inventory = [], isLoading } = useQuery<InventoryItem[]>({
-    queryKey: ["/api/inventory"],
+    queryKey: ["/api/inventory", userDistrict || "all"],
+    queryFn: async () => {
+      const url = userDistrict && userDistrict !== "all"
+        ? `/api/inventory?district=${encodeURIComponent(userDistrict)}`
+        : "/api/inventory";
+      const res = await fetch(url, { credentials: "include" });
+      if (!res.ok) {
+        throw new Error(`${res.status}: ${await res.text()}`);
+      }
+      return res.json();
+    },
   });
 
   // Create form

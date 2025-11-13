@@ -51,6 +51,16 @@ export default function DashboardVolunteers() {
   // Fetch volunteers with district filter
   const { data: volunteers = [], isLoading } = useQuery<Volunteer[]>({
     queryKey: ["/api/volunteers", userDistrict || "all"],
+    queryFn: async () => {
+      const url = userDistrict && userDistrict !== "all"
+        ? `/api/volunteers?district=${encodeURIComponent(userDistrict)}`
+        : "/api/volunteers";
+      const res = await fetch(url, { credentials: "include" });
+      if (!res.ok) {
+        throw new Error(`${res.status}: ${await res.text()}`);
+      }
+      return res.json();
+    },
     enabled: isDistrictAdmin || (isDepartmentAdmin && selectedDistrict !== ""),
   });
 

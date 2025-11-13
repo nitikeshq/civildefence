@@ -50,13 +50,33 @@ export default function TasksPage() {
 
   // Fetch incidents (for district admin: only their district, for department admin: selected district)
   const { data: incidents = [] } = useQuery<Incident[]>({
-    queryKey: ["/api/incidents", userDistrict || ""],
+    queryKey: ["/api/incidents", userDistrict || "all"],
+    queryFn: async () => {
+      const url = userDistrict && userDistrict !== "all"
+        ? `/api/incidents?district=${encodeURIComponent(userDistrict)}`
+        : "/api/incidents";
+      const res = await fetch(url, { credentials: "include" });
+      if (!res.ok) {
+        throw new Error(`${res.status}: ${await res.text()}`);
+      }
+      return res.json();
+    },
     enabled: isDistrictAdmin || (isDepartmentAdmin && !!selectedDistrict),
   });
 
   // Fetch volunteers from selected district
   const { data: volunteers = [] } = useQuery<Volunteer[]>({
-    queryKey: ["/api/volunteers", { district: userDistrict, status: "approved" }],
+    queryKey: ["/api/volunteers", userDistrict || "all", "approved"],
+    queryFn: async () => {
+      const url = userDistrict && userDistrict !== "all"
+        ? `/api/volunteers?district=${encodeURIComponent(userDistrict)}&status=approved`
+        : "/api/volunteers?status=approved";
+      const res = await fetch(url, { credentials: "include" });
+      if (!res.ok) {
+        throw new Error(`${res.status}: ${await res.text()}`);
+      }
+      return res.json();
+    },
     enabled: !!userDistrict,
   });
 
@@ -181,6 +201,7 @@ export default function TasksPage() {
                         <SelectValue placeholder="Choose a district" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="all">All Districts</SelectItem>
                         {ODISHA_DISTRICTS.map((district: string) => (
                           <SelectItem key={district} value={district}>
                             {district}
