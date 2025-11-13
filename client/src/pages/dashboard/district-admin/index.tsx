@@ -1,26 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
-import {
-  LayoutDashboard,
-  Users,
-  AlertTriangle,
-  Package,
-  UserCheck,
-  ClipboardList,
-  BoxIcon,
-} from "lucide-react";
+import { UserCheck, ClipboardList, BoxIcon, Users, AlertTriangle, Package } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 import type { Volunteer, Incident, InventoryItem } from "@shared/schema";
-
-const navItems = [
-  { label: "Dashboard", path: "/dashboard/district-admin", icon: LayoutDashboard },
-  { label: "Volunteers", path: "/dashboard/district-admin/volunteers", icon: Users },
-  { label: "Incidents", path: "/dashboard/district-admin/incidents", icon: AlertTriangle },
-  { label: "Inventory", path: "/dashboard/district-admin/inventory", icon: Package },
-];
+import { districtAdminNav } from "./nav-config";
 
 export default function DistrictAdminDashboard() {
   const [, setLocation] = useLocation();
@@ -59,7 +45,7 @@ export default function DistrictAdminDashboard() {
   const isLoading = loadingVolunteers || loadingIncidents || loadingInventory;
 
   return (
-    <DashboardLayout navItems={navItems} title="District Admin">
+    <DashboardLayout navItems={districtAdminNav} title="District Admin" subtitle="Manage district operations">
       <div className="p-6 space-y-6">
         {/* Page Header */}
         <div>
