@@ -5,6 +5,8 @@ import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { useAuth } from "@/hooks/useAuth";
 import { useScopedVolunteers, useScopedIncidents, useScopedInventory } from "@/hooks/useScopedData";
 import { getAdminNavItems, getRolePermissions } from "@/lib/roleUtils";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import { useMemo } from "react";
 
 export default function DashboardOverview() {
   const [, setLocation] = useLocation();
@@ -36,6 +38,29 @@ export default function DashboardOverview() {
   const lowStockItems = inventory.filter((item) => item.quantity < 10).length;
 
   const isLoading = loadingVolunteers || loadingIncidents || loadingInventory;
+
+  // Chart data - volunteer status distribution
+  const volunteerStatusData = useMemo(() => [
+    { name: "Approved", value: activeVolunteers, color: "#22c55e" },
+    { name: "Pending", value: pendingApprovals, color: "#eab308" },
+    { name: "Rejected", value: volunteers.filter((v) => v.status === "rejected").length, color: "#ef4444" },
+  ], [activeVolunteers, pendingApprovals, volunteers]);
+
+  // Chart data - incident severity distribution
+  const incidentSeverityData = useMemo(() => {
+    const severityCounts = {
+      low: incidents.filter((i) => i.severity === "low").length,
+      medium: incidents.filter((i) => i.severity === "medium").length,
+      high: incidents.filter((i) => i.severity === "high").length,
+      critical: incidents.filter((i) => i.severity === "critical").length,
+    };
+    return [
+      { name: "Low", value: severityCounts.low, color: "#3b82f6" },
+      { name: "Medium", value: severityCounts.medium, color: "#eab308" },
+      { name: "High", value: severityCounts.high, color: "#f97316" },
+      { name: "Critical", value: severityCounts.critical, color: "#ef4444" },
+    ];
+  }, [incidents]);
 
   return (
     <DashboardLayout navItems={navItems}>
@@ -151,49 +176,72 @@ export default function DashboardOverview() {
           )}
         </div>
 
-        {/* Quick Stats */}
+        {/* Analytics Charts */}
         <div className="grid gap-4 md:grid-cols-2">
-          <Card data-testid="card-volunteer-stats">
+          {/* Volunteer Status Distribution Chart */}
+          <Card data-testid="card-volunteer-chart">
             <CardHeader>
-              <CardTitle>Volunteer Status</CardTitle>
+              <CardTitle>Volunteer Status Distribution</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Approved</span>
-                  <span className="font-medium">{activeVolunteers}</span>
+              {isLoading ? (
+                <div className="h-80 bg-muted animate-pulse rounded" />
+              ) : totalVolunteers > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={volunteerStatusData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, value }) => `${name}: ${value}`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {volunteerStatusData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-80 flex items-center justify-center text-muted-foreground">
+                  No volunteer data available
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Pending</span>
-                  <span className="font-medium">{pendingApprovals}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Total</span>
-                  <span className="font-medium">{totalVolunteers}</span>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
 
-          <Card data-testid="card-incident-stats">
+          {/* Incident Severity Distribution Chart */}
+          <Card data-testid="card-incident-chart">
             <CardHeader>
-              <CardTitle>Incident Status</CardTitle>
+              <CardTitle>Incident Severity Distribution</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Active</span>
-                  <span className="font-medium">{activeIncidents}</span>
+              {isLoading ? (
+                <div className="h-80 bg-muted animate-pulse rounded" />
+              ) : totalIncidents > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={incidentSeverityData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="value" fill="#8884d8">
+                      {incidentSeverityData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-80 flex items-center justify-center text-muted-foreground">
+                  No incident data available
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Resolved</span>
-                  <span className="font-medium">{resolvedIncidents}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Total</span>
-                  <span className="font-medium">{totalIncidents}</span>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </div>
