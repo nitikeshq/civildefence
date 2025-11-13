@@ -434,7 +434,7 @@ export default function DashboardTrainings() {
                         <Select
                           onValueChange={field.onChange}
                           value={field.value}
-                          disabled={isDistrictAdmin}
+                          disabled={isDistrictAdmin || createForm.watch("isStatewide")}
                         >
                           <FormControl>
                             <SelectTrigger data-testid="select-district">
@@ -644,7 +644,7 @@ export default function DashboardTrainings() {
                         <Select
                           onValueChange={field.onChange}
                           value={field.value}
-                          disabled={isDistrictAdmin}
+                          disabled={isDistrictAdmin || editForm.watch("isStatewide")}
                         >
                           <FormControl>
                             <SelectTrigger>
