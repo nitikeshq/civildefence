@@ -1,267 +1,260 @@
-import { useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import LogoutCard from "@/components/LogoutCard";
-import type { Assignment, Incident, TrainingSession } from "@shared/schema";
-import { redirectToSignIn } from "@/lib/authRedirect";
-import { useToast } from "@/hooks/use-toast";
-import { 
-  AlertTriangle, 
-  Calendar,
+import DashboardLayout from "@/components/layouts/DashboardLayout";
+import {
+  LayoutDashboard,
+  ClipboardList,
+  GraduationCap,
+  User,
   CheckCircle,
   Clock,
-  MapPin,
-  TrendingUp,
-  Award
+  AlertTriangle,
+  Calendar,
 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { useLocation } from "wouter";
+import type { Assignment, TrainingSession } from "@shared/schema";
+
+const navItems = [
+  { label: "Dashboard", path: "/dashboard/volunteer", icon: LayoutDashboard },
+  { label: "My Tasks", path: "/dashboard/volunteer/tasks", icon: ClipboardList },
+  { label: "Training", path: "/dashboard/volunteer/training", icon: GraduationCap },
+  { label: "Profile", path: "/dashboard/volunteer/profile", icon: User },
+];
 
 export default function VolunteerDashboard() {
-  const { toast } = useToast();
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const [, setLocation] = useLocation();
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      toast({
-        title: "Unauthorized",
-        description: "Please sign in to continue",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        redirectToSignIn();
-      }, 500);
-      return;
-    }
-  }, [isAuthenticated, isLoading, toast]);
-
-  const { data: assignments = [] } = useQuery<Assignment[]>({
+  const { data: assignments = [], isLoading: loadingAssignments } = useQuery<Assignment[]>({
     queryKey: ["/api/my-assignments"],
-    enabled: isAuthenticated,
   });
 
-  const { data: incidents = [] } = useQuery<Incident[]>({
-    queryKey: ["/api/my-incidents"],
-    enabled: isAuthenticated,
-  });
-
-  const { data: trainingSessions = [] } = useQuery<TrainingSession[]>({
+  const { data: trainingSessions = [], isLoading: loadingTraining } = useQuery<TrainingSession[]>({
     queryKey: ["/api/my-training"],
-    enabled: isAuthenticated,
   });
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
-  }
+  // Calculate metrics
+  const activeAssignments = assignments.filter(
+    (a) => a.status === "assigned" || a.status === "in_progress"
+  );
+  const completedAssignments = assignments.filter((a) => a.status === "completed");
 
-  const activeAssignments = assignments.filter(a => 
-    a.status === "assigned" || a.status === "in_progress"
+  const upcomingTraining = trainingSessions.filter(
+    (t) => new Date(t.scheduledAt) > new Date()
   );
-  const completedAssignments = assignments.filter(a => a.status === "completed");
-  const upcomingTraining = trainingSessions.filter(t => 
-    new Date(t.scheduledAt) > new Date()
+  const completedTraining = trainingSessions.filter(
+    (t) => t.status === "completed"
   );
+
+  const isLoading = loadingAssignments || loadingTraining;
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
-      <main id="main-content" className="flex-1 bg-muted/30">
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              Welcome, {user?.firstName || "Volunteer"}
-            </h1>
-            <p className="text-muted-foreground">
-              Your volunteer dashboard - Track your assignments and training
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Card className="border-l-4 border-l-orange-500">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active Assignments</CardTitle>
-                <div className="p-2 bg-orange-50 rounded-lg">
-                  <AlertTriangle className="h-4 w-4 text-orange-600" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-orange-600">{activeAssignments.length}</div>
-                <div className="flex items-center gap-2 mt-1">
-                  <Clock className="h-3 w-3 text-orange-600" />
-                  <span className="text-xs font-medium text-orange-600">
-                    Requires your attention
-                  </span>
-                </div>
-                <Progress value={assignments.length > 0 ? (activeAssignments.length / assignments.length) * 100 : 0} className="mt-3 [&>div]:bg-orange-500" />
-                <p className="text-xs text-muted-foreground mt-1">
-                  {assignments.length} total assignments
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-l-4 border-l-green-500">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Completed Tasks</CardTitle>
-                <div className="p-2 bg-green-50 rounded-lg">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-green-600">{completedAssignments.length}</div>
-                <div className="flex items-center gap-2 mt-1">
-                  <Award className="h-3 w-3 text-green-600" />
-                  <span className="text-xs font-medium text-green-600">
-                    Successfully completed
-                  </span>
-                </div>
-                <Progress value={assignments.length > 0 ? (completedAssignments.length / assignments.length) * 100 : 0} className="mt-3 [&>div]:bg-green-500" />
-                <p className="text-xs text-muted-foreground mt-1">
-                  {assignments.length > 0 ? Math.round((completedAssignments.length / assignments.length) * 100) : 0}% completion rate
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-l-4 border-l-blue-500">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Upcoming Training</CardTitle>
-                <div className="p-2 bg-blue-50 rounded-lg">
-                  <Calendar className="h-4 w-4 text-blue-600" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-blue-600">{upcomingTraining.length}</div>
-                <div className="flex items-center gap-2 mt-1">
-                  <TrendingUp className="h-3 w-3 text-blue-600" />
-                  <span className="text-xs font-medium text-blue-600">
-                    Sessions scheduled
-                  </span>
-                </div>
-                <Progress value={trainingSessions.length > 0 ? (upcomingTraining.length / trainingSessions.length) * 100 : 0} className="mt-3 [&>div]:bg-blue-500" />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Enhance your skills
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>My Active Incidents</CardTitle>
-                <CardDescription>
-                  Incidents currently assigned to you
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {activeAssignments.length === 0 ? (
-                  <p className="text-sm text-muted-foreground py-8 text-center">
-                    No active assignments at the moment
-                  </p>
-                ) : (
-                  <div className="space-y-4">
-                    {incidents.slice(0, 5).map((incident) => (
-                      <div key={incident.id} className="flex items-start gap-3 p-3 border rounded-md">
-                        <AlertTriangle className="h-5 w-5 text-destructive mt-0.5" />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <p className="font-medium truncate">{incident.title}</p>
-                            <Badge variant={
-                              incident.severity === "critical" ? "destructive" :
-                              incident.severity === "high" ? "default" : "secondary"
-                            } data-testid={`badge-severity-${incident.id}`}>
-                              {incident.severity}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                            <MapPin className="h-3 w-3" />
-                            <span className="truncate">{incident.location}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Upcoming Training Sessions</CardTitle>
-                <CardDescription>
-                  Your scheduled training programs
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {upcomingTraining.length === 0 ? (
-                  <p className="text-sm text-muted-foreground py-8 text-center">
-                    No upcoming training sessions
-                  </p>
-                ) : (
-                  <div className="space-y-4">
-                    {upcomingTraining.slice(0, 5).map((training) => (
-                      <div key={training.id} className="flex items-start gap-3 p-3 border rounded-md">
-                        <Calendar className="h-5 w-5 text-primary mt-0.5" />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium mb-1">{training.title}</p>
-                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                            <Clock className="h-3 w-3" />
-                            <span>{new Date(training.scheduledAt).toLocaleDateString()}</span>
-                          </div>
-                          {training.location && (
-                            <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
-                              <MapPin className="h-3 w-3" />
-                              <span className="truncate">{training.location}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="mt-8">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Quick Actions</CardTitle>
-                    <CardDescription>Common tasks for volunteers</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <Link href="/incident-reporting">
-                        <Button className="w-full" variant="default" data-testid="button-report-incident">
-                          <AlertTriangle className="mr-2 h-4 w-4" />
-                          Report Incident
-                        </Button>
-                      </Link>
-                      <Button className="w-full" variant="outline" data-testid="button-view-profile">
-                        View My Profile
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-              <LogoutCard />
-            </div>
-          </div>
+    <DashboardLayout navItems={navItems} title="Volunteer Portal">
+      <div className="p-6 space-y-6">
+        {/* Page Header */}
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">My Dashboard</h1>
+          <p className="text-muted-foreground mt-1">
+            View your tasks, training, and volunteer activities
+          </p>
         </div>
-      </main>
 
-      <Footer />
-    </div>
+        {/* Key Metrics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Active Tasks */}
+          <Card data-testid="card-active-tasks">
+            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Tasks</CardTitle>
+              <ClipboardList className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="h-8 bg-muted animate-pulse rounded" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold" data-testid="text-active-tasks">
+                    {activeAssignments.length}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Tasks in progress
+                  </p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Completed Tasks */}
+          <Card data-testid="card-completed-tasks">
+            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Completed Tasks</CardTitle>
+              <CheckCircle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="h-8 bg-muted animate-pulse rounded" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold" data-testid="text-completed-tasks">
+                    {completedAssignments.length}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Total completed
+                  </p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Upcoming Training */}
+          <Card data-testid="card-upcoming-training">
+            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Upcoming Training</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="h-8 bg-muted animate-pulse rounded" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold" data-testid="text-upcoming-training">
+                    {upcomingTraining.length}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Sessions scheduled
+                  </p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Training Completed */}
+          <Card data-testid="card-training-completed">
+            <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Training Completed</CardTitle>
+              <GraduationCap className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="h-8 bg-muted animate-pulse rounded" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold" data-testid="text-training-completed">
+                    {completedTraining.length}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Total sessions
+                  </p>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Active Tasks List */}
+        {activeAssignments.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Active Tasks</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {activeAssignments.slice(0, 5).map((assignment) => (
+                <div
+                  key={assignment.id}
+                  className="flex items-center justify-between gap-3 p-3 rounded-lg border hover-elevate"
+                  data-testid={`task-${assignment.id}`}
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10">
+                      {assignment.status === "in_progress" ? (
+                        <Clock className="h-5 w-5 text-primary" />
+                      ) : (
+                        <AlertTriangle className="h-5 w-5 text-primary" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">
+                        {assignment.role || "Task Assignment"}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {assignment.status === "in_progress" ? "In Progress" : "Assigned"}
+                      </p>
+                    </div>
+                  </div>
+                  <Badge variant="outline" data-testid={`badge-${assignment.status}`}>
+                    {assignment.status}
+                  </Badge>
+                </div>
+              ))}
+              {activeAssignments.length > 5 && (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setLocation("/dashboard/volunteer/tasks")}
+                  data-testid="button-view-all-tasks"
+                >
+                  View All Tasks ({activeAssignments.length})
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Upcoming Training */}
+        {upcomingTraining.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Upcoming Training Sessions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {upcomingTraining.slice(0, 3).map((session) => (
+                <div
+                  key={session.id}
+                  className="flex items-center justify-between gap-3 p-3 rounded-lg border hover-elevate"
+                  data-testid={`training-${session.id}`}
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10">
+                      <GraduationCap className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{session.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(session.scheduledAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  <Badge variant="outline">{session.status || "Scheduled"}</Badge>
+                </div>
+              ))}
+              {upcomingTraining.length > 3 && (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setLocation("/dashboard/volunteer/training")}
+                  data-testid="button-view-all-training"
+                >
+                  View All Training ({upcomingTraining.length})
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* No Active Tasks Message */}
+        {!isLoading && activeAssignments.length === 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>No Active Tasks</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                You don't have any active tasks at the moment. Check back later for new assignments.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </DashboardLayout>
   );
 }
