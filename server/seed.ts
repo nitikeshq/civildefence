@@ -41,6 +41,15 @@ async function seedDatabase() {
       role: "state_admin" as const,
       district: "Bhubaneswar",
     },
+    {
+      username: "cms_manager",
+      password: "cms123",
+      firstName: "CMS",
+      lastName: "Manager",
+      email: "cms.manager@odisha.gov.in",
+      role: "cms_manager" as const,
+      district: "Bhubaneswar",
+    },
   ];
 
   for (const userData of testUsers) {

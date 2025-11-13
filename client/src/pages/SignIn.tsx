@@ -17,7 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
-import { LogIn, ShieldCheck, Users, Building2, Flag } from "lucide-react";
+import { LogIn, ShieldCheck, Users, Building2, Flag, Settings } from "lucide-react";
 import AccessibilityBar from "@/components/AccessibilityBar";
 
 const signInSchema = z.object({
@@ -45,11 +45,11 @@ const testCredentials = [
     color: "text-green-600 dark:text-green-400",
   },
   {
-    role: "Department Admin",
+    role: "Department Admin (State)",
     username: "dept_admin",
     password: "department123",
     icon: ShieldCheck,
-    description: "Department-wide administrative access",
+    description: "State-level department administration",
     color: "text-orange-600 dark:text-orange-400",
   },
   {
@@ -57,8 +57,16 @@ const testCredentials = [
     username: "state_admin",
     password: "state123",
     icon: Flag,
-    description: "Full system administrative access",
+    description: "State-wide system oversight",
     color: "text-red-600 dark:text-red-400",
+  },
+  {
+    role: "CMS Manager",
+    username: "cms_manager",
+    password: "cms123",
+    icon: Settings,
+    description: "Content management & site configuration",
+    color: "text-purple-600 dark:text-purple-400",
   },
 ];
 

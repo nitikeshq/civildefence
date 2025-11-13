@@ -30,6 +30,7 @@ export const userRoleEnum = pgEnum("user_role", [
   "district_admin",
   "department_admin",
   "state_admin",
+  "cms_manager",
 ]);
 
 // Users table for local password authentication
@@ -285,3 +286,141 @@ export const insertAssignmentSchema = createInsertSchema(assignments).omit({
 
 export type InsertAssignment = z.infer<typeof insertAssignmentSchema>;
 export type Assignment = typeof assignments.$inferSelect;
+
+// CMS Tables
+
+// Translations table for managing all text in multiple languages
+export const translations = pgTable("translations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  key: varchar("key").notNull(),
+  language: varchar("language").notNull(),
+  value: text("value").notNull(),
+  category: varchar("category"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertTranslationSchema = createInsertSchema(translations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertTranslation = z.infer<typeof insertTranslationSchema>;
+export type Translation = typeof translations.$inferSelect;
+
+// Hero banners table for managing hero slider content
+export const heroBanners = pgTable("hero_banners", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title_en: varchar("title_en").notNull(),
+  title_or: varchar("title_or").notNull(),
+  subtitle_en: text("subtitle_en").notNull(),
+  subtitle_or: text("subtitle_or").notNull(),
+  imageUrl: varchar("image_url").notNull(),
+  buttonText_en: varchar("button_text_en"),
+  buttonText_or: varchar("button_text_or"),
+  buttonLink: varchar("button_link"),
+  order: integer("order").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertHeroBannerSchema = createInsertSchema(heroBanners).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertHeroBanner = z.infer<typeof insertHeroBannerSchema>;
+export type HeroBanner = typeof heroBanners.$inferSelect;
+
+// About content table for managing about section
+export const aboutContent = pgTable("about_content", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  section: varchar("section").notNull(),
+  title_en: varchar("title_en").notNull(),
+  title_or: varchar("title_or").notNull(),
+  content_en: text("content_en").notNull(),
+  content_or: text("content_or").notNull(),
+  iconName: varchar("icon_name"),
+  order: integer("order").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertAboutContentSchema = createInsertSchema(aboutContent).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertAboutContent = z.infer<typeof insertAboutContentSchema>;
+export type AboutContent = typeof aboutContent.$inferSelect;
+
+// Services table for managing services section
+export const services = pgTable("services", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title_en: varchar("title_en").notNull(),
+  title_or: varchar("title_or").notNull(),
+  description_en: text("description_en").notNull(),
+  description_or: text("description_or").notNull(),
+  iconName: varchar("icon_name").notNull(),
+  color: varchar("color").default("text-primary"),
+  bgColor: varchar("bg_color").default("bg-primary/10"),
+  order: integer("order").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertServiceSchema = createInsertSchema(services).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertService = z.infer<typeof insertServiceSchema>;
+export type Service = typeof services.$inferSelect;
+
+// Content images table for managing all site images
+export const contentImages = pgTable("content_images", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name").notNull(),
+  imageUrl: varchar("image_url").notNull(),
+  altText_en: varchar("alt_text_en"),
+  altText_or: varchar("alt_text_or"),
+  category: varchar("category"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertContentImageSchema = createInsertSchema(contentImages).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertContentImage = z.infer<typeof insertContentImageSchema>;
+export type ContentImage = typeof contentImages.$inferSelect;
+
+// Site settings table for general configuration
+export const siteSettings = pgTable("site_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  key: varchar("key").unique().notNull(),
+  value: text("value"),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertSiteSettingSchema = createInsertSchema(siteSettings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertSiteSetting = z.infer<typeof insertSiteSettingSchema>;
+export type SiteSetting = typeof siteSettings.$inferSelect;
