@@ -461,12 +461,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/trainings', isAuthenticated, async (req: any, res) => {
     try {
       const { district } = req.query;
-      const user = req.user; // Use req.user instead of req.authenticatedUser
+      const user = req.user;
+      
+      // Guard against missing user session
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized - user session not found" });
+      }
       
       let trainings;
       if (district) {
         trainings = await storage.getTrainingsByDistrict(district);
-      } else if (user?.role === "district_admin" && user?.district) {
+      } else if (user.role === "district_admin" && user.district) {
         trainings = await storage.getTrainingsByDistrict(user.district);
       } else {
         trainings = await storage.getAllTrainings();
