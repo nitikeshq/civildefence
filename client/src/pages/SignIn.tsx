@@ -109,7 +109,7 @@ export default function SignIn() {
       });
       setLocation("/");
     },
-    onError: (error: Error) {
+    onError: (error) => {
       toast({
         title: "Error",
         description: error.message,
