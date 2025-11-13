@@ -186,7 +186,7 @@ export function getDashboardSubtitle(role: UserRole | null | undefined, district
 }
 
 // Import icons for navigation
-import { LayoutDashboard, Users, AlertTriangle, ClipboardList, Package, FileText } from "lucide-react";
+import { LayoutDashboard, Users, AlertTriangle, ClipboardList, Package, FileText, GraduationCap } from "lucide-react";
 
 export function getAdminNavItems(role: string) {
   const baseItems = [
@@ -194,6 +194,7 @@ export function getAdminNavItems(role: string) {
     { label: "Volunteers", path: "/dashboard/volunteers", icon: Users },
     { label: "Incidents", path: "/dashboard/incidents", icon: AlertTriangle },
     { label: "Tasks", path: "/dashboard/tasks", icon: ClipboardList },
+    { label: "Trainings", path: "/dashboard/trainings", icon: GraduationCap },
     { label: "Inventory", path: "/dashboard/inventory", icon: Package },
     { label: "Reports", path: "/dashboard/reports", icon: FileText },
   ];

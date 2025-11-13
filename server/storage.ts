@@ -4,6 +4,8 @@ import {
   incidents,
   inventory,
   assignments,
+  trainings,
+  trainingRegistrations,
   type User,
   type UpsertUser,
   type Volunteer,
@@ -14,9 +16,13 @@ import {
   type InsertInventory,
   type Assignment,
   type InsertAssignment,
+  type Training,
+  type InsertTraining,
+  type TrainingRegistration,
+  type InsertTrainingRegistration,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, sql, ilike, or } from "drizzle-orm";
+import { eq, and, desc, sql, ilike, or, gte } from "drizzle-orm";
 
 // Interface for storage operations
 export interface IStorage {
@@ -65,9 +71,20 @@ export interface IStorage {
   getMyAssignments(userId: string): Promise<any[]>;
   updateAssignmentStatus(id: string, status: string, userId: string): Promise<any>;
   
-  // Training session operations
-  getAllTrainingSessions(): Promise<any[]>;
-  getMyTrainingSessions(userId: string): Promise<any[]>;
+  // Training operations
+  createTraining(training: InsertTraining): Promise<Training>;
+  getTraining(id: string): Promise<Training | undefined>;
+  getAllTrainings(): Promise<Training[]>;
+  getTrainingsByDistrict(district: string): Promise<Training[]>;
+  updateTraining(id: string, updates: Partial<InsertTraining>): Promise<Training>;
+  deleteTraining(id: string): Promise<void>;
+  
+  // Training Registration operations
+  registerForTraining(trainingId: string, userId: string): Promise<TrainingRegistration>;
+  unregisterFromTraining(trainingId: string, userId: string): Promise<void>;
+  getTrainingRegistrations(trainingId: string): Promise<TrainingRegistration[]>;
+  getUserTrainingRegistrations(userId: string): Promise<Training[]>;
+  isUserRegisteredForTraining(trainingId: string, userId: string): Promise<boolean>;
   
   // Volunteer profile
   getVolunteerByUserId(userId: string): Promise<Volunteer | undefined>;
@@ -376,22 +393,166 @@ export class DatabaseStorage implements IStorage {
     return assignment;
   }
 
-  // Training session operations
-  async getAllTrainingSessions(): Promise<any[]> {
-    const { trainingSessions } = await import("@shared/schema");
-    return await db
-      .select()
-      .from(trainingSessions)
-      .orderBy(desc(trainingSessions.scheduledAt));
+  // Training operations
+  async createTraining(trainingData: InsertTraining): Promise<Training> {
+    const [training] = await db.insert(trainings).values(trainingData).returning();
+    return training;
   }
 
-  async getMyTrainingSessions(userId: string): Promise<any[]> {
-    // NOTE: Temporary stub implementation - returns all training sessions
-    // TODO: In production, this should:
-    // 1. Query a volunteer_training_registrations table to find sessions the volunteer registered for
-    // 2. Or filter sessions where the volunteer's ID appears in an attendees array
-    // For now, volunteers see all available sessions (feature-complete for demo)
-    return this.getAllTrainingSessions();
+  async getTraining(id: string): Promise<Training | undefined> {
+    const [training] = await db
+      .select({
+        training: trainings,
+        enrolledCount: sql<number>`(SELECT COUNT(*) FROM ${trainingRegistrations} WHERE ${trainingRegistrations.trainingId} = ${trainings.id})`,
+      })
+      .from(trainings)
+      .where(eq(trainings.id, id));
+    
+    if (!training) return undefined;
+    return { ...training.training, enrolledCount: training.enrolledCount };
+  }
+
+  async getAllTrainings(): Promise<Training[]> {
+    const results = await db
+      .select({
+        training: trainings,
+        enrolledCount: sql<number>`(SELECT COUNT(*) FROM ${trainingRegistrations} WHERE ${trainingRegistrations.trainingId} = ${trainings.id})`,
+      })
+      .from(trainings)
+      .orderBy(desc(trainings.startAt));
+    
+    return results.map(r => ({ ...r.training, enrolledCount: r.enrolledCount }));
+  }
+
+  async getTrainingsByDistrict(district: string): Promise<Training[]> {
+    const results = await db
+      .select({
+        training: trainings,
+        enrolledCount: sql<number>`(SELECT COUNT(*) FROM ${trainingRegistrations} WHERE ${trainingRegistrations.trainingId} = ${trainings.id})`,
+      })
+      .from(trainings)
+      .where(or(eq(trainings.district, district), eq(trainings.isStatewide, true)))
+      .orderBy(desc(trainings.startAt));
+    
+    return results.map(r => ({ ...r.training, enrolledCount: r.enrolledCount }));
+  }
+
+  async updateTraining(id: string, updates: Partial<InsertTraining>): Promise<Training> {
+    const [training] = await db
+      .update(trainings)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(trainings.id, id))
+      .returning();
+    return training;
+  }
+
+  async deleteTraining(id: string): Promise<void> {
+    await db.delete(trainingRegistrations).where(eq(trainingRegistrations.trainingId, id));
+    await db.delete(trainings).where(eq(trainings.id, id));
+  }
+
+  // Training Registration operations
+  async registerForTraining(trainingId: string, userId: string): Promise<TrainingRegistration> {
+    const volunteer = await this.getVolunteerByUserId(userId);
+    if (!volunteer) {
+      throw new Error("Volunteer profile not found for user");
+    }
+
+    const existing = await db
+      .select()
+      .from(trainingRegistrations)
+      .where(
+        and(
+          eq(trainingRegistrations.trainingId, trainingId),
+          eq(trainingRegistrations.volunteerId, volunteer.id)
+        )
+      );
+
+    if (existing.length > 0) {
+      throw new Error("Already registered for this training");
+    }
+
+    const training = await this.getTraining(trainingId);
+    if (!training) {
+      throw new Error("Training not found");
+    }
+
+    if (training.enrolledCount >= training.capacity) {
+      throw new Error("Training is at full capacity");
+    }
+
+    const [registration] = await db
+      .insert(trainingRegistrations)
+      .values({
+        trainingId,
+        volunteerId: volunteer.id,
+      })
+      .returning();
+
+    return registration;
+  }
+
+  async unregisterFromTraining(trainingId: string, userId: string): Promise<void> {
+    const volunteer = await this.getVolunteerByUserId(userId);
+    if (!volunteer) {
+      throw new Error("Volunteer profile not found for user");
+    }
+
+    await db
+      .delete(trainingRegistrations)
+      .where(
+        and(
+          eq(trainingRegistrations.trainingId, trainingId),
+          eq(trainingRegistrations.volunteerId, volunteer.id)
+        )
+      );
+  }
+
+  async getTrainingRegistrations(trainingId: string): Promise<TrainingRegistration[]> {
+    return await db
+      .select()
+      .from(trainingRegistrations)
+      .where(eq(trainingRegistrations.trainingId, trainingId));
+  }
+
+  async getUserTrainingRegistrations(userId: string): Promise<Training[]> {
+    const volunteer = await this.getVolunteerByUserId(userId);
+    if (!volunteer) return [];
+
+    const registrations = await db
+      .select()
+      .from(trainingRegistrations)
+      .where(eq(trainingRegistrations.volunteerId, volunteer.id));
+
+    const trainingIds = registrations.map(r => r.trainingId);
+    if (trainingIds.length === 0) return [];
+
+    const results = await db
+      .select({
+        training: trainings,
+        enrolledCount: sql<number>`(SELECT COUNT(*) FROM ${trainingRegistrations} WHERE ${trainingRegistrations.trainingId} = ${trainings.id})`,
+      })
+      .from(trainings)
+      .where(sql`${trainings.id} = ANY(${trainingIds})`);
+
+    return results.map(r => ({ ...r.training, enrolledCount: r.enrolledCount }));
+  }
+
+  async isUserRegisteredForTraining(trainingId: string, userId: string): Promise<boolean> {
+    const volunteer = await this.getVolunteerByUserId(userId);
+    if (!volunteer) return false;
+
+    const [registration] = await db
+      .select()
+      .from(trainingRegistrations)
+      .where(
+        and(
+          eq(trainingRegistrations.trainingId, trainingId),
+          eq(trainingRegistrations.volunteerId, volunteer.id)
+        )
+      );
+
+    return !!registration;
   }
 
   // Volunteer profile

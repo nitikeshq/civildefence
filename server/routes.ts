@@ -457,25 +457,176 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Training Session routes
-  app.get('/api/training-sessions', isAuthenticated, async (req, res) => {
+  // Training routes - Admin
+  app.get('/api/trainings', isAuthenticated, async (req: any, res) => {
     try {
-      const trainingSessions = await storage.getAllTrainingSessions();
-      res.json(trainingSessions);
+      const { district } = req.query;
+      const user = req.authenticatedUser;
+      
+      let trainings;
+      if (district) {
+        trainings = await storage.getTrainingsByDistrict(district);
+      } else if (user.role === "district_admin" && user.district) {
+        trainings = await storage.getTrainingsByDistrict(user.district);
+      } else {
+        trainings = await storage.getAllTrainings();
+      }
+      
+      res.json(trainings);
     } catch (error) {
-      console.error("Error fetching training sessions:", error);
-      res.status(500).json({ message: "Failed to fetch training sessions" });
+      console.error("Error fetching trainings:", error);
+      res.status(500).json({ message: "Failed to fetch trainings" });
     }
   });
 
-  app.get('/api/my-training', isAuthenticated, requireRole("volunteer"), async (req: any, res) => {
+  app.get('/api/trainings/:id', isAuthenticated, async (req, res) => {
+    try {
+      const training = await storage.getTraining(req.params.id);
+      if (!training) {
+        return res.status(404).json({ message: "Training not found" });
+      }
+      res.json(training);
+    } catch (error) {
+      console.error("Error fetching training:", error);
+      res.status(500).json({ message: "Failed to fetch training" });
+    }
+  });
+
+  app.post('/api/trainings', isAuthenticated, requireRole("district_admin", "department_admin", "state_admin"), async (req: any, res) => {
+    try {
+      const user = req.authenticatedUser;
+      const trainingData = req.body;
+      
+      if (user.role === "district_admin") {
+        if (trainingData.district !== user.district) {
+          return res.status(403).json({ message: "District admins can only create trainings for their district" });
+        }
+        if (trainingData.isStatewide) {
+          return res.status(403).json({ message: "District admins cannot create statewide trainings" });
+        }
+      }
+      
+      const training = await storage.createTraining({
+        ...trainingData,
+        createdBy: user.id,
+      });
+      
+      res.json(training);
+    } catch (error: any) {
+      console.error("Error creating training:", error);
+      res.status(400).json({ message: error.message || "Failed to create training" });
+    }
+  });
+
+  app.patch('/api/trainings/:id', isAuthenticated, requireRole("district_admin", "department_admin", "state_admin"), async (req: any, res) => {
+    try {
+      const user = req.authenticatedUser;
+      const training = await storage.getTraining(req.params.id);
+      
+      if (!training) {
+        return res.status(404).json({ message: "Training not found" });
+      }
+      
+      if (user.role === "district_admin" && training.district !== user.district) {
+        return res.status(403).json({ message: "You can only edit trainings in your district" });
+      }
+      
+      const updates = req.body;
+      if (user.role === "district_admin") {
+        if (updates.district && updates.district !== user.district) {
+          return res.status(403).json({ message: "District admins cannot change training district" });
+        }
+        if (updates.isStatewide) {
+          return res.status(403).json({ message: "District admins cannot create statewide trainings" });
+        }
+      }
+      
+      const updated = await storage.updateTraining(req.params.id, updates);
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating training:", error);
+      res.status(400).json({ message: error.message || "Failed to update training" });
+    }
+  });
+
+  app.delete('/api/trainings/:id', isAuthenticated, requireRole("district_admin", "department_admin", "state_admin"), async (req: any, res) => {
+    try {
+      const user = req.authenticatedUser;
+      const training = await storage.getTraining(req.params.id);
+      
+      if (!training) {
+        return res.status(404).json({ message: "Training not found" });
+      }
+      
+      if (user.role === "district_admin" && training.district !== user.district) {
+        return res.status(403).json({ message: "You can only delete trainings in your district" });
+      }
+      
+      await storage.deleteTraining(req.params.id);
+      res.json({ message: "Training deleted successfully" });
+    } catch (error: any) {
+      console.error("Error deleting training:", error);
+      res.status(400).json({ message: error.message || "Failed to delete training" });
+    }
+  });
+
+  // Training routes - Volunteer
+  app.get('/api/my-trainings', isAuthenticated, requireRole("volunteer"), async (req: any, res) => {
     try {
       const userId = (req.user as any).id;
-      const sessions = await storage.getMyTrainingSessions(userId);
-      res.json(sessions);
+      const trainings = await storage.getUserTrainingRegistrations(userId);
+      res.json(trainings);
     } catch (error) {
-      console.error("Error fetching training sessions:", error);
-      res.status(500).json({ message: "Failed to fetch training sessions" });
+      console.error("Error fetching user trainings:", error);
+      res.status(500).json({ message: "Failed to fetch trainings" });
+    }
+  });
+
+  app.post('/api/trainings/:id/register', isAuthenticated, requireRole("volunteer"), async (req: any, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const trainingId = req.params.id;
+      
+      const registration = await storage.registerForTraining(trainingId, userId);
+      res.json(registration);
+    } catch (error: any) {
+      console.error("Error registering for training:", error);
+      if (error.message?.includes("Already registered")) {
+        return res.status(400).json({ message: "You are already registered for this training" });
+      }
+      if (error.message?.includes("full capacity")) {
+        return res.status(400).json({ message: "Training is at full capacity" });
+      }
+      if (error.message?.includes("not found")) {
+        return res.status(404).json({ message: "Training not found" });
+      }
+      res.status(400).json({ message: error.message || "Failed to register for training" });
+    }
+  });
+
+  app.delete('/api/trainings/:id/register', isAuthenticated, requireRole("volunteer"), async (req: any, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const trainingId = req.params.id;
+      
+      await storage.unregisterFromTraining(trainingId, userId);
+      res.json({ message: "Unregistered from training successfully" });
+    } catch (error: any) {
+      console.error("Error unregistering from training:", error);
+      res.status(400).json({ message: error.message || "Failed to unregister from training" });
+    }
+  });
+
+  app.get('/api/trainings/:id/registration-status', isAuthenticated, requireRole("volunteer"), async (req: any, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const trainingId = req.params.id;
+      
+      const isRegistered = await storage.isUserRegisteredForTraining(trainingId, userId);
+      res.json({ isRegistered });
+    } catch (error) {
+      console.error("Error checking registration status:", error);
+      res.status(500).json({ message: "Failed to check registration status" });
     }
   });
 
