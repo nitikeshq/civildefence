@@ -140,13 +140,22 @@ Preferred communication style: Simple, everyday language.
 
 **Navigation Consistency**
 - All admin dashboard pages now use `getAdminNavItems()` for unified navigation
-- Consistent headers and subtitles across all dashboard views
+- Constant role-based sidebar headers (e.g., "District Admin - Khordha", "Department Admin - Odisha")
+- Removed page-specific title/subtitle props from DashboardLayout
 - Role-based navigation with automatic scoping
+
+**District Filtering for Department Admins**
+- **Volunteers Page**: Added district filter dropdown for department/state admins
+- **Incidents Page**: District filter dropdown available
+- **Inventory Page**: District filter dropdown available
+- **Tasks Page**: District filter dropdown available
+- District admins automatically scoped to their district (no filter needed)
+- Department/State admins must select district to view data
 
 **CRUD Operations**
 - **Incidents**: Full CRUD with edit/delete functionality, district-based filtering
 - **Inventory**: Full CRUD with pagination (10 items per page), district-based filtering
-- **Volunteers**: Create, view, approve/reject workflows
+- **Volunteers**: Create, view, approve/reject workflows with district filtering
 - **Tasks/Assignments**: Individual task assignment per volunteer (not group assignments)
 
 **Task Assignment Workflow**
@@ -156,28 +165,35 @@ Preferred communication style: Simple, everyday language.
 - Department/State admins must select district before creating assignments
 
 **Data Seeding**
-- 8 diverse incidents across multiple districts
-- 15 inventory items with varied categories and conditions
-- Realistic test data for development and demonstration
+- **Volunteer Users**: 8 volunteer user accounts with login credentials (username: volunteer1-8, password: volunteer123)
+- **Volunteer Registrations**: 8 volunteer registrations across multiple districts (5 approved, 3 pending)
+- **Incidents**: 8 diverse incidents across multiple districts
+- **Inventory**: 15 inventory items with varied categories and conditions
+- All test users have password format: `{role}123` (e.g., volunteer123, district123, department123)
 
 ### Pending Features
 
-**Training Management System** (Recommended Implementation)
-- **Who Creates**: Both district admins and department/state admins
+**Training Management System** (Not Yet Implemented)
+- **Status**: Feature not implemented. User has asked about this feature.
+- **Planned Who Creates**: Both district admins and department/state admins
   - District admins: Create and manage local training sessions for their district
   - Department/State admins: Create statewide training sessions accessible across all districts
-- **Implementation Scope**:
+- **Planned Implementation Scope**:
   - New `trainings` table in database schema
   - CRUD endpoints in `server/routes.ts`
   - Storage methods in `server/storage.ts`
   - Dedicated admin page for training management
   - Volunteer interface to view and register for trainings
-- **Schema Requirements**:
+  - District filter support for department/state admins
+- **Planned Schema Requirements**:
   - Training title, description, date/time, location
   - District association (specific district or "All Districts" for statewide)
   - Capacity limits and current enrollment
   - Skills/topics covered
   - Created by (admin user reference)
+  - Registration tracking for volunteers
+
+**NOTE**: This feature is in the roadmap but has not been developed yet. When user asks about "where is training creation", inform them it hasn't been implemented and is on the pending features list.
 
 ### Known Infrastructure Issues
 

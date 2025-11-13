@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Users, Search, Eye, Check, X } from "lucide-react";
+import { Users, Search, Eye, Check, X, Filter } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,31 +13,46 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { useScopedVolunteers } from "@/hooks/useScopedData";
 import { getAdminNavItems } from "@/lib/roleUtils";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { ODISHA_DISTRICTS } from "@/lib/constants";
 import type { Volunteer } from "@shared/schema";
 
 export default function DashboardVolunteers() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
   const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
 
-  const { data: volunteers = [], isLoading } = useScopedVolunteers();
-
   // Get consistent navigation items for all admin pages
   const navItems = user ? getAdminNavItems(user.role || "volunteer") : [];
   const isDistrictAdmin = user?.role === "district_admin";
   const isDepartmentAdmin = user?.role === "department_admin" || user?.role === "state_admin";
+  
+  // Determine the district to filter by
+  const userDistrict = isDistrictAdmin ? (user?.district || "") : selectedDistrict;
+
+  // Fetch volunteers with district filter
+  const { data: volunteers = [], isLoading } = useQuery<Volunteer[]>({
+    queryKey: ["/api/volunteers", userDistrict || "all"],
+    enabled: isDistrictAdmin || (isDepartmentAdmin && !!selectedDistrict),
+  });
 
   const approveMutation = useMutation({
     mutationFn: async (volunteerId: string) => {
@@ -142,17 +157,57 @@ export default function DashboardVolunteers() {
               Review and approve volunteer applications
             </p>
           </div>
-          <div className="relative w-full md:w-96">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search volunteers..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-              data-testid="input-search-volunteers"
-            />
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            {/* District Filter for Department Admins */}
+            {isDepartmentAdmin && (
+              <div className="w-full md:w-60">
+                <Label htmlFor="district-filter" className="sr-only">Filter by District</Label>
+                <Select value={selectedDistrict} onValueChange={setSelectedDistrict}>
+                  <SelectTrigger id="district-filter" data-testid="select-district-filter">
+                    <Filter className="h-4 w-4 mr-2" />
+                    <SelectValue placeholder="Select District" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ODISHA_DISTRICTS.map((district) => (
+                      <SelectItem key={district} value={district}>
+                        {district}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            
+            {/* Search Input */}
+            <div className="relative w-full md:w-96">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search volunteers..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+                data-testid="input-search-volunteers"
+              />
+            </div>
           </div>
         </div>
+
+        {/* District Admin Info */}
+        {isDistrictAdmin && (
+          <div className="p-3 bg-muted rounded-lg">
+            <p className="text-sm font-medium">Showing volunteers from: {user?.district}</p>
+          </div>
+        )}
+
+        {/* Department Admin - No District Selected */}
+        {isDepartmentAdmin && !selectedDistrict && (
+          <div className="p-4 bg-muted rounded-lg text-center">
+            <Filter className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
+            <p className="text-sm font-medium text-muted-foreground">
+              Please select a district to view volunteers
+            </p>
+          </div>
+        )}
 
         {/* Stats Cards */}
         <div className="grid gap-4 md:grid-cols-3">

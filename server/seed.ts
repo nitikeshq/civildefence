@@ -1,7 +1,7 @@
 import { storage } from "./storage";
 import { hashPassword } from "./auth";
 import { db } from "./db";
-import { incidents, inventory } from "@shared/schema";
+import { incidents, inventory, volunteers } from "@shared/schema";
 
 async function seedDatabase() {
   console.log("Seeding database with test users...");
@@ -10,11 +10,74 @@ async function seedDatabase() {
     {
       username: "volunteer1",
       password: "volunteer123",
-      firstName: "John",
-      lastName: "Volunteer",
-      email: "volunteer@example.com",
+      firstName: "Ravi",
+      lastName: "Kumar",
+      email: "ravi.kumar@example.com",
       role: "volunteer" as const,
       district: "Khordha",
+    },
+    {
+      username: "volunteer2",
+      password: "volunteer123",
+      firstName: "Priya",
+      lastName: "Patel",
+      email: "priya.patel@example.com",
+      role: "volunteer" as const,
+      district: "Puri",
+    },
+    {
+      username: "volunteer3",
+      password: "volunteer123",
+      firstName: "Suresh",
+      lastName: "Rao",
+      email: "suresh.rao@example.com",
+      role: "volunteer" as const,
+      district: "Cuttack",
+    },
+    {
+      username: "volunteer4",
+      password: "volunteer123",
+      firstName: "Anjali",
+      lastName: "Sharma",
+      email: "anjali.sharma@example.com",
+      role: "volunteer" as const,
+      district: "Balasore",
+    },
+    {
+      username: "volunteer5",
+      password: "volunteer123",
+      firstName: "Deepak",
+      lastName: "Singh",
+      email: "deepak.singh@example.com",
+      role: "volunteer" as const,
+      district: "Ganjam",
+    },
+    {
+      username: "volunteer6",
+      password: "volunteer123",
+      firstName: "Kavita",
+      lastName: "Nayak",
+      email: "kavita.nayak@example.com",
+      role: "volunteer" as const,
+      district: "Sambalpur",
+    },
+    {
+      username: "volunteer7",
+      password: "volunteer123",
+      firstName: "Rajesh",
+      lastName: "Mishra",
+      email: "rajesh.mishra@example.com",
+      role: "volunteer" as const,
+      district: "Mayurbhanj",
+    },
+    {
+      username: "volunteer8",
+      password: "volunteer123",
+      firstName: "Sita",
+      lastName: "Devi",
+      email: "sita.devi@example.com",
+      role: "volunteer" as const,
+      district: "Jagatsinghpur",
     },
     {
       username: "district_admin",
@@ -54,6 +117,8 @@ async function seedDatabase() {
     },
   ];
 
+  const createdUsers = new Map<string, any>();
+
   for (const userData of testUsers) {
     try {
       const { password, ...userInfo } = userData;
@@ -63,6 +128,7 @@ async function seedDatabase() {
       const existing = await storage.getUserByUsername(userInfo.username);
       if (existing) {
         console.log(`User ${userInfo.username} already exists, skipping...`);
+        createdUsers.set(userInfo.username, existing);
         continue;
       }
 
@@ -71,9 +137,166 @@ async function seedDatabase() {
         password_hash,
       });
 
+      createdUsers.set(userInfo.username, user);
       console.log(`✓ Created user: ${user.username} (${user.role})`);
     } catch (error) {
       console.error(`✗ Failed to create user ${userData.username}:`, error);
+    }
+  }
+
+  // Seed volunteer registrations
+  console.log("\n👥 Seeding volunteer registrations...");
+  const volunteerRegistrations = [
+    {
+      username: "volunteer1",
+      fullName: "Ravi Kumar",
+      email: "ravi.kumar@example.com",
+      phone: "+91 9876543210",
+      address: "123 Main Street, Bhubaneswar, Khordha",
+      district: "Khordha",
+      dateOfBirth: "1985-03-15",
+      isExServiceman: true,
+      serviceHistory: "Indian Army, 10 years service, Medical Corps",
+      skills: ["First Aid", "Disaster Response", "Medical Support"],
+      qualifications: "B.Sc in Nursing, Advanced Trauma Life Support Certificate",
+      emergencyContact: "Meera Kumar",
+      emergencyPhone: "+91 9876543211",
+      status: "approved" as const,
+    },
+    {
+      username: "volunteer2",
+      fullName: "Priya Patel",
+      email: "priya.patel@example.com",
+      phone: "+91 9876543212",
+      address: "456 Beach Road, Puri",
+      district: "Puri",
+      dateOfBirth: "1990-07-22",
+      isExServiceman: false,
+      skills: ["Communication", "Crowd Management", "Translation"],
+      qualifications: "M.A. in Social Work",
+      emergencyContact: "Rahul Patel",
+      emergencyPhone: "+91 9876543213",
+      status: "approved" as const,
+    },
+    {
+      username: "volunteer3",
+      fullName: "Suresh Rao",
+      email: "suresh.rao@example.com",
+      phone: "+91 9876543214",
+      address: "789 River Road, Cuttack",
+      district: "Cuttack",
+      dateOfBirth: "1982-11-30",
+      isExServiceman: true,
+      serviceHistory: "Indian Navy, 15 years service, Engineering Branch",
+      skills: ["Rescue Operations", "Swimming", "Technical Repairs"],
+      qualifications: "B.E. in Mechanical Engineering",
+      emergencyContact: "Lakshmi Rao",
+      emergencyPhone: "+91 9876543215",
+      status: "pending" as const,
+    },
+    {
+      username: "volunteer4",
+      fullName: "Anjali Sharma",
+      email: "anjali.sharma@example.com",
+      phone: "+91 9876543216",
+      address: "321 Hill View, Balasore",
+      district: "Balasore",
+      dateOfBirth: "1995-05-10",
+      isExServiceman: false,
+      skills: ["Teaching", "Child Care", "Counseling"],
+      qualifications: "B.Ed., M.A. in Psychology",
+      emergencyContact: "Vikram Sharma",
+      emergencyPhone: "+91 9876543217",
+      status: "approved" as const,
+    },
+    {
+      username: "volunteer5",
+      fullName: "Deepak Singh",
+      email: "deepak.singh@example.com",
+      phone: "+91 9876543218",
+      address: "654 Market Road, Berhampur, Ganjam",
+      district: "Ganjam",
+      dateOfBirth: "1988-09-18",
+      isExServiceman: true,
+      serviceHistory: "Border Security Force, 8 years service",
+      skills: ["Security", "Logistics", "Vehicle Operation"],
+      qualifications: "Diploma in Security Management",
+      emergencyContact: "Sunita Singh",
+      emergencyPhone: "+91 9876543219",
+      status: "pending" as const,
+    },
+    {
+      username: "volunteer6",
+      fullName: "Kavita Nayak",
+      email: "kavita.nayak@example.com",
+      phone: "+91 9876543220",
+      address: "987 Temple Street, Sambalpur",
+      district: "Sambalpur",
+      dateOfBirth: "1992-12-05",
+      isExServiceman: false,
+      skills: ["Healthcare", "Public Health", "Vaccination"],
+      qualifications: "B.Pharm, Certified Pharmacist",
+      emergencyContact: "Anil Nayak",
+      emergencyPhone: "+91 9876543221",
+      status: "approved" as const,
+    },
+    {
+      username: "volunteer7",
+      fullName: "Rajesh Mishra",
+      email: "rajesh.mishra@example.com",
+      phone: "+91 9876543222",
+      address: "147 Forest Colony, Baripada, Mayurbhanj",
+      district: "Mayurbhanj",
+      dateOfBirth: "1987-04-28",
+      isExServiceman: false,
+      skills: ["Firefighting", "Emergency Response", "Heavy Equipment"],
+      qualifications: "Diploma in Fire Safety Engineering",
+      emergencyContact: "Geeta Mishra",
+      emergencyPhone: "+91 9876543223",
+      status: "pending" as const,
+    },
+    {
+      username: "volunteer8",
+      fullName: "Sita Devi",
+      email: "sita.devi@example.com",
+      phone: "+91 9876543224",
+      address: "258 Coastal Road, Paradip, Jagatsinghpur",
+      district: "Jagatsinghpur",
+      dateOfBirth: "1993-08-14",
+      isExServiceman: false,
+      skills: ["Food Distribution", "Relief Work", "Community Organization"],
+      qualifications: "B.A. in Social Science",
+      emergencyContact: "Ram Devi",
+      emergencyPhone: "+91 9876543225",
+      status: "approved" as const,
+    },
+  ];
+
+  for (const volData of volunteerRegistrations) {
+    try {
+      const user = createdUsers.get(volData.username);
+      if (!user) {
+        console.log(`User ${volData.username} not found, skipping volunteer registration...`);
+        continue;
+      }
+
+      const { username, ...volInfo } = volData;
+      
+      // Check if volunteer registration already exists
+      const existing = await storage.getVolunteerByUserId(user.id);
+      if (existing) {
+        console.log(`Volunteer registration for ${volData.fullName} already exists, skipping...`);
+        continue;
+      }
+
+      await db.insert(volunteers).values({
+        userId: user.id,
+        ...volInfo,
+      });
+
+      console.log(`✓ Created volunteer registration: ${volInfo.fullName} (${volInfo.district})`);
+    } catch (error) {
+      console.error(`✗ Failed to create volunteer registration for ${volData.fullName}:`, error);
     }
   }
 
