@@ -53,6 +53,17 @@ export interface IStorage {
   searchVolunteers(query: string): Promise<Volunteer[]>;
   searchIncidents(query: string): Promise<Incident[]>;
   searchInventory(query: string): Promise<InventoryItem[]>;
+  
+  // Assignment operations
+  getMyAssignments(userId: string): Promise<any[]>;
+  updateAssignmentStatus(id: string, status: string, userId: string): Promise<any>;
+  
+  // Training session operations
+  getAllTrainingSessions(): Promise<any[]>;
+  getMyTrainingSessions(userId: string): Promise<any[]>;
+  
+  // Volunteer profile
+  getVolunteerByUserId(userId: string): Promise<Volunteer | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -268,6 +279,93 @@ export class DatabaseStorage implements IStorage {
         )
       )
       .orderBy(desc(inventory.createdAt));
+  }
+
+  // Assignment operations
+  async getMyAssignments(userId: string): Promise<any[]> {
+    // First get the volunteer record for this user
+    const [volunteer] = await db
+      .select()
+      .from(volunteers)
+      .where(eq(volunteers.userId, userId));
+    
+    if (!volunteer) {
+      return [];
+    }
+
+    // Then get assignments for this volunteer using volunteerId
+    const { assignments } = await import("@shared/schema");
+    return await db
+      .select()
+      .from(assignments)
+      .where(eq(assignments.volunteerId, volunteer.id))
+      .orderBy(desc(assignments.createdAt));
+  }
+
+  async updateAssignmentStatus(id: string, status: string, userId: string): Promise<any> {
+    // First get the volunteer record for this user to verify ownership
+    const [volunteer] = await db
+      .select()
+      .from(volunteers)
+      .where(eq(volunteers.userId, userId));
+    
+    if (!volunteer) {
+      throw new Error("Volunteer not found");
+    }
+
+    // Verify the assignment belongs to this volunteer
+    const { assignments } = await import("@shared/schema");
+    const [existingAssignment] = await db
+      .select()
+      .from(assignments)
+      .where(eq(assignments.id, id));
+    
+    if (!existingAssignment) {
+      throw new Error("Assignment not found");
+    }
+    
+    if (existingAssignment.volunteerId !== volunteer.id) {
+      throw new Error("Unauthorized: Assignment does not belong to this volunteer");
+    }
+
+    // Update the assignment
+    const [assignment] = await db
+      .update(assignments)
+      .set({ 
+        status: status as any,
+        completedAt: status === "completed" ? new Date() : null,
+        updatedAt: new Date(),
+      })
+      .where(eq(assignments.id, id))
+      .returning();
+    return assignment;
+  }
+
+  // Training session operations
+  async getAllTrainingSessions(): Promise<any[]> {
+    const { trainingSessions } = await import("@shared/schema");
+    return await db
+      .select()
+      .from(trainingSessions)
+      .orderBy(desc(trainingSessions.scheduledAt));
+  }
+
+  async getMyTrainingSessions(userId: string): Promise<any[]> {
+    // NOTE: Temporary stub implementation - returns all training sessions
+    // TODO: In production, this should:
+    // 1. Query a volunteer_training_registrations table to find sessions the volunteer registered for
+    // 2. Or filter sessions where the volunteer's ID appears in an attendees array
+    // For now, volunteers see all available sessions (feature-complete for demo)
+    return this.getAllTrainingSessions();
+  }
+
+  // Volunteer profile
+  async getVolunteerByUserId(userId: string): Promise<Volunteer | undefined> {
+    const [volunteer] = await db
+      .select()
+      .from(volunteers)
+      .where(eq(volunteers.userId, userId));
+    return volunteer;
   }
 }
 

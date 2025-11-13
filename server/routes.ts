@@ -342,6 +342,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Assignment routes - Volunteer-specific
+  app.get('/api/my-assignments', isAuthenticated, requireRole("volunteer"), async (req: any, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const assignments = await storage.getMyAssignments(userId);
+      res.json(assignments);
+    } catch (error) {
+      console.error("Error fetching assignments:", error);
+      res.status(500).json({ message: "Failed to fetch assignments" });
+    }
+  });
+
+  app.patch('/api/assignments/:id/status', isAuthenticated, requireRole("volunteer"), async (req: any, res) => {
+    try {
+      const validatedData = z.object({
+        status: z.enum(["assigned", "in_progress", "completed", "declined"]),
+      }).parse(req.body);
+      
+      const userId = (req.user as any).id;
+      const assignment = await storage.updateAssignmentStatus(req.params.id, validatedData.status, userId);
+      res.json(assignment);
+    } catch (error: any) {
+      console.error("Error updating assignment status:", error);
+      if (error.name === "ZodError") {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      if (error.message?.includes("Unauthorized") || error.message?.includes("does not belong")) {
+        return res.status(403).json({ message: "You are not authorized to update this assignment" });
+      }
+      if (error.message?.includes("not found")) {
+        return res.status(404).json({ message: "Assignment not found" });
+      }
+      res.status(500).json({ message: "Failed to update assignment status" });
+    }
+  });
+
+  // Training Session routes
+  app.get('/api/training-sessions', isAuthenticated, async (req, res) => {
+    try {
+      const trainingSessions = await storage.getAllTrainingSessions();
+      res.json(trainingSessions);
+    } catch (error) {
+      console.error("Error fetching training sessions:", error);
+      res.status(500).json({ message: "Failed to fetch training sessions" });
+    }
+  });
+
+  app.get('/api/my-training', isAuthenticated, requireRole("volunteer"), async (req: any, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const sessions = await storage.getMyTrainingSessions(userId);
+      res.json(sessions);
+    } catch (error) {
+      console.error("Error fetching training sessions:", error);
+      res.status(500).json({ message: "Failed to fetch training sessions" });
+    }
+  });
+
+  app.get('/api/my-volunteer-profile', isAuthenticated, requireRole("volunteer"), async (req: any, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const volunteer = await storage.getVolunteerByUserId(userId);
+      if (!volunteer) {
+        return res.status(404).json({ message: "Volunteer profile not found" });
+      }
+      res.json(volunteer);
+    } catch (error) {
+      console.error("Error fetching volunteer profile:", error);
+      res.status(500).json({ message: "Failed to fetch volunteer profile" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

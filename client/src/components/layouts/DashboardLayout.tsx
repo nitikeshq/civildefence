@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import cmPhoto from "@assets/cm-photo.jpg";
 
 interface NavItem {
   label: string;
@@ -74,17 +75,44 @@ export default function DashboardLayout({
           }
         />
         <div className="flex flex-col flex-1">
-          <header className="flex items-center justify-between gap-2 p-4 border-b min-h-[57px]">
-            <SidebarTrigger data-testid="button-sidebar-toggle" />
-            <Button
-              onClick={handleLogout}
-              variant="outline"
-              size="sm"
-              data-testid="button-logout"
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </Button>
+          <header className="flex items-center justify-between gap-4 p-4 border-b min-h-[57px] bg-card">
+            <div className="flex items-center gap-4">
+              <SidebarTrigger data-testid="button-sidebar-toggle" />
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10">
+                  <svg className="h-6 w-6 text-primary" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                  </svg>
+                </div>
+                <div className="hidden md:block">
+                  <p className="text-sm font-semibold text-foreground">Civil Defence Department</p>
+                  <p className="text-xs text-muted-foreground">Government of Odisha</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="hidden lg:flex items-center gap-3 px-3 py-1 rounded-md bg-muted/50">
+                <img 
+                  src={cmPhoto} 
+                  alt="Hon'ble Chief Minister"
+                  className="h-10 w-10 rounded-full object-cover"
+                  data-testid="img-cm-photo"
+                />
+                <div className="text-right">
+                  <p className="text-xs text-muted-foreground">Hon'ble Chief Minister</p>
+                  <p className="text-xs font-medium">Mohan Ch. Majhi</p>
+                </div>
+              </div>
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                size="sm"
+                data-testid="button-logout"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Button>
+            </div>
           </header>
           <main className="flex-1 overflow-auto bg-background">{children}</main>
         </div>

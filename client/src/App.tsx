@@ -10,6 +10,9 @@ import SignIn from "@/pages/SignIn";
 import SignUp from "@/pages/SignUp";
 import Dashboard from "@/pages/Dashboard";
 import VolunteerDashboard from "@/pages/dashboard/volunteer";
+import VolunteerTasks from "@/pages/dashboard/volunteer/tasks";
+import VolunteerTraining from "@/pages/dashboard/volunteer/training";
+import VolunteerProfile from "@/pages/dashboard/volunteer/profile";
 import DistrictAdminDashboard from "@/pages/dashboard/district-admin";
 import AdminDashboard from "@/pages/dashboard/admin";
 import CMSDashboard from "@/pages/dashboard/cms-manager";
@@ -44,6 +47,9 @@ function Router() {
         <>
           <Route path="/" component={Dashboard} />
           <Route path="/dashboard/volunteer" component={VolunteerDashboard} />
+          <Route path="/dashboard/volunteer/tasks" component={VolunteerTasks} />
+          <Route path="/dashboard/volunteer/training" component={VolunteerTraining} />
+          <Route path="/dashboard/volunteer/profile" component={VolunteerProfile} />
           <Route path="/dashboard/district-admin" component={DistrictAdminDashboard} />
           <Route path="/dashboard/admin" component={AdminDashboard} />
           <Route path="/cms/dashboard" component={CMSDashboard} />
