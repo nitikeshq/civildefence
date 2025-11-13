@@ -19,7 +19,7 @@ import type { TrainingSession } from "@shared/schema";
 const navItems = [
   { label: "Dashboard", path: "/dashboard/volunteer", icon: LayoutDashboard },
   { label: "My Tasks", path: "/dashboard/volunteer/tasks", icon: ClipboardList },
-  { label: "Training", path: "/dashboard/volunteer/training", icon: GraduationCap },
+  { label: "Training", path: "/dashboard/volunteer/trainings", icon: GraduationCap },
   { label: "Profile", path: "/dashboard/volunteer/profile", icon: User },
 ];
 

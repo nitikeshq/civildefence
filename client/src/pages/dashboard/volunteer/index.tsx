@@ -22,7 +22,7 @@ import type { Assignment, TrainingSession, Volunteer } from "@shared/schema";
 const navItems = [
   { label: "Dashboard", path: "/dashboard/volunteer", icon: LayoutDashboard },
   { label: "My Tasks", path: "/dashboard/volunteer/tasks", icon: ClipboardList },
-  { label: "Training", path: "/dashboard/volunteer/training", icon: GraduationCap },
+  { label: "Training", path: "/dashboard/volunteer/trainings", icon: GraduationCap },
   { label: "Profile", path: "/dashboard/volunteer/profile", icon: User },
 ];
 
@@ -306,7 +306,7 @@ export default function VolunteerDashboard() {
                 <Button
                   variant="outline"
                   className="w-full"
-                  onClick={() => setLocation("/dashboard/volunteer/training")}
+                  onClick={() => setLocation("/dashboard/volunteer/trainings")}
                   data-testid="button-view-all-training"
                 >
                   View All Training ({upcomingTraining.length})
