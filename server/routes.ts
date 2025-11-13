@@ -114,6 +114,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get volunteer's own profile/status
+  app.get('/api/my-volunteer-profile', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = (req.user as any).id;
+      const volunteers = await storage.getAllVolunteers();
+      const myProfile = volunteers.find((v: any) => v.userId === userId);
+      
+      if (!myProfile) {
+        return res.status(404).json({ message: "Volunteer profile not found" });
+      }
+      
+      res.json(myProfile);
+    } catch (error: any) {
+      console.error("Error fetching volunteer profile:", error);
+      res.status(500).json({ message: error.message || "Failed to fetch volunteer profile" });
+    }
+  });
+
   // Admin-only: View all volunteers or filter by status/district
   app.get('/api/volunteers', isAuthenticated, requireRole("district_admin", "department_admin", "state_admin"), async (req: any, res) => {
     try {

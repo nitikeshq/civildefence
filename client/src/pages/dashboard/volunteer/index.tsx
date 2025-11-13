@@ -9,12 +9,15 @@ import {
   Clock,
   AlertTriangle,
   Calendar,
+  XCircle,
+  ShieldCheck,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useLocation } from "wouter";
-import type { Assignment, TrainingSession } from "@shared/schema";
+import type { Assignment, TrainingSession, Volunteer } from "@shared/schema";
 
 const navItems = [
   { label: "Dashboard", path: "/dashboard/volunteer", icon: LayoutDashboard },
@@ -25,6 +28,10 @@ const navItems = [
 
 export default function VolunteerDashboard() {
   const [, setLocation] = useLocation();
+
+  const { data: volunteerProfile, isLoading: loadingProfile } = useQuery<Volunteer>({
+    queryKey: ["/api/my-volunteer-profile"],
+  });
 
   const { data: assignments = [], isLoading: loadingAssignments } = useQuery<Assignment[]>({
     queryKey: ["/api/my-assignments"],
@@ -47,7 +54,48 @@ export default function VolunteerDashboard() {
     (t) => t.status === "completed"
   );
 
-  const isLoading = loadingAssignments || loadingTraining;
+  const isLoading = loadingAssignments || loadingTraining || loadingProfile;
+
+  // Get status badge variant and icon
+  const getStatusDisplay = (status: string) => {
+    switch (status) {
+      case "approved":
+        return {
+          variant: "default" as const,
+          icon: CheckCircle,
+          title: "Application Approved",
+          description: "Your volunteer application has been approved. You can now participate in incidents and training.",
+          alertVariant: "default" as const,
+        };
+      case "pending":
+        return {
+          variant: "secondary" as const,
+          icon: Clock,
+          title: "Application Pending",
+          description: "Your volunteer application is currently under review. You will be notified once it has been reviewed by the admin.",
+          alertVariant: "default" as const,
+        };
+      case "rejected":
+        return {
+          variant: "destructive" as const,
+          icon: XCircle,
+          title: "Application Rejected",
+          description: volunteerProfile?.rejectionReason || "Your volunteer application was not approved. Please contact the administrator for more information.",
+          alertVariant: "destructive" as const,
+        };
+      default:
+        return {
+          variant: "secondary" as const,
+          icon: ShieldCheck,
+          title: "Application Status",
+          description: "Your application status is being processed.",
+          alertVariant: "default" as const,
+        };
+    }
+  };
+
+  const statusDisplay = volunteerProfile ? getStatusDisplay(volunteerProfile.status || "pending") : null;
+  const StatusIcon = statusDisplay?.icon;
 
   return (
     <DashboardLayout navItems={navItems} title="Volunteer Portal">
@@ -59,6 +107,33 @@ export default function VolunteerDashboard() {
             View your tasks, training, and volunteer activities
           </p>
         </div>
+
+        {/* Application Status Alert */}
+        {volunteerProfile && statusDisplay && StatusIcon && (
+          <Alert variant={statusDisplay.alertVariant} data-testid="alert-application-status">
+            <StatusIcon className="h-5 w-5" />
+            <AlertTitle className="text-lg font-semibold">{statusDisplay.title}</AlertTitle>
+            <AlertDescription className="mt-2">
+              {statusDisplay.description}
+              {volunteerProfile.status === "rejected" && (
+                <div className="mt-3">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setLocation("/dashboard/volunteer/profile")}
+                    data-testid="button-update-application"
+                  >
+                    Update Application
+                  </Button>
+                </div>
+              )}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {loadingProfile && (
+          <div className="h-24 bg-muted animate-pulse rounded-lg" />
+        )}
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
