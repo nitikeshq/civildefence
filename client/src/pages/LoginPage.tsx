@@ -3,17 +3,54 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Shield, ArrowLeft } from "lucide-react";
-import { Link } from "wouter";
+import { Shield, ArrowLeft, Loader2 } from "lucide-react";
+import { Link, useLocation } from "wouter";
+import { useMutation } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { getDashboardRouteFromRole } from "@/lib/authRedirect";
+import type { User } from "@shared/schema";
 import odishaLogo from "@assets/generated_images/Odisha_government_emblem_a49e5a90.png";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+
+  const loginMutation = useMutation({
+    mutationFn: async (credentials: { username: string; password: string }) => {
+      const response = await apiRequest("POST", "/api/auth/login", credentials);
+      const user = await response.json() as User;
+      return user;
+    },
+    onSuccess: async (user) => {
+      // Invalidate the auth query to refresh user state
+      await queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      
+      // Show success message
+      const displayName = user.firstName || user.username;
+      toast({
+        title: "Login Successful",
+        description: `Welcome back, ${displayName}!`,
+      });
+      
+      // Redirect to appropriate dashboard based on role
+      const dashboardRoute = getDashboardRouteFromRole(user.role || "volunteer");
+      setLocation(dashboardRoute);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Login Failed",
+        description: error.message || "Invalid username or password",
+        variant: "destructive",
+      });
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login submitted", { username, password });
+    loginMutation.mutate({ username, password });
   };
 
   return (
@@ -74,10 +111,20 @@ export default function LoginPage() {
           <Button
             type="submit"
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+            disabled={loginMutation.isPending}
             data-testid="button-submit-login"
           >
-            <Shield className="mr-2 h-4 w-4" />
-            Login
+            {loginMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Logging in...
+              </>
+            ) : (
+              <>
+                <Shield className="mr-2 h-4 w-4" />
+                Login
+              </>
+            )}
           </Button>
         </form>
 
