@@ -1,0 +1,109 @@
+Functional Requirements
+The proposed solution for the Civil Defence will be developed to meet specific objectives and deliverables,
+incorporating a range of key features and functionalities designed to support the Civil Defence. Below is a
+16
+detailed breakdown of the scope of work, incorporating all essential elements and additional details:
+Key Deliverables
+A software for registration of volunteers would likely have the following scope:
+• User Registration & Profile Management: The system should allow volunteers (particularly exservicemen
+or civilians) to create user accounts and register their personal, contact, and service
+details. It should support uploading of relevant documents such as ID proof, service certificates, and
+photographs.
+• Verification & Approval Process: The software should allow ex-servicemen to create accounts and
+register their personal and service details. This might include fields for name, contact information,
+service history, and any relevant documents or certificates.
+• Role-based Access: Different access levels should be defined for administrators, verifiers, and
+volunteers to ensure data security and proper authorization.
+• Communication Module: The system should facilitate notifications and updates via SMS, email, or
+in-app alerts regarding registration status, training schedules, and deployment information.
+• Data security: The software should have measures in place to protect the confidentiality and security
+of the data, including encryption and access controls.
+• Reporting & Analytics: The software should generate various statistical and operational reports (e.g.,
+total registered volunteers, district-wise data, training completion status) to aid in decision-making
+and planning.
+• Admin Dashboard: A comprehensive dashboard for Civil Defence authorities to monitor
+registrations, approvals, and overall volunteer management activities in real time.
+• Scalability & Maintenance: The system should be scalable to accommodate future enhancements
+and increased user load, with provisions for regular updates and maintenance.
+The following are the module wise functional requirement, which the implementing agency is intended to
+develop under this assignment.
+Design & development of Volunteer Registration and Profile Management Module
+This Module is comparatively broader with improved vision in terms of following sectors-
+• Capture personal information (name, contact details, address, etc.).
+17
+• Document identification details (ID number, social security number, etc.).
+• Record skills, qualifications, and training certifications.
+• Store medical history and emergency contact information.
+Design & development of Incident Reporting Module
+• Provide an interface for volunteers to report incidents or emergencies.
+• Include incident details (location, nature, severity, etc.).
+• Assign and track incidents to specific volunteers or teams.
+• Allow for timestamping and geolocation tagging of incidents.
+• Develop a mobile app for volunteers to easily access and use the system on the field.
+• Enable offline functionality for incident reporting in areas with limited connectivity.
+• Collect feedback from volunteers regarding incidents, training, and overall experience.
+• Conduct periodic evaluations to assess the performance and satisfaction of volunteers.
+Design & development of Inventory Management Module
+• Maintain a comprehensive list of available equipment and resources.
+• Track the quantity, condition, and location of each item.
+• Allow for categorization (e.g., medical supplies, communication equipment, vehicles, etc.).
+Design & development of Admin Module
+• Monitor and oversee the volunteer registration process.
+• Approve or reject volunteer applications based on predefined criteria.
+• View and edit volunteer profiles for accuracy and completeness.
+• Review and validate incident reports submitted by volunteers.
+• Assign incidents to appropriate response teams or volunteers.
+• Monitor incident status and progress.
+• Supervise the inventory database, ensuring accurate and up-to-date information.
+• Add, edit, or remove inventory items as needed.
+• Track inventory usage and availability.
+• Etc.
+Additional Features
+User Dashboard & MIS reports:
+• A personalized dashboard for each user, displaying relevant information such as
+pending applications, notifications, and bookmarked content.
+• The dashboard will be customizable, allowing users to prioritize the information
+18
+and tools they use most frequently.
+The dashboard should have a dynamic interface enabling the user to get updated information.
+Each user should have a separate dashboard according to their roles. User will be able to take
+action on the pending items through the dashboard. Dashboard will provide graphical
+representation of the data (Charts & Graphs). It should allow reports to be generated in Excel,
+CSV and PDF format. System will facilitate dynamic query builder feature in the application,
+dashboard visual representation of Data/ Statistics for individual authorities based on access
+rights until Division level to Department level. The features
+• Generate reports on volunteer demographics, incident trends, and inventory usage.
+• Provide visual dashboards for quick insights into key metrics.
+• Allow for customizable reporting based on specific criteria.
+Dashboard Settings: Configurable to Prioritize the registered candidate,
+important Projects/Schemes of Department and the number of registrations
+being processed. This could include data on customer feedback or satisfaction
+with the registration process.
+Officer's Login: Officer's personalized login will configure to access the
+Dashboard.
+Administrative Logins: Technical Administrator can personalize access to
+tinker Settings.
+Periodically Updated: Constantly Improved to Provide the Best View of
+Services
+Analytical Review: At a Glance to Drill Down Reports & Graphical Analysis of
+Project Statistics.
+Access 24x7: Access to the Dashboard from anywhere anytime with
+Periodically Updated Data in Real Time.
+19
+Search and Filter Functionality:
+• Advanced search and filtering options across all modules, allowing users to quickly
+find the information and services they need.
+• Includes keyword search, category filters, and sorting options for enhanced
+usability.
+User Matrix:
+Hierarchy Roles and Rights State Level View Progress Reports
+Department Level (state) View Progress Report
+District Level District level administration is responsible for
+registering ex-servicemen by collecting, entering and
+validating the necessary information into the system.
+They also have the ability to view and track the
+progress of registered ex-servicemen through the use
+of progress reports.
+This comprehensive scope ensures that the proposed web portal for Civil Defence will not only meet
+current needs but also provide a scalable, future-proof solution that supports the ongoing growth and
+development.
