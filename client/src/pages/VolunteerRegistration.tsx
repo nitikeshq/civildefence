@@ -29,22 +29,7 @@ type FormData = z.infer<typeof formSchema>;
 
 export default function VolunteerRegistration() {
   const { toast } = useToast();
-  const { isAuthenticated, isLoading } = useAuth();
   const [, navigate] = useLocation();
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      toast({
-        title: "Unauthorized",
-        description: "Please sign in to continue",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        redirectToSignIn();
-      }, 500);
-      return;
-    }
-  }, [isAuthenticated, isLoading, toast]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),

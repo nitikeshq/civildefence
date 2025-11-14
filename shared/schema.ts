@@ -111,6 +111,36 @@ export const insertVolunteerSchema = createInsertSchema(volunteers).omit({
 export type InsertVolunteer = z.infer<typeof insertVolunteerSchema>;
 export type Volunteer = typeof volunteers.$inferSelect;
 
+// Public volunteer registration schema (combines user credentials + volunteer profile)
+export const publicVolunteerRegistrationSchema = z.object({
+  // User credentials
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string().min(8, "Password confirmation is required"),
+  // Volunteer profile
+  fullName: z.string().min(1, "Full name is required"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  address: z.string().min(1, "Address is required"),
+  district: z.string().min(1, "District selection is required"),
+  dateOfBirth: z.string().optional(),
+  isExServiceman: z.boolean().default(false),
+  serviceHistory: z.string().optional(),
+  skills: z.string().optional(),
+  qualifications: z.string().optional(),
+  medicalHistory: z.string().optional(),
+  emergencyContact: z.string().optional(),
+  emergencyPhone: z.string().optional(),
+  idProofUrl: z.string().optional(),
+  certificateUrl: z.string().optional(),
+  photoUrl: z.string().optional(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+
+export type PublicVolunteerRegistration = z.infer<typeof publicVolunteerRegistrationSchema>;
+
 // Incident severity enum
 export const incidentSeverityEnum = pgEnum("incident_severity", [
   "low",
