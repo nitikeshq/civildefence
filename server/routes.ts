@@ -744,7 +744,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Hero Banners CRUD
-  app.get('/api/cms/hero-banners', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
+  // Public GET endpoint for landing page
+  app.get('/api/cms/hero-banners', async (req, res) => {
     try {
       const banners = await storage.getAllHeroBanners();
       res.json(banners);
@@ -797,7 +798,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // About Content CRUD
-  app.get('/api/cms/about', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
+  // Public GET endpoint for landing page
+  app.get('/api/cms/about', async (req, res) => {
     try {
       const content = await storage.getAllAboutContent();
       res.json(content);
@@ -850,7 +852,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Services CRUD
-  app.get('/api/cms/services', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
+  // Public GET endpoint for landing page
+  app.get('/api/cms/services', async (req, res) => {
     try {
       const services = await storage.getAllServices();
       res.json(services);

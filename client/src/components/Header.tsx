@@ -34,7 +34,7 @@ export default function Header() {
             <img
               src={cmPhoto}
               alt="Hon'ble Chief Minister of Odisha"
-              className="-my-4 h-[calc(100%+2rem)] w-auto rounded-md"
+              className="h-20 md:h-24 w-auto rounded-md"
               data-testid="img-cm-photo"
             />
           </div>

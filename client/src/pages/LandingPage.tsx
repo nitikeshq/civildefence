@@ -41,9 +41,9 @@ export default function LandingPage() {
                   </Button>
                 </Link>
                 <Link href="/signin" asChild>
-                  <Button size="lg" variant="outline" className="text-lg px-8" data-testid="button-admin-login">
+                  <Button size="lg" variant="outline" className="text-lg px-8" data-testid="button-portal-login">
                     <Users className="mr-2 h-5 w-5" />
-                    Admin Login
+                    Volunteer & Admin Login
                   </Button>
                 </Link>
               </div>
