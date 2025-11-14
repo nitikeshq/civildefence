@@ -102,6 +102,10 @@ export default function AccessibilityBar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-10">
           <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-foreground">
+              Government of Odisha
+            </span>
+            <span className="text-muted-foreground">|</span>
             <a
               href="#main-content"
               className="text-xs font-medium text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
