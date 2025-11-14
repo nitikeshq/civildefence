@@ -175,33 +175,6 @@ export default function AccessibilityBar() {
               {highContrast ? "Normal" : "High"} Contrast
             </Button>
 
-            <span className="text-muted-foreground">|</span>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => switchLanguage("english")}
-                className={`text-xs font-medium transition-colors ${
-                  language === "english" 
-                    ? "text-primary font-semibold underline" 
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-                data-testid="button-lang-english"
-              >
-                English
-              </button>
-              <span className="text-muted-foreground">/</span>
-              <button
-                onClick={() => switchLanguage("odia")}
-                className={`text-xs font-medium transition-colors ${
-                  language === "odia" 
-                    ? "text-primary font-semibold underline" 
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-                data-testid="button-lang-odia"
-              >
-                ଓଡ଼ିଆ
-              </button>
-            </div>
           </div>
         </div>
       </div>
