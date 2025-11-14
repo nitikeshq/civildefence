@@ -20,10 +20,13 @@ export default function Header() {
             <div className="flex justify-end mb-2">
               <LanguageSwitcher />
             </div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-foreground leading-tight">
-              Civil Defence Department
+            <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-foreground leading-tight">
+              Directorate General Fire Services, Civil Defence & Home Guards
             </h1>
-            <p className="text-sm md:text-base text-muted-foreground mt-1">
+            <p className="text-xs sm:text-sm md:text-base text-muted-foreground mt-1">
+              Ministry of Home Affairs Government of India
+            </p>
+            <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
               Government of Odisha
             </p>
           </div>
