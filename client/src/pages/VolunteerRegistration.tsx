@@ -1,15 +1,11 @@
-import { useEffect, useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocation } from "wouter";
-import { insertVolunteerSchema } from "@shared/schema";
-import { z } from "zod";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { isUnauthorizedError } from "@/lib/authUtils";
-import { redirectToSignIn } from "@/lib/authRedirect";
+import { publicVolunteerRegistrationSchema } from "@shared/schema";
+import { apiRequest } from "@/lib/queryClient";
+import AccessibilityBar from "@/components/AccessibilityBar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,20 +16,20 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
+import { z } from "zod";
 
-const formSchema = insertVolunteerSchema.extend({
-  skills: z.string().optional(),
-});
-
-type FormData = z.infer<typeof formSchema>;
+type FormData = z.infer<typeof publicVolunteerRegistrationSchema>;
 
 export default function VolunteerRegistration() {
   const { toast } = useToast();
   const [, navigate] = useLocation();
 
   const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(publicVolunteerRegistrationSchema),
     defaultValues: {
+      username: "",
+      password: "",
+      confirmPassword: "",
       fullName: "",
       email: "",
       phone: "",
@@ -52,33 +48,17 @@ export default function VolunteerRegistration() {
 
   const mutation = useMutation({
     mutationFn: async (data: FormData) => {
-      const { skills, ...rest } = data;
-      const volunteerData = {
-        ...rest,
-        skills: skills ? skills.split(",").map(s => s.trim()) : [],
-      };
-      await apiRequest("/api/volunteers", "POST", volunteerData);
+      await apiRequest("/api/public/volunteer-register", "POST", data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/volunteers"] });
       toast({
         title: "Success",
-        description: "Volunteer registration submitted successfully. Awaiting approval.",
+        description: "Registration submitted successfully! You can now sign in with your credentials once your application is approved.",
       });
-      navigate("/");
+      form.reset();
+      navigate("/signin");
     },
     onError: (error: Error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "Please sign in to continue",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          redirectToSignIn();
-        }, 500);
-        return;
-      }
       toast({
         title: "Error",
         description: error.message || "Failed to submit volunteer registration",
@@ -91,16 +71,9 @@ export default function VolunteerRegistration() {
     mutation.mutate(data);
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen flex flex-col">
+      <AccessibilityBar />
       <Header />
       
       <main id="main-content" className="flex-1 bg-muted/30">
@@ -122,20 +95,73 @@ export default function VolunteerRegistration() {
             <CardContent>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="fullName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Full Name *</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="Enter full name" data-testid="input-fullname" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  {/* Account Credentials Section */}
+                  <div className="space-y-4 pb-6 border-b">
+                    <h3 className="text-lg font-semibold">Create Account Credentials</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Choose a username and password to access your volunteer account after approval.
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="username"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Username *</FormLabel>
+                            <FormControl>
+                              <Input {...field} placeholder="Choose a username" data-testid="input-username" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div></div>
+                      <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Password *</FormLabel>
+                            <FormControl>
+                              <Input {...field} type="password" placeholder="Enter password (min 8 characters)" data-testid="input-password" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="confirmPassword"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Confirm Password *</FormLabel>
+                            <FormControl>
+                              <Input {...field} type="password" placeholder="Re-enter password" data-testid="input-confirm-password" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Personal Information Section */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Personal Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="fullName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Full Name *</FormLabel>
+                            <FormControl>
+                              <Input {...field} placeholder="Enter full name" data-testid="input-fullname" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
                     <FormField
                       control={form.control}
@@ -314,8 +340,9 @@ export default function VolunteerRegistration() {
                       </FormItem>
                     )}
                   />
+                  </div>
 
-                  <div className="flex gap-3">
+                  <div className="flex flex-wrap gap-3">
                     <Button 
                       type="submit" 
                       disabled={mutation.isPending}

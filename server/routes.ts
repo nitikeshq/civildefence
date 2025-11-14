@@ -101,6 +101,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Public volunteer registration endpoint (no authentication required)
+  app.post('/api/public/volunteer-register', async (req, res) => {
+    try {
+      const { username, password, confirmPassword, ...volunteerData } = req.body;
+      
+      // Validate passwords match
+      if (password !== confirmPassword) {
+        return res.status(400).json({ message: "Passwords do not match" });
+      }
+      
+      // Check if username already exists
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+      
+      // Check if email already exists in volunteers
+      const allVolunteers = await storage.getAllVolunteers();
+      const emailExists = allVolunteers.some((v: any) => v.email === volunteerData.email);
+      if (emailExists) {
+        return res.status(400).json({ message: "Email already registered" });
+      }
+      
+      // Hash password
+      const password_hash = await bcrypt.hash(password, 10);
+      
+      // Create user account
+      const user = await storage.createUser({
+        username,
+        password_hash,
+        email: volunteerData.email,
+        firstName: volunteerData.fullName.split(' ')[0],
+        lastName: volunteerData.fullName.split(' ').slice(1).join(' ') || undefined,
+        role: "volunteer",
+        district: volunteerData.district,
+      });
+      
+      // Create volunteer profile
+      await storage.createVolunteer({
+        userId: user.id,
+        ...volunteerData,
+      });
+      
+      res.json({ 
+        message: "Registration submitted successfully. You can sign in once your application is approved." 
+      });
+    } catch (error: any) {
+      console.error("Error in public volunteer registration:", error);
+      res.status(500).json({ message: error.message || "Failed to submit registration" });
+    }
+  });
+
   // Volunteer routes
   app.post('/api/volunteers', isAuthenticated, async (req: any, res) => {
     try {
