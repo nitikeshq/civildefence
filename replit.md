@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a web-based volunteer management system for the Civil Defence Department, Government of Odisha. The application facilitates volunteer registration (ex-servicemen and civilians), incident reporting, inventory management, and administrative approval workflows. Built with a modern React frontend and Express backend, it provides role-based access control for volunteers, district admins, department admins, and state admins.
+This project is a web-based volunteer management system for the Civil Defence Department, Government of Odisha. Its primary purpose is to streamline volunteer registration (for ex-servicemen and civilians), manage incident reporting, track inventory, and facilitate administrative approval workflows. The system aims to provide a robust, role-based access control environment for volunteers, district administrators, department administrators, and state administrators, contributing to efficient disaster management and civil defence operations in Odisha.
 
 ## User Preferences
 
@@ -12,274 +12,55 @@ Preferred communication style: Simple, everyday language.
 
 ### Frontend Architecture
 
-**Framework & Build System**
-- React with TypeScript for type-safe component development
-- Vite as the build tool and development server for fast hot module replacement
-- Wouter for lightweight client-side routing instead of React Router
-
-**UI Component System**
-- shadcn/ui component library (New York style variant) for consistent, accessible components
-- Radix UI primitives for headless accessible components
-- TailwindCSS for utility-first styling with custom design tokens
-- Class Variance Authority (CVA) for component variant management
-
-**State Management & Data Fetching**
-- TanStack Query (React Query) for server state management, caching, and synchronization
-- React Hook Form with Zod resolvers for form state and validation
-- Custom hooks pattern for authentication (`useAuth`) and UI state (`useToast`, `useIsMobile`)
-
-**Design System**
-- Government of India WCAG 2.0 Level AA compliance with enhanced accessibility
-- Increased font sizes (base: 18px instead of 16px) for senior government officials
-- Bilingual readiness supporting English and Odia (Noto Sans font family)
-- System-based approach following GIGW guidelines
-
-**Page Structure**
-- Landing page for unauthenticated users with government portal aesthetics
-- Dashboard for authenticated users with role-based content
-- Dedicated pages for volunteer registration, incident reporting, inventory management, and volunteer approval
-- Separate sign-in/sign-up flows with local password authentication
+The frontend is built with **React and TypeScript**, utilizing **Vite** for development and bundling. **shadcn/ui** (New York style) and **Radix UI** provide a consistent, accessible component library, styled with **TailwindCSS** and **Class Variance Authority (CVA)**. State management and data fetching are handled by **TanStack Query** and **React Hook Form** with Zod resolvers. The design adheres to **Government of India WCAG 2.0 Level AA compliance** and GIGW guidelines, featuring increased font sizes and bilingual readiness for English and Odia. The application includes distinct landing, dashboard, and specific functional pages for volunteer management, incident reporting, inventory, and approvals, with role-based content delivery.
 
 ### Backend Architecture
 
-**Server Framework**
-- Express.js on Node.js runtime with ES modules
-- TypeScript for type safety across the entire stack
-- Session-based authentication using express-session with Passport.js Local Strategy
-
-**Authentication & Authorization**
-- Passport.js with Local Strategy for username/password authentication
-- bcryptjs for password hashing with salt rounds
-- Role-based access control (RBAC) with middleware functions (`isAuthenticated`, `requireRole`)
-- Four user roles: volunteer, district_admin, department_admin, state_admin
-- Session storage in PostgreSQL for persistence across server restarts
-
-**API Design**
-- RESTful API endpoints under `/api` prefix
-- Standardized error handling with HTTP status codes
-- Request/response logging middleware for debugging
-- CRUD operations for volunteers, incidents, and inventory items
-- Status update endpoints for approval workflows
-
-**Data Validation**
-- Zod schemas shared between client and server (`@shared/schema`)
-- Runtime validation on all mutation endpoints
-- Type-safe database operations with Drizzle ORM's inferred types
+The backend is developed with **Express.js on Node.js**, also using **TypeScript** for type safety. It implements **session-based authentication** via `express-session` and **Passport.js Local Strategy** with `bcryptjs` for password hashing. **Role-based access control (RBAC)** is enforced through middleware for four distinct roles: volunteer, district_admin, department_admin, and state_admin. The API is **RESTful**, using `/api` prefix, standardized error handling, and `Zod` for shared client/server data validation.
 
 ### Data Storage
 
-**Database**
-- PostgreSQL as the primary relational database
-- Neon serverless PostgreSQL driver with WebSocket support for edge deployments
-- Drizzle ORM for type-safe database queries and migrations
+**PostgreSQL** serves as the primary relational database, accessed via **Neon serverless PostgreSQL driver** and **Drizzle ORM** for type-safe queries and migrations. The schema includes tables for `users`, `volunteers`, `incidents`, `inventory`, `sessions`, `trainings`, and various CMS components (`translations`, `hero_banners`, `site_settings`, `about_content`, `services`). Enums are used for roles, statuses, and categories. A centralized storage interface abstracts database operations, supporting filtering and bulk actions.
 
-**Schema Design**
-- `users` table: Local authentication with username, password_hash, email, role, and profile data
-- `volunteers` table: Volunteer registrations with personal details, skills, documents, and approval status
-- `incidents` table: Emergency incident reports with location, severity, status, and assigned volunteers
-- `inventory` table: Equipment and resource tracking with quantity, condition, location, and inspection dates
-- `sessions` table: Express session persistence for authentication state
+### System Design Choices & Features
 
-**Enums**
-- `user_role`: volunteer | district_admin | department_admin | state_admin
-- Incident status: reported | assigned | in_progress | resolved | closed
-- Volunteer status: pending | approved | rejected
-- Inventory category: medical_supplies | communication_equipment | rescue_equipment | vehicles | safety_gear | other
-- Inventory condition: excellent | good | fair | poor | needs_repair
+- **CMS Manager System**: Full CRUD for 5 content types (translations, hero banners, site settings, about content, services) with frontend integration. Dynamic content updates without redeployment. Includes i18next multilingual support (English/Odia) and site settings context.
+- **Training Management System**: Full CRUD for trainings, role-based filtering, and volunteer enrollment with capacity enforcement. Supports statewide and district-specific trainings.
+- **District-Based Access Control**: District admins are scoped to their district; department and state admins have broader access with filtering capabilities.
+- **CRUD Operations**: Comprehensive create, read, update, delete functionality for incidents, inventory, and volunteers, including approval workflows.
+- **Task Assignment Workflow**: Individual task assignment to volunteers.
+- **Data Seeding**: Extensive seed data for volunteers, incidents, inventory, and trainings across districts to facilitate development and testing.
 
-**Data Access Layer**
-- Storage interface (`IStorage`) abstracts database operations
-- Centralized storage implementation in `server/storage.ts`
-- Query methods for filtering by status, district, and search criteria
-- Bulk operations support for incident assignment to multiple volunteers
+## External Dependencies
 
-### External Dependencies
+### Third-Party UI Libraries
+- **Radix UI**: Extensive collection of headless accessible components.
+- **Lucide React**: Iconography library.
+- **date-fns**: Date manipulation and formatting utility.
+- **cmdk**: Command palette functionality.
 
-**Third-Party UI Libraries**
-- Radix UI components (20+ primitives): accordion, alert-dialog, avatar, checkbox, dialog, dropdown-menu, select, tabs, toast, tooltip, etc.
-- Lucide React for consistent iconography
-- date-fns for date manipulation and formatting
-- cmdk for command palette functionality
+### Development Tools
+- **Drizzle Kit**: Database schema migrations.
+- **TSX**: TypeScript execution in development.
+- **ESBuild**: Production server bundling.
+- **Replit-specific plugins**: Runtime error overlay, cartographer, dev banner.
 
-**Development Tools**
-- Drizzle Kit for database schema migrations
-- TSX for TypeScript execution in development
-- ESBuild for production server bundling
-- Replit-specific plugins: runtime error overlay, cartographer, dev banner
+### Database & Storage
+- **@neondatabase/serverless**: PostgreSQL driver optimized for serverless/edge.
+- **connect-pg-simple**: PostgreSQL session store for `express-session`.
+- **ws**: WebSocket library (used by Neon driver).
 
-**Database & Storage**
-- @neondatabase/serverless: PostgreSQL driver optimized for serverless/edge environments
-- connect-pg-simple: PostgreSQL session store for express-session
-- ws: WebSocket library for Neon database connections
+### Authentication Libraries
+- **passport**: Authentication middleware.
+- **passport-local**: Local username/password strategy.
+- **bcryptjs**: Password hashing.
+- **express-session**: Session management.
 
-**Authentication Libraries**
-- passport: Authentication middleware framework
-- passport-local: Local username/password strategy
-- bcryptjs: Password hashing library
-- express-session: Session management middleware
+### Form & Validation
+- **@hookform/resolvers**: Validation resolver for React Hook Form.
+- **zod**: Schema validation.
+- **drizzle-zod**: Automatic Zod schema generation from Drizzle.
 
-**Form & Validation**
-- @hookform/resolvers: Validation resolver for React Hook Form
-- zod: Schema validation library
-- drizzle-zod: Automatic Zod schema generation from Drizzle schemas
-
-**Build & Asset Management**
-- Vite with React plugin and custom Replit plugins
-- PostCSS with TailwindCSS and Autoprefixer
-- Path aliases: `@/` for client source, `@shared/` for shared code, `@assets/` for static assets
-
-**Deployment Considerations**
-- Environment variables: DATABASE_URL (required), SESSION_SECRET (required for production)
-- Build output: `dist/public` for frontend, `dist/index.js` for backend
-- Production mode uses built assets, development uses Vite middleware
-- Session cookie security flags adjust based on NODE_ENV
-
-## Implemented Features
-
-### Recent Updates (November 2025)
-
-**Navigation Consistency**
-- All admin dashboard pages now use `getAdminNavItems()` for unified navigation
-- Constant role-based sidebar headers (e.g., "District Admin - Khordha", "Department Admin - Odisha")
-- Removed page-specific title/subtitle props from DashboardLayout
-- Role-based navigation with automatic scoping
-
-**District Filtering for Department Admins**
-- **Volunteers Page**: Added district filter dropdown for department/state admins
-- **Incidents Page**: District filter dropdown available
-- **Inventory Page**: District filter dropdown available
-- **Tasks Page**: District filter dropdown available
-- District admins automatically scoped to their district (no filter needed)
-- Department/State admins must select district to view data
-
-**CRUD Operations**
-- **Incidents**: Full CRUD with edit/delete functionality, district-based filtering
-- **Inventory**: Full CRUD with pagination (10 items per page), district-based filtering
-- **Volunteers**: Create, view, approve/reject workflows with district filtering
-- **Tasks/Assignments**: Individual task assignment per volunteer (not group assignments)
-
-**Task Assignment Workflow**
-- Each selected volunteer receives an individual task assignment
-- UI clearly communicates this behavior in the assignment dialog
-- District admins auto-scoped to their district
-- Department/State admins must select district before creating assignments
-
-**Data Seeding**
-- **Volunteer Users**: 8 volunteer user accounts with login credentials (username: volunteer1-8, password: volunteer123)
-- **Volunteer Registrations**: 8 volunteer registrations across multiple districts (5 approved, 3 pending)
-- **Incidents**: 8 diverse incidents across multiple districts
-- **Inventory**: 15 inventory items with varied categories and conditions
-- **Trainings**: 10 training sessions across multiple districts (3 statewide, 7 district-specific)
-- All test users have password format: `{role}123` (e.g., volunteer123, district123, department123)
-
-**Training Management System** (November 2025)
-- **Status**: Fully implemented and operational
-- **Database Schema**: Complete `trainings` and `trainingRegistrations` tables with foreign key relationships
-- **Storage Layer**: Full CRUD operations with role-based filtering and enrollment management
-- **API Routes**: Complete REST API with district-based permissions and registration endpoints
-- **Admin Interface** (`/dashboard/trainings`):
-  - Full CRUD operations for creating, editing, and deleting trainings
-  - District filter dropdown (defaults to "All Districts" for department/state admins)
-  - Statewide training checkbox for department/state admins
-  - District admins restricted to their district and can see statewide trainings
-  - Real-time enrollment count display
-  - Status filtering (upcoming, ongoing, completed, cancelled)
-- **Volunteer Interface** (`/dashboard/volunteer/trainings`):
-  - List view with search and status filtering
-  - Registration/unregistration functionality with capacity enforcement
-  - Display of enrolled count and capacity
-  - Clear indication of statewide vs district-specific trainings
-- **Key Features**:
-  - Statewide trainings visible across all districts
-  - Capacity limits with duplicate registration prevention
-  - Transactional enrollment updates
-  - Predicate-based cache invalidation for cross-role consistency
-  - Individual volunteer enrollment tracking
-- **Permissions**:
-  - District admins: Create trainings for their district only, view their district + statewide
-  - Department/State admins: Create trainings for any district or statewide
-  - Volunteers: View and register for trainings in their district + statewide
-
-**CMS Manager System** (November 2025)
-- **Status**: Fully implemented and operational with complete CRUD for all 5 content types + full frontend integration
-- **Database Schemas**: Complete CMS tables with camelCase TypeScript properties, snake_case database columns
-  - `translations`: key/language/value for UI text internationalization (integrated with i18next)
-  - `hero_banners`: Bilingual slider content (title_en/or, subtitle_en/or, button_text_en/or, button_link, image_url, order, is_active)
-  - `site_settings`: Key/value configuration pairs (globally accessible via React Context)
-  - `about_content`: Bilingual content blocks (section, title_en/or, content_en/or, icon_name, order, is_active)
-  - `services`: Bilingual service cards (title_en/or, description_en/or, icon_name, color, bg_color, order, is_active)
-  
-- **Frontend CMS Manager** (`/dashboard/cms`):
-  - Tab-based interface for managing all 5 content types
-  - React Hook Form with zodResolver using shared insert schemas from `@shared/schema`
-  - Number inputs properly convert strings to integers with parseInt
-  - Boolean inputs use Checkbox with onCheckedChange for proper boolean values
-  - TanStack Query for data fetching with proper cache invalidation
-  - Consistent UI patterns: Table views, modal dialogs for create/edit, alert dialogs for delete confirmation
-  - Loading states, empty states, and error handling throughout
-  - All forms use camelCase properties matching normalized schema
-
-- **Frontend Integration (Dynamic Content)**:
-  - **i18next Multilingual System**: 
-    - Configured with i18next-http-backend to load translations from `/api/locales/:lng/:ns`
-    - Returns nested namespace format `{ translation: {...} }` for i18next compatibility
-    - 404 handling with fallback to bundled translations when CMS has no entries
-    - `partialBundledLanguages: true` merges CMS translations with bundled defaults
-    - Custom parse/request functions for defensive error handling
-    - Language switcher in Header (English/ଓଡ଼ିଆ) with localStorage persistence
-  - **Hero Slider** (`HeroSlider.tsx`): Fetches from `/api/cms/hero-banners`, falls back to static slides
-  - **About Section** (`AboutSection.tsx`): Fetches from `/api/cms/about`, displays mission/vision/about blocks
-  - **Services Section** (`ServicesSection.tsx`): Fetches from `/api/cms/services`, falls back to hardcoded services
-  - **Site Settings Provider** (`SiteSettingsContext.tsx`): React Context providing `getSetting(key, default)` helper accessible throughout app
-  - **Language Switcher** (`LanguageSwitcher.tsx`): Dropdown in Header for English/Odia language switching
-
-- **Backend Implementation** (`server/routes.ts`):
-  - **Public Endpoints**:
-    - `/api/locales/:lng/:ns`: i18next backend endpoint (returns `{ [ns]: {...} }`)
-    - `/api/cms/settings`: Public site settings endpoint for frontend use
-  - **Admin Endpoints**: All 10 CMS mutation endpoints (5 POST + 5 PATCH) with Zod validation
-    - POST routes: Use `insertSchema.strict().parse(req.body)` to reject unknown fields
-    - PATCH routes: Use `insertSchema.partial().strict().parse(req.body)` with empty guard
-  - Proper error handling: 400 for validation errors, 404 for missing translations, 500 for server errors
-  - Authorization via requireRole("department_admin", "state_admin", "cms_manager")
-  
-- **Shared Schemas** (`shared/schema.ts`):
-  - All CMS insert schemas created with `createInsertSchema().omit({id: true})`
-  - camelCase property names in TypeScript (titleEn, subtitleEn, buttonTextEn, etc.)
-  - snake_case column names in database (title_en, subtitle_en, button_text_en, etc.)
-  - Type-safe insert types exported for all content types
-  
-- **Access Control**:
-  - CMS Manager: Full access to all CMS content types
-  - Department Admin: Full access to all CMS content types
-  - State Admin: Full access to all CMS content types
-  - Public: Read-only access to translations (i18next) and site settings
-
-- **Integration Benefits**: CMS changes (hero banners, services, about content, translations, site settings) now dynamically update the frontend without code changes or deployments
-
-
-### Pending Features
-
-**None** - All planned features have been implemented.
-
-### Known Infrastructure Issues
-
-**Neon Database Connection**
-- Intermittent connection termination messages: `error: terminating connection due to administrator command`
-- This is a Neon infrastructure behavior (auto-scaling, connection pooling)
-- Application auto-reconnects automatically via Drizzle ORM connection pool
-- No code changes required; connection recovery is handled transparently
-
-### Architecture Notes
-
-**District-Based Access Control**
-- District admins: Automatically scoped to their assigned district
-- Department admins: Must manually select district for creating incidents/inventory/tasks
-- State admins: Full access across all 28-29 districts
-- Filtering applied at query level via `useScopedData` hooks
-
-**Navigation Pattern**
-- All admin pages use `getAdminNavItems(role)` helper
-- Consistent title/subtitle formatting based on role and district
-- Sidebar navigation managed through shadcn/ui `<Sidebar>` component
-- No residual references to deprecated `getNavigationItems`, `getDashboardTitle`, or `getDashboardSubtitle`
+### Build & Asset Management
+- **Vite**: Frontend build tool.
+- **PostCSS** with **TailwindCSS** and **Autoprefixer**: CSS processing.
