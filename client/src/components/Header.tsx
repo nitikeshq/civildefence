@@ -1,6 +1,5 @@
 import cmPhoto from "@assets/cm-photo.jpg";
 import civilDefenceLogo from "@assets/civil-defence-logo.jpg";
-import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Header() {
   return (
@@ -27,13 +26,10 @@ export default function Header() {
             </div>
           </div>
 
-          <div className="flex flex-col items-end gap-2">
-            <LanguageSwitcher />
-            <div className="text-right">
-              <p className="text-xs sm:text-sm md:text-base font-semibold text-foreground">
-                Government of Odisha
-              </p>
-            </div>
+          <div className="text-center flex-1">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-foreground">
+              Government of Odisha
+            </p>
           </div>
 
           <div className="flex flex-col items-center gap-2">
