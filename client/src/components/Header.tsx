@@ -1,5 +1,5 @@
 import cmPhoto from "@assets/cm-photo.jpg";
-import odishaLogo from "@assets/odisha-govt-logo.png";
+import civilDefenceLogo from "@assets/civil-defence-logo.jpg";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Header() {
@@ -9,10 +9,10 @@ export default function Header() {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <img
-              src={odishaLogo}
-              alt="Government of Odisha Emblem"
+              src={civilDefenceLogo}
+              alt="Civil Defence Department Logo"
               className="h-16 md:h-20 w-auto"
-              data-testid="img-odisha-logo"
+              data-testid="img-civil-defence-logo"
             />
           </div>
 
