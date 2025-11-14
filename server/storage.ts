@@ -654,7 +654,7 @@ export class DatabaseStorage implements IStorage {
       const [trainingStats] = await db
         .select({
           total: sql<number>`COUNT(*)`,
-          upcoming: sql<number>`COUNT(CASE WHEN ${trainings.status} = 'scheduled' THEN 1 END)`,
+          upcoming: sql<number>`COUNT(CASE WHEN ${trainings.status} = 'upcoming' THEN 1 END)`,
         })
         .from(trainings)
         .where(
