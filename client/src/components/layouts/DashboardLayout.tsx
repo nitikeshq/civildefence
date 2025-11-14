@@ -68,8 +68,8 @@ export default function DashboardLayout({
                   </svg>
                 </div>
                 <div className="hidden md:block">
-                  <p className="text-sm font-semibold text-white">Civil Defence Department</p>
-                  <p className="text-xs text-white/90">Government of Odisha</p>
+                  <p className="text-sm font-semibold text-white">Directorate General</p>
+                  <p className="text-xs text-white/90">Fire Services, Civil Defence & Home Guards</p>
                 </div>
               </div>
             </div>
