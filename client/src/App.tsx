@@ -23,6 +23,7 @@ import VolunteerTrainings from "@/pages/volunteer/trainings";
 import CMSDashboard from "@/pages/dashboard/cms-manager";
 import CMSManager from "@/pages/dashboard/cms";
 import VolunteerRegistration from "@/pages/VolunteerRegistration";
+import DistrictMap from "@/pages/DistrictMap";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -61,6 +62,7 @@ function Router() {
           <Route path="/dashboard/inventory" component={DashboardInventory} />
           <Route path="/dashboard/reports" component={DashboardReports} />
           <Route path="/dashboard/cms" component={CMSManager} />
+          <Route path="/dashboard/district-map" component={DistrictMap} />
           {/* Legacy CMS Routes */}
           <Route path="/cms/dashboard" component={CMSDashboard} />
           <Route path="/cms/:page" component={CMSDashboard} />

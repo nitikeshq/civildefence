@@ -193,13 +193,14 @@ export function getDashboardSubtitle(role: UserRole | null | undefined, district
 }
 
 // Import icons for navigation
-import { LayoutDashboard, Users, AlertTriangle, ClipboardList, Package, FileText, GraduationCap, Settings } from "lucide-react";
+import { LayoutDashboard, Users, AlertTriangle, ClipboardList, Package, FileText, GraduationCap, Settings, MapPin } from "lucide-react";
 
 export function getAdminNavItems(role: string) {
   const permissions = getRolePermissions(role as UserRole);
   
   const baseItems = [
     { label: "Overview", path: "/dashboard/overview", icon: LayoutDashboard },
+    { label: "District Map", path: "/dashboard/district-map", icon: MapPin },
     { label: "Volunteers", path: "/dashboard/volunteers", icon: Users },
     { label: "Incidents", path: "/dashboard/incidents", icon: AlertTriangle },
     { label: "Tasks", path: "/dashboard/tasks", icon: ClipboardList },
