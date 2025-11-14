@@ -1,5 +1,5 @@
 import cmPhoto from "@assets/cm-photo.jpg";
-import odishaLogo from "@assets/generated_images/Odisha_government_emblem_a49e5a90.png";
+import odishaLogo from "@assets/odisha-govt-logo.png";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Header() {
