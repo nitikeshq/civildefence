@@ -108,12 +108,11 @@ export default function AccessibilityBar() {
             <span className="text-muted-foreground">|</span>
             <a
               href="#main-content"
-              className="text-xs font-medium text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md"
               data-testid="link-skip-content"
             >
               Skip to Main Content
             </a>
-            <span className="text-muted-foreground">|</span>
             <button
               onClick={toggleScreenReader}
               className={`text-xs font-medium flex items-center gap-1 transition-colors ${

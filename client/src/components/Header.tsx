@@ -27,14 +27,14 @@ export default function Header() {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="text-right">
+            <div className="text-right flex flex-col justify-center">
               <p className="text-xs font-medium text-muted-foreground">Hon'ble Chief Minister</p>
               <p className="text-sm font-semibold text-primary">Mohan Ch. Majhi</p>
             </div>
             <img
               src={cmPhoto}
               alt="Hon'ble Chief Minister of Odisha"
-              className="h-16 md:h-20 w-auto rounded-md"
+              className="h-20 md:h-24 w-auto rounded-md"
               data-testid="img-cm-photo"
             />
           </div>
