@@ -123,8 +123,9 @@ export default function SignIn() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold">Civil Defence Department</h1>
-              <p className="text-sm md:text-base text-primary-foreground/90">Government of Odisha</p>
+              <h1 className="text-2xl md:text-3xl font-bold">Directorate General</h1>
+              <h2 className="text-lg md:text-xl font-semibold text-primary-foreground/95">Fire Services, Civil Defence & Home Guards</h2>
+              <p className="text-sm md:text-base text-primary-foreground/90">Ministry of Home Affairs, Government of India</p>
             </div>
             <div className="flex items-center gap-3">
               <Link href="/" asChild>

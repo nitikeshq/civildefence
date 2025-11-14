@@ -7,7 +7,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           <div>
             <h3 className="text-lg font-bold text-foreground mb-4">
-              Civil Defence Department
+              Fire Services, Civil Defence & Home Guards
             </h3>
             <p className="text-sm text-muted-foreground leading-relaxed mb-4">
               Protecting communities and saving lives through dedicated volunteer service,
@@ -106,7 +106,7 @@ export default function Footer() {
         <div className="border-t border-border pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-muted-foreground text-center md:text-left">
-              © 2025 Civil Defence Department, Government of Odisha. All rights reserved.
+              © 2025 Directorate General, Fire Services, Civil Defence & Home Guards, Government of Odisha. All rights reserved.
             </p>
             <div className="flex gap-4">
               <a href="#" className="text-sm text-muted-foreground hover:text-foreground" data-testid="link-privacy">
