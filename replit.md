@@ -201,14 +201,15 @@ Preferred communication style: Simple, everyday language.
   - Volunteers: View and register for trainings in their district + statewide
 
 **CMS Manager System** (November 2025)
-- **Status**: Fully implemented and operational with complete CRUD for all 5 content types
+- **Status**: Fully implemented and operational with complete CRUD for all 5 content types + full frontend integration
 - **Database Schemas**: Complete CMS tables with camelCase TypeScript properties, snake_case database columns
-  - `translations`: key/language/value for UI text internationalization
+  - `translations`: key/language/value for UI text internationalization (integrated with i18next)
   - `hero_banners`: Bilingual slider content (title_en/or, subtitle_en/or, button_text_en/or, button_link, image_url, order, is_active)
-  - `site_settings`: Key/value configuration pairs
+  - `site_settings`: Key/value configuration pairs (globally accessible via React Context)
   - `about_content`: Bilingual content blocks (section, title_en/or, content_en/or, icon_name, order, is_active)
   - `services`: Bilingual service cards (title_en/or, description_en/or, icon_name, color, bg_color, order, is_active)
-- **Frontend Implementation** (`/dashboard/cms`):
+  
+- **Frontend CMS Manager** (`/dashboard/cms`):
   - Tab-based interface for managing all 5 content types
   - React Hook Form with zodResolver using shared insert schemas from `@shared/schema`
   - Number inputs properly convert strings to integers with parseInt
@@ -217,22 +218,44 @@ Preferred communication style: Simple, everyday language.
   - Consistent UI patterns: Table views, modal dialogs for create/edit, alert dialogs for delete confirmation
   - Loading states, empty states, and error handling throughout
   - All forms use camelCase properties matching normalized schema
+
+- **Frontend Integration (Dynamic Content)**:
+  - **i18next Multilingual System**: 
+    - Configured with i18next-http-backend to load translations from `/api/locales/:lng/:ns`
+    - Returns nested namespace format `{ translation: {...} }` for i18next compatibility
+    - 404 handling with fallback to bundled translations when CMS has no entries
+    - `partialBundledLanguages: true` merges CMS translations with bundled defaults
+    - Custom parse/request functions for defensive error handling
+    - Language switcher in Header (English/ଓଡ଼ିଆ) with localStorage persistence
+  - **Hero Slider** (`HeroSlider.tsx`): Fetches from `/api/cms/hero-banners`, falls back to static slides
+  - **About Section** (`AboutSection.tsx`): Fetches from `/api/cms/about`, displays mission/vision/about blocks
+  - **Services Section** (`ServicesSection.tsx`): Fetches from `/api/cms/services`, falls back to hardcoded services
+  - **Site Settings Provider** (`SiteSettingsContext.tsx`): React Context providing `getSetting(key, default)` helper accessible throughout app
+  - **Language Switcher** (`LanguageSwitcher.tsx`): Dropdown in Header for English/Odia language switching
+
 - **Backend Implementation** (`server/routes.ts`):
-  - All 10 CMS mutation endpoints (5 POST + 5 PATCH) with Zod validation
-  - POST routes: Use `insertSchema.strict().parse(req.body)` to reject unknown fields
-  - PATCH routes: Use `insertSchema.partial().strict().parse(req.body)` with empty guard
-  - Proper error handling: 400 for validation errors, 500 for server errors
+  - **Public Endpoints**:
+    - `/api/locales/:lng/:ns`: i18next backend endpoint (returns `{ [ns]: {...} }`)
+    - `/api/cms/settings`: Public site settings endpoint for frontend use
+  - **Admin Endpoints**: All 10 CMS mutation endpoints (5 POST + 5 PATCH) with Zod validation
+    - POST routes: Use `insertSchema.strict().parse(req.body)` to reject unknown fields
+    - PATCH routes: Use `insertSchema.partial().strict().parse(req.body)` with empty guard
+  - Proper error handling: 400 for validation errors, 404 for missing translations, 500 for server errors
   - Authorization via requireRole("department_admin", "state_admin", "cms_manager")
+  
 - **Shared Schemas** (`shared/schema.ts`):
   - All CMS insert schemas created with `createInsertSchema().omit({id: true})`
   - camelCase property names in TypeScript (titleEn, subtitleEn, buttonTextEn, etc.)
   - snake_case column names in database (title_en, subtitle_en, button_text_en, etc.)
   - Type-safe insert types exported for all content types
+  
 - **Access Control**:
   - CMS Manager: Full access to all CMS content types
   - Department Admin: Full access to all CMS content types
   - State Admin: Full access to all CMS content types
-- **Usage**: Frontend developers can fetch CMS data via `/api/cms/*` endpoints to dynamically populate landing pages, about sections, services listings, and site configuration
+  - Public: Read-only access to translations (i18next) and site settings
+
+- **Integration Benefits**: CMS changes (hero banners, services, about content, translations, site settings) now dynamically update the frontend without code changes or deployments
 
 
 ### Pending Features

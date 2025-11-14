@@ -1,5 +1,6 @@
 import cmPhoto from "@assets/cm-photo.jpg";
 import odishaLogo from "@assets/generated_images/Odisha_government_emblem_a49e5a90.png";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Header() {
   return (
@@ -16,6 +17,9 @@ export default function Header() {
           </div>
 
           <div className="flex-1 text-center">
+            <div className="flex justify-end mb-2">
+              <LanguageSwitcher />
+            </div>
             <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-foreground leading-tight">
               Civil Defence Department
             </h1>

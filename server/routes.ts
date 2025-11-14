@@ -663,6 +663,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // CMS API Routes - Admin only
   
+  // Public endpoint for i18next - serves translations by language in nested namespace format
+  app.get('/api/locales/:lng/:ns', async (req, res) => {
+    try {
+      const { lng, ns } = req.params;
+      const allTranslations = await storage.getAllTranslations();
+      
+      // Filter by language and convert to key-value format
+      const translationsForLang = allTranslations
+        .filter((t: any) => t.language === lng)
+        .reduce((acc: any, t: any) => {
+          acc[t.key] = t.value;
+          return acc;
+        }, {});
+      
+      // If no translations found for this language, return 404 so i18next uses fallback
+      if (Object.keys(translationsForLang).length === 0) {
+        return res.status(404).json({});
+      }
+      
+      // Return in nested format that i18next expects: { [namespace]: {...} }
+      res.json({ [ns]: translationsForLang });
+    } catch (error) {
+      console.error("Error fetching translations for i18next:", error);
+      res.status(500).json({});
+    }
+  });
+
   // Translations CRUD
   app.get('/api/cms/translations', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
     try {
@@ -876,7 +903,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Site Settings CRUD
-  app.get('/api/cms/settings', isAuthenticated, requireRole("department_admin", "state_admin", "cms_manager"), async (req, res) => {
+  // Public endpoint for site-wide settings (accessible without auth for frontend use)
+  app.get('/api/cms/settings', async (req, res) => {
     try {
       const settings = await storage.getAllSiteSettings();
       res.json(settings);
